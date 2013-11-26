@@ -1,13 +1,29 @@
-# Bootstrap
-app/bootstrap*
+#####################################
+# IDE configurations
+#####################################
+# PhpStorm
+.idea
+atlassian-ide-plugin.xml
 
-# Symfony directories
-vendor/*
-*/logs/*
-*/cache/*
-web/uploads/*
-web/bundles/*
+# Sublime
+.*\.sublime-project
+.*\.sublime-workspace
 
-# Configuration files
-app/config/parameters.ini
-app/config/parameters.yml
+#####################################
+# Vendor
+#####################################
+vendor
+composer.phar
+composer.lock
+phpunit.xml
+
+#####################################
+# BeatsMX
+#####################################
+
+*/Resources/engine/bin/*
+*/Resources/engine/lib/*
+*/Resources/views/beatsmx/*
+*/Resources/public/js/beatsmx/*
+*/Resources/public/css/beatsmx/*
+*/Resources/public/img/beatsmx/*

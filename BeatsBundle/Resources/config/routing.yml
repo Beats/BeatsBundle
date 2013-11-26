@@ -1,0 +1,26 @@
+beats.fsal.link:
+  pattern: /file/{id}/{name}
+  requirements:
+    _method:  GET
+    id: '(\w+[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})'
+    name: '[\w\-]+'
+
+beats.oauth.connect:
+  pattern: /oauth/connect/{provider}
+  requirements:
+    _method:  GET
+    provider: '\w+'
+
+########################################################################################################################
+
+beats.basic.html.browser:
+  pattern: /update/browser
+  defaults: { _controller: BeatsBundle:HTML/Basic:browser }
+  requirements:
+    _method: GET
+
+beats.basic.html.flash:
+  pattern: /flash
+  defaults: { _controller: BeatsBundle:HTML/Basic:flash }
+  requirements:
+    _method: GET

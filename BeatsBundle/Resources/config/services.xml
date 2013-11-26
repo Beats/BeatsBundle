@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+
+    <parameter key="beats.cache_warmer.persister.class">BeatsBundle\CacheWarmer\Persister</parameter>
+
+    <parameter key="buzz.client.class">Buzz\Client\Curl</parameter>
+    <parameter key="buzz.browser.class">Buzz\Browser</parameter>
+
+    <parameter key="beats.chronos.class">BeatsBundle\Service\Chronos</parameter>
+
+    <parameter key="beats.mailer.class">BeatsBundle\Service\Mailer</parameter>
+
+    <parameter key="beats.routing.exporter.class">BeatsBundle\Routing\Exporter</parameter>
+
+    <parameter key="beats.security.authentication.handler.class">BeatsBundle\Security\Http\Authentication\AuthenticationHandler</parameter>
+
+    <parameter key="beats.listener.engine.class">BeatsBundle\EventListener\EngineListener</parameter>
+
+    <parameter key="beats.extension.twig.class">BeatsBundle\Extension\TwigExtension</parameter>
+
+    <parameter key="beats.security.user.provider.class">BeatsBundle\Security\User\UserProvider</parameter>
+
+    <parameter key="beats.flasher.class">BeatsBundle\Session\Flasher</parameter>
+
+    <parameter key="beats.validation.validator.class">BeatsBundle\Validation\Validator</parameter>
+
+    <parameter key="beats.fsal.imager.class">BeatsBundle\FSAL\Imager</parameter>
+    <parameter key="beats.fsal.domfs.class">BeatsBundle\FSAL\DOMFS</parameter>
+
+    <parameter key="beats.scheduler.at.class">BeatsBundle\Scheduler\AtScheduler</parameter>
+
+    <parameter key="beats.dbal.rdb.class">BeatsBundle\DBAL\RDB</parameter>
+    <parameter key="beats.dbal.dom.class">BeatsBundle\DBAL\DOM</parameter>
+    <parameter key="beats.dbal.mix.class">BeatsBundle\DBAL\MIX</parameter>
+
+  </parameters>
+
+  <services>
+
+    <service id="beats.cache_warmer.persister" class="%beats.cache_warmer.persister.class%">
+      <argument type="service" id="service_container"/>
+      <!--<argument>%beats.cache_warmer.persister%</argument>-->
+    </service>
+
+    <service id="buzz.client" class="%buzz.client.class%" public="false"/>
+    <service id="buzz.browser" class="%buzz.browser.class%" public="true">
+      <argument type="service" id="buzz.client"/>
+    </service>
+
+    <service id="beats.security.authentication.handler" class="%beats.security.authentication.handler.class%" public="false" abstract="true">
+      <argument type="service" id="service_container"/>
+      <argument type="collection"/>
+    </service>
+
+    <service id="beats.chronos" class="%beats.chronos.class%">
+      <argument type="service" id="service_container"/>
+    </service>
+
+    <service id="beats.mailer" class="%beats.mailer.class%">
+      <argument type="service" id="service_container"/>
+    </service>
+
+    <service id="beats.routing.exporter" class="%beats.routing.exporter.class%">
+      <argument type="service" id="service_container"/>
+      <tag name="kernel.cache_warmer" priority="10"/>
+    </service>
+
+
+    <service id="beats.listener.engine" class="%beats.listener.engine.class%">
+      <argument type="service" id="service_container"/>
+      <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest"/>
+      <!--<tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>-->
+      <!--<tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse"/>-->
+    </service>
+
+    <service id="beats.extension.twig" class="%beats.extension.twig.class%" public="true">
+      <tag name="twig.extension"/>
+      <argument type="service" id="service_container"/>
+    </service>
+
+    <service id="beats.security.user.provider"
+             class="%beats.security.user.provider.class%"
+             public="false"
+      >
+      <argument type="service" id="service_container"/>
+      <argument type="string">%beats.security.service.id%</argument>
+    </service>
+
+
+    <service id="beats.flasher" class="%beats.flasher.class%" public="true">
+      <argument type="service" id="service_container"/>
+    </service>
+
+
+    <service id="beats.validation.validator" class="%beats.validation.validator.class%" public="true">
+      <argument type="service" id="service_container"/>
+    </service>
+
+
+    <service id="beats.fsal.imager" class="%beats.fsal.imager.class%" public="true">
+      <argument type="service" id="service_container"/>
+    </service>
+
+    <service id="beats.fsal.domfs" class="%beats.fsal.domfs.class%" public="true">
+      <argument type="service" id="service_container"/>
+    </service>
+
+    <service id="beats.scheduler.at" class="%beats.scheduler.at.class%" public="true">
+      <argument type="service" id="service_container"/>
+    </service>
+
+
+    <service id="beats.dbal.rdb" class="%beats.dbal.rdb.class%" public="true">
+      <argument>%beats.rdb%</argument>
+    </service>
+
+    <service id="beats.dbal.dom" class="%beats.dbal.dom.class%" public="true">
+      <argument>%beats.dom%</argument>
+    </service>
+
+    <service id="beats.dbal.mix" class="%beats.dbal.mix.class%" public="true">
+      <argument type="service" id="beats.dbal.dom"/>
+      <argument type="service" id="beats.dbal.rdb"/>
+    </service>
+
+  </services>
+</container>

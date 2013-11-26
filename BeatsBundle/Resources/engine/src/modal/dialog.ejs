@@ -1,0 +1,24 @@
+<% if (header) { %>
+<div class="modal-header">
+  <% if (close) { %>
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true" value="<%= value %>">&times;</button>
+  <% } %>
+  <% if (title) { %>
+  <h3 id="<%= id %>-modal-header"><%== title %></h3>
+  <% } %>
+</div>
+<% } %>
+
+<div class="modal-body">
+  <%== body %>
+</div>
+
+<% if (footer) { %>
+<div class="modal-footer" style="text-align: center;">
+  <% for(var i in buttons) { var button = buttons[i] %>
+  <button type="button" class="btn <%= button.classes %>" value="<%= button.value %>"
+  <% if (button.dismiss) { %>data-dismiss="modal"<% } %>
+  ><%== button.text %></button>
+  <% } %>
+</div>
+<% } %>

@@ -1,0 +1,51 @@
+{% extends "::html5.html.twig" %}
+
+{% block metas %}
+  {{ parent() }}
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+  <meta name="author" content="Beats">
+  <meta name="description" content="We're not supporting your browser. Please upgrade!">
+  <meta property="og:site_name" content="Beats">
+{% endblock %}
+
+{% block title %}Please Update your browser{% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css">
+{% endblock %}
+
+{% block body %}
+  {{ parent() }}
+
+  <div class="container">
+    <div class="row-fluid">
+      <div style="margin-top:30px" class="span12 text-center">
+
+        <h1>Please update your Browser!</h1>
+
+        <h2>Sorry! This website doesn't support your browser</h2>
+
+        <p class="lead">If you'd like to visit our website, and read our content please upgrade your browser.</p>
+
+        <p class="lead">Here are few options that you can choose from.</p>
+
+	      <ul class="thumbnails" style="margin-top:30px">
+
+          {% for browser in browsers %}
+            <li class="span2 {{ loop.index0 ? '' : 'offset1' }}">
+              <a target="_blank" href="{{ browser.href }}" class="thumbnail no-border">
+                <img src="{{ asset('/bundles/beats/img/browser/' ~ browser.icon) }}" alt="{{ browser.name }}"/>
+              </a>
+
+              <p class="margin-top align-center lead">{{ browser.name }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{
+  "name": "beats/beats-bundle",
+  "type": "symfony-bundle",
+  "description": "Symfony BeatsBundle",
+  "license": "GPLv3",
+  "keywords": [],
+  "authors": [
+    {
+      "name": "Aleksandar Ostojić",
+      "email": "o100ja@gmail.com"
+    },
+    {
+      "name": "Vladan Stanković",
+      "email": "vladan@neospindle.com"
+    },
+    {
+      "name": "Beats Community",
+      "homepage": "http://beats.rs/contributors"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/console": "*",
+    "symfony/finder": "*",
+    "symfony/framework-bundle": "~2.3",
+    "symfony/security-bundle": "*",
+    "symfony/assetic-bundle": "2.3.*",
+    "symfony/swiftmailer-bundle": "2.3.*",
+    "symfony/monolog-bundle": "2.3.*",
+    "symfony/twig-bundle": "~2.1",
+    "sensio/distribution-bundle": "2.3.*",
+    "symfony/class-loader": "*",
+
+    "kriswallsmith/buzz": ">=v0.10",
+    "o100ja/rug": "v0.1-alpha"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "3.7.*",
+    "symfony/browser-kit": "*"
+  },
+  "suggest": {
+  },
+  "autoload": {
+    "psr-0": {
+      "Beats\\Bundle\\BeatsBundle": ""
+    }
+  },
+  "target-dir": "Beats/Bundle/BeatsBundle",
+  "minimum-stability": "dev"
+}

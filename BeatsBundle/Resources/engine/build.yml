@@ -1,0 +1,27 @@
+beatsmx:
+  version: 0.1
+  dependencies:
+#    - '@BeatsBundle/Resources/public/js/jquery/jquery-1.9.1.js'
+#    - '@BeatsBundle/Resources/public/js/jquery-plugins/js/jquery-migrate-1.2.1.js'
+#    - 'http://code.jquery.com/jquery-1.9.1.js'
+#    - 'http://code.jquery.com/jquery-migrate-1.2.1.js'
+  javascripts:
+    - 'beats'
+    - 'date'
+    - 'model'
+    - 'controller'
+    - 'view'
+    - 'router'
+    - 'browser'
+    - 'flasher'
+    - 'blocker'
+    - 'reditor'
+    - 'field'
+    - 'field/widget'
+    - 'field/datepicker'
+    - 'field/number'
+    - 'modal/dialog'
+  templates:
+    - 'flasher/message'
+    - 'field/datepicker'
+    - 'modal/dialog'

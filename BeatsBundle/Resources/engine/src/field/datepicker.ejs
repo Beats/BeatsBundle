@@ -1,0 +1,25 @@
+<div class="control-group">
+  <input type="hidden" class="beats_hidden_field" id="<%= id %>" name="<%= name %>" value="<%= hidden %>"/>
+
+  <% if (label) { %>
+  <label for="<%= id %>" class="control-label"><%= label %></label>
+  <% } %>
+  <div class="controls span12 no-margin-left">
+    <div class="span4">
+      <select data-field="m" class="span12 date date-m">
+        <%== options(parts.m, value.m, empty.m) %>
+      </select>
+    </div>
+    <div class="span4">
+      <select data-field="d" class="span12 date date-d">
+        <%== options(parts.d, value.d, empty.d) %>
+      </select>
+    </div>
+    <div class="span4">
+      <select data-field="y" class="span12 date date-y">
+        <%== options(parts.y, value.y, empty.y) %>
+      </select>
+    </div>
+  </div>
+  <span class="help-inline hide"><%= error %></span>
+</div>
