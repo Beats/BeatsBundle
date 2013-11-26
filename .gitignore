@@ -21,9 +21,9 @@ phpunit.xml
 # BeatsMX
 #####################################
 
-*/Resources/engine/bin/*
-*/Resources/engine/lib/*
-*/Resources/views/beatsmx/*
-*/Resources/public/js/beatsmx/*
-*/Resources/public/css/beatsmx/*
-*/Resources/public/img/beatsmx/*
+/Resources/engine/bin/*
+/Resources/engine/lib/*
+/Resources/views/beatsmx/*
+/Resources/public/js/beatsmx/*
+/Resources/public/css/beatsmx/*
+/Resources/public/img/beatsmx/*
