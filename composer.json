@@ -42,9 +42,9 @@
   },
   "autoload": {
     "psr-0": {
-      "Beats\\Bundle\\BeatsBundle": ""
+      "BeatsBundle": ""
     }
   },
-  "target-dir": "Beats/Bundle/BeatsBundle",
+  "target-dir": "BeatsBundle",
   "minimum-stability": "dev"
 }
