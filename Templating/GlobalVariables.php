@@ -101,32 +101,11 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     return $this->container->get('beats.security.user.provider')->loadUserByUsername($identity);
   }
 
-  abstract public function isAdmin();
-
-  abstract public function isFront();
-
-  /********************************************************************************************************************/
-
-
-  /**
-   * @return \Symfony\Component\Security\Core\User\User|null
-   */
-  public function getAdmin() {
-    if ($this->isAdmin()) {
-      return $this->_extractUser();
-    }
-    return null;
-  }
 
   /**
    * @return Member|null
    */
-  public function getMember() {
-    if ($this->isAdmin()) {
-      return $this->_loadUser();
-    }
-    return $this->_extractUser();
-  }
+  abstract public function getMember();
 
   /**
    * Returns the current user.
