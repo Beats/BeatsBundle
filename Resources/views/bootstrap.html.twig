@@ -1,0 +1,25 @@
+{% extends "BeatsBundle::html5.html.twig" %}
+
+{% block metas %}
+  {{ parent() }}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"/>
+
+{% endblock %}
+
+{% block javascripts %}
+
+  {% javascripts output="js/ecma-jquery-bootstrap.js"
+  '@BeatsBundle/Resources/public/js/ecma-extend.js'
+  '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
+  '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js' %}
+  <script type="text/javascript" src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "BeatsBundle::html5.html.twig" %}
+
+{% block javascripts %}
+
+  {% javascripts output="js/ecma-jquery-canjs.js"
+  '@BeatsBundle/Resources/public/js/ecma-extend.js'
+  '@BeatsBundle/Resources/public/js/beatsmx/beats-can-0.1.js' %}
+  <script type="text/javascript" src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+
+{% endblock %}

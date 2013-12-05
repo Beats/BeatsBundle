@@ -25,3 +25,17 @@ beatsmx:
     - 'flasher/message'
     - 'field/datepicker'
     - 'modal/dialog'
+
+beats-can:
+  version: 0.1
+  dependencies:
+#    - 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
+#    - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
+  javascripts:
+    - 'can/beats'
+    - 'can/router'
+    - 'can/control'
+    - 'can/blocker'
+    - 'can/flasher'
+  templates:
+    - 'can/flasher/message'
