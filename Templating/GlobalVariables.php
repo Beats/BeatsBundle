@@ -134,4 +134,15 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     return UTC::toFormat($format, $time);
   }
 
+  /********************************************************************************************************************/
+
+  public function getLang() {
+    $locale = $this->container->get('translator')->getLocale();
+//    language[_territory][.codeset][@modifier]
+    preg_match('#(?<lang>\w{2})(_(?<_territory>\w+))?(.(?<codeset>\w+))?(.(?<modifier>\w+))?#', $locale, $matches);
+    return $matches['lang'];
+  }
+
+  /********************************************************************************************************************/
+
 }
