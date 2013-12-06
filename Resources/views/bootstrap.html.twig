@@ -8,8 +8,13 @@
 {% block stylesheets %}
   {{ parent() }}
 
-  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"/>
-  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"/>
+  {% if app.debug %}
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"/>
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"/>
+  {% endif %}
 
 {% endblock %}
 
@@ -18,7 +23,7 @@
   {% javascripts output="js/ecma-jquery-bootstrap.js"
   '@BeatsBundle/Resources/public/js/ecma-extend.js'
   '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
-  '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js' %}
+  '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.js' %}
   <script type="text/javascript" src="{{ asset_url }}"></script>
   {% endjavascripts %}
 
