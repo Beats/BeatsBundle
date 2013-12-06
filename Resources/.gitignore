@@ -1,0 +1,9 @@
+#####################################
+# BeatsMX
+#####################################
+engine/bin/*
+engine/lib/*
+public/js/beats-can/*
+public/css/beats-can/*
+public/ejs/beats-can/*
+views/beats-can/*

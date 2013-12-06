@@ -1,4 +1,5 @@
 beatsmx:
+  ignore: true
   version: 0.1
   dependencies:
 #    - '@BeatsBundle/Resources/public/js/jquery/jquery-1.9.1.js'
