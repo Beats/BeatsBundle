@@ -29,7 +29,7 @@ EOT
       $this->_command('cache:clear', array(), $input, $output);
     }
     if (!$input->getOption('no-build')) {
-      $this->_command('beats:fe:build', array(
+      $this->_command('beats:fe:can', array(
         '--no-minify' => $input->getOption('no-minify'),
       ), $input, $output);
     }
