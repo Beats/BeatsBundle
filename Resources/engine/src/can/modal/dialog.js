@@ -152,7 +152,7 @@
           tabindex: '-1',
           role: 'dialog',
           'aria-hidden': 'true',
-          'aria-labelledby': self.options.id + '-modal-header'
+          'aria-labelledby': self.options.id + '-modal-title'
         })
 
         self.element.modal({
