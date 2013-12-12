@@ -131,17 +131,11 @@ EOT
     $srcHome = implode(DIRECTORY_SEPARATOR, array($home, 'src'));
     $libHome = implode(DIRECTORY_SEPARATOR, array($home, 'lib'));
     $binHome = implode(DIRECTORY_SEPARATOR, array($home, 'bin'));
-    $tplHome = implode(DIRECTORY_SEPARATOR, array($root, 'views', self::DIR_NAME));
-    $outHome = array(
-      'js'  => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'js', self::DIR_NAME)),
-      'css' => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'css', self::DIR_NAME)),
-      'ejs' => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'ejs', self::DIR_NAME)),
-    );
 
     $fs = $this->_fsal()->fs();
 
-    $fs->mkdir(array_merge(array($libHome, $binHome, $tplHome), $outHome));
-    $fs->remove(array_merge(array($binHome, $tplHome), $outHome));
+    $fs->mkdir(array($libHome, $binHome));
+    $fs->remove(array($binHome));
 
     $configs = $this->_readConfig($bundle, $home);
     foreach ($configs as $name => $config) {
@@ -149,6 +143,20 @@ EOT
         $output->writeln("  Ignoring components: <warning>$name</warning>\n");
         continue;
       }
+      if ($config['version'][0] != 'v') {
+        $config['version'] = 'v' . $config['version'];
+      }
+
+      $tplHome = implode(DIRECTORY_SEPARATOR, array($root, 'views', self::DIR_NAME, $config['version']));
+      $outHome = array(
+        'js'  => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'js', self::DIR_NAME, $config['version'])),
+        'css' => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'css', self::DIR_NAME, $config['version'])),
+        'ejs' => implode(DIRECTORY_SEPARATOR, array($root, 'public', 'ejs', self::DIR_NAME, $config['version'])),
+      );
+
+      $fs->mkdir($outHome);
+      $fs->mkdir($tplHome);
+
       $external = array(
         'js'  => array(),
         'css' => array(),
@@ -159,6 +167,7 @@ EOT
         'css' => array(),
         'ejs' => array(),
       );
+
       $this->_prepareComponents($bundle, $name, $config, $srcHome, $libHome, $external, $internal, $input, $output);
       if ($this->_isMinify) {
         $this->_minifyComponents($bundle, $name, $config, $binHome, $external, $internal, $input, $output);
@@ -341,7 +350,7 @@ EOT
 
   private function _bundle($config, $outHome, $external, $internal, $fext, OutputInterface $output) {
     $dstSrc = implode(DIRECTORY_SEPARATOR, array($outHome[$fext], sprintf(
-      '%s-%s.%s', $config['name'], $config['version'], $fext
+      '%s.%s', $config['name'], $fext
     )));
     $this->_write($dstSrc);
     $output->writeln(sprintf("      %s <info>%s</info>", 'Bundling', $dstSrc));
@@ -354,7 +363,7 @@ EOT
 
     if ($this->_isMinify) {
       $dstMin = implode(DIRECTORY_SEPARATOR, array($outHome[$fext], sprintf(
-        '%s-%s.min.%s', $config['name'], $config['version'], $fext
+        '%s.min.%s', $config['name'], $fext
       )));
       $this->_write($dstMin);
       $output->writeln(sprintf("      %s <info>%s</info>", 'Bundling', $dstMin));
@@ -375,7 +384,7 @@ EOT
     }
 
     $dstSrc = implode(DIRECTORY_SEPARATOR, array($tplHome, sprintf(
-      '%s-%s.html.twig', $config['name'], $config['version']
+      '%s.html.twig', $config['name']
     )));
 
     if ($this->_isTplEmbed) {
