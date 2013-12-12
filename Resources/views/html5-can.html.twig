@@ -9,3 +9,8 @@
   {% endjavascripts %}
 
 {% endblock %}
+
+{% block jsTemplates %}
+  {{ parent() }}
+  {% include 'BeatsBundle:beats-can:v0.1/beats-can.html.twig' %}
+{% endblock %}

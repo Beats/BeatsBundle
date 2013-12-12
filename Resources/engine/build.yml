@@ -38,5 +38,8 @@ beats-can:
     - 'can/control'
     - 'can/blocker'
     - 'can/flasher'
+    - 'can/modal'
+    - 'can/modal/dialog'
   templates:
     - 'can/flasher/message'
+    - 'can/modal/dialog'
