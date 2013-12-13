@@ -11,7 +11,7 @@
     fsal: {}
   }
 
-  can.Construct.extend('Beats.Router', {
+  Beats.Router = can.Construct.extend({
 
     _routes: {},
 

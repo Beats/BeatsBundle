@@ -31,6 +31,7 @@ beats-can:
   version: 0.1
   dependencies:
 #    - 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
+#    - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
 #    - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
   javascripts:
     - 'can/beats'

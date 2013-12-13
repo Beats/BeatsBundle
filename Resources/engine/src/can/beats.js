@@ -157,7 +157,7 @@
 
 // Determine the current user TimeZone
   if (!Beats.timezone) {
-    $.cookie('beats_tz', Beats.timezone = jstz.determine().name())
+    _.cookie('beats_tz', Beats.timezone = jstz.determine().name())
   }
 
   return Beats
