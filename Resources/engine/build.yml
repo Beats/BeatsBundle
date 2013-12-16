@@ -40,7 +40,12 @@ beats-can:
     - 'can/blocker'
     - 'can/flasher'
     - 'can/modal'
+    - 'can/field'
+    - 'can/field/widget'
+    - 'can/field/datepicker'
+    - 'can/field/number'
     - 'can/modal/dialog'
   templates:
     - 'can/flasher/message'
+    - 'can/field/datepicker'
     - 'can/modal/dialog'
