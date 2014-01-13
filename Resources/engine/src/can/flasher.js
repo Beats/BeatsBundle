@@ -10,6 +10,7 @@
       warning: 'warning',
       counsel: 'info'
     },
+
     instance: null,
 
     message: function (message, heading, type, delay, fade, method) {
@@ -125,13 +126,13 @@
 
   }, {
     init: function () {
-      this._super.apply(this, arguments)
+      var self = this
+        , messages = []
+      self._super.apply(self, arguments)
       if (_.instance) {
         throw new Beats.Error('Already exists')
       }
-      _.instance = this
-      var self = this
-        , messages = []
+      _.instance = self
 
       self.element.children().each(function (idx, span) {
         messages.push($(span).data())
