@@ -1,7 +1,7 @@
 <?php
 namespace BeatsBundle\Service;
 
-
+use BeatsBundle\Service\ContainerAware;
 use BeatsBundle\CacheWarmer\Persister;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
