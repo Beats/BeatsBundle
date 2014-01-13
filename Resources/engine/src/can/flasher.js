@@ -6,8 +6,8 @@
   var _ = {
     types: {
       success: 'success',
-      failure: 'error',
-      warning: 'block',
+      failure: 'danger',
+      warning: 'warning',
       counsel: 'info'
     },
     instance: null,
