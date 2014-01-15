@@ -5,6 +5,7 @@ namespace BeatsBundle\Templating;
 use BeatsBundle\Helper\UTC;
 use BeatsBundle\Security\Core\User\Member;
 use BeatsBundle\Security\User\UserInterface;
+use BeatsBundle\Service\Aware\ValidatorAware;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -16,6 +17,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables {
+  use ValidatorAware;
 
   /**
    * @return SecurityContextInterface
@@ -79,6 +81,13 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     return (bool)$this->container->getParameter('kernel.debug');
   }
 
+  /**
+   * @return \BeatsBundle\Validation\Validator
+   */
+  public function getValidator() {
+    return $this->_validator();
+  }
+
   /********************************************************************************************************************/
 
   protected function _extractUser() {
@@ -136,12 +145,20 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
 
   /********************************************************************************************************************/
 
+  public function get_field($path) {
+    return $this->_validator()->getMessages()->get($path, null, true);
+  }
+
+  /********************************************************************************************************************/
+
   public function getLang() {
     $locale = $this->container->get('translator')->getLocale();
 //    language[_territory][.codeset][@modifier]
     preg_match('#(?<lang>\w{2})(_(?<_territory>\w+))?(.(?<codeset>\w+))?(.(?<modifier>\w+))?#', $locale, $matches);
     return $matches['lang'];
   }
+
+  /********************************************************************************************************************/
 
   /********************************************************************************************************************/
 
