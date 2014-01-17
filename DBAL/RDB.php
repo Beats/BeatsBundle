@@ -558,10 +558,13 @@ class RDB extends AbstractDB {
     return $statement->fetchAll(PDO::FETCH_COLUMN);
   }
 
-  public function nullify($model, $idField) {
-    $sql = sprintf("UPDATE %s SET %s = NULL ", RDB::table($model), $idField);
+  public function nullify($model, $field, $id) {
+    $pk = self::pk($model);
+
+    $sql = sprintf("UPDATE %s SET %s = NULL WHERE %s = ? ", self::table($model), $field, $pk);
 
     $statement = $this->pdo()->prepare($sql);
+    self::pdoBind($statement, null, array($pk => $id));
     return $this->execute($statement);
   }
 
