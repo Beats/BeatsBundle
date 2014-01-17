@@ -104,19 +104,14 @@ class DOMFS extends AbstractFSAL {
     $ext = ExtensionGuesser::getInstance()->guess($att->content_type);
 
     if (empty($path)) {
-      $path = $this->temporary() . '.' . $ext;
+      $path = $this->temporary($ext);
     } else {
       $path = self::ensureDir($path);
       $path .= DIRECTORY_SEPARATOR . $name . '.' . $ext;
     }
 
-    $hW = fopen($path, 'c');
-    ftruncate($hW, 0);
-
-    $hR = $this->_dom()->open($model, $id, $name);
-    stream_copy_to_stream($hR, $hW);
-    fclose($hR);
-    fclose($hW);
+    $src = $this->_dom()->open($model, $id, $name)->getRealPath();
+    copy($src, $path);
 
     $file = new File($path);
     return $file;
