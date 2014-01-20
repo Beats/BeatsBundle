@@ -35,6 +35,7 @@ beats-can:
 #    - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
   javascripts:
     - 'can/beats'
+    - 'can/entity'
     - 'can/router'
     - 'can/control'
     - 'can/blocker'
