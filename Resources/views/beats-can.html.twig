@@ -1,15 +1,17 @@
 {% extends "BeatsBundle::bootstrap.html.twig" %}
 
+{% block stylesheets %}
+  {{ parent() }}
+
+  <link rel="stylesheet" type="text/css" href="/bundles/beats/css/beats-can/v0.1/beats-can.css"/>
+
+{% endblock %}
+
 {% block javascripts %}
 
   {% javascripts output="js/ecma-jquery-canjs-bootstrap.js"
-  '@BeatsBundle/Resources/public/js/ecma-extend.js'
   'routes.js'
-  '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
-  '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
-  '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
-  '@BeatsBundle/Resources/public/js/beats-can/v0.1/beats-can.js'
-  '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.js'  %}
+  '@BeatsBundle/Resources/public/js/beats-can/v0.1/beats-can.js' %}
   <script type="text/javascript" src="{{ asset_url }}"></script>
   {% endjavascripts %}
 
