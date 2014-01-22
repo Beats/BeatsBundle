@@ -32,9 +32,9 @@ beats-can:
   dependencies:
     - '@BeatsBundle/Resources/public/js/ecma-extend.js'
     - '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
-    - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
     - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.js'
-    - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.css'
+#    - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.css'
+    - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
     - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
   javascripts:
     - 'can/beats'
@@ -54,7 +54,7 @@ beats-can:
     - 'can/field/datepicker'
     - 'can/modal/dialog'
 
-ecma-jquery-canjs-boostrap:
+ecma-jquery-boostrap:
   version: 0.1
   dependencies:
   - '@BeatsBundle/Resources/public/js/ecma-extend.js'
@@ -62,4 +62,3 @@ ecma-jquery-canjs-boostrap:
   - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
   - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.js'
 #  - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.css'
-  - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
