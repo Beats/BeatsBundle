@@ -39,7 +39,8 @@ class  CanCommand extends ServiceCommand {
     $this
       ->setName($name)
       ->setDescription('Builds the front-end engine')
-      ->addOption('no-minify', 'M', InputOption::VALUE_NONE, 'Whether to minify the build')
+      ->addOption('no-minify', 'M', InputOption::VALUE_NONE, 'Do not minify the build')
+      ->addOption('no-remote', 'R', InputOption::VALUE_NONE, 'Do not fetch remote dependencies')
       ->addOption('no-embed', 'E', InputOption::VALUE_NONE, 'Whether to embed the templates')
       ->addOption('no-dependencies', 'D', InputOption::VALUE_NONE, 'Whether to download dependencies')
       ->addOption('exported', 'X', InputOption::VALUE_NONE, 'Whether to export the templates')
@@ -200,9 +201,11 @@ EOT
     $output->writeln("    Dependencies");
     if (!empty($config['dependencies'])) {
       foreach ($config['dependencies'] as $href) {
-        $fext = self::_fext($href);
-
-        $external[$fext][] = $this->_loadReferred($bundle, $href, $libHome, $fext, $output);
+        $fext  = self::_fext($href);
+        $asset = $this->_loadReferred($bundle, $href, $libHome, $fext, $output);
+        if (!empty($asset)) {
+          $external[$fext][] = $asset;
+        }
       }
     }
 
@@ -210,8 +213,9 @@ EOT
     if (!empty($config['javascripts'])) {
       foreach ($config['javascripts'] as $path) {
         $asset = $this->_loadInternal($bundle, $path, $srcHome, 'js', $output);
-
-        $internal['js'][] = $asset;
+        if (!empty($asset)) {
+          $internal['js'][] = $asset;
+        }
       }
     }
 
@@ -219,8 +223,9 @@ EOT
     if (!empty($config['stylesheets'])) {
       foreach ($config['stylesheets'] as $path) {
         $asset = $this->_loadInternal($bundle, $path, $srcHome, 'css', $output);
-
-        $internal['css'][] = $asset;
+        if (!empty($asset)) {
+          $internal['css'][] = $asset;
+        }
       }
     }
 
@@ -228,8 +233,9 @@ EOT
     if (!empty($config['templates'])) {
       foreach ($config['templates'] as $path) {
         $asset = $this->_loadInternal($bundle, $path, $srcHome, 'ejs', $output);
-
-        $internal['ejs'][] = $asset;
+        if (!empty($asset)) {
+          $internal['ejs'][] = $asset;
+        }
       }
 
     }
@@ -299,40 +305,62 @@ EOT
     $filter = $this->_srcFilter($fext);
     $asset  = new FileAsset($file, empty($filter) ? array() : array($filter), $srcHome, $path);
 
-    if ($this->_isReformat) {
-      $output->write(" <info>Reformatting</info>");
-      $this->_write($file, $asset->dump());
+    try {
+      $asset->getLastModified();
+      if ($this->_isReformat) {
+        $output->write(" <info>Reformatting</info>");
+        $this->_write($file, $asset->dump());
+      }
+    } catch (\Exception $ex) {
+      $output->writeln(" <info>Fail</info>");
+      return null;
     }
-
     $output->writeln(" <info>Done</info>");
-
     $this->_observe($bundle, $file, $asset);
-
     return $asset;
   }
 
   private function _loadExternal(Bundle $bundle, $href, $libHome, $fext, OutputInterface $output) {
     $output->write(sprintf("      %s <info>%s</info>", 'Loading', $href));
 
-    $filter = $this->_srcFilter($fext);
-    $asset  = new HttpAsset($href, empty($filter) ? array() : array($filter));
+    $filter    = $this->_srcFilter($fext);
+    $hrefAsset = new HttpAsset($href, empty($filter) ? array() : array($filter));
+    $file      = $libHome . DIRECTORY_SEPARATOR . $hrefAsset->getSourcePath();
+    $fileAsset = new FileAsset($file, $filter, $libHome, $hrefAsset->getSourcePath());
 
-    try {
-      $dstPath = $libHome . DIRECTORY_SEPARATOR . $asset->getSourcePath();
-      $this->_write($dstPath, $asset->dump());
-      $output->write(sprintf(" <info>Exporting</info> %s", $dstPath));
-    } catch (\Exception $ex) {
-      $output->write(" <error>Fail</error> loading old");
+
+    if ($this->_isRemote) {
+      try {
+        $output->write(sprintf(" <info>Caching</info> %s", $file));
+        $this->_write($file, $hrefAsset->dump());
+      } catch (\Exception $ex) {
+        $output->write(" <error>Fail</error> trying cached");
+        try {
+          $fileAsset->getLastModified();
+        } catch (\Exception $ex) {
+          $output->writeln(" <error>Fail</error>");
+          return null;
+        }
+      }
+    } else {
+      try {
+        $output->write(sprintf(" <info>cached</info> %s", $file));
+        $fileAsset->getLastModified();
+      } catch (\Exception $ex) {
+        try {
+          $output->write(" <error>Fail</error> trying remote");
+
+          $output->write(sprintf(" <info>Caching</info> %s", $file));
+          $this->_write($file, $hrefAsset->dump());
+        } catch (\Exception $ex) {
+          $output->writeln(" <error>Fail</error>");
+          return null;
+        }
+      }
     }
-
-    $file  = $libHome . DIRECTORY_SEPARATOR . $asset->getSourcePath();
-    $asset = new FileAsset($file, $filter, $libHome, $asset->getSourcePath());
-
     $output->writeln(" <info>Done</info>");
-
-    $this->_observe($bundle, $file, $asset);
-
-    return $asset;
+    $this->_observe($bundle, $file, $fileAsset);
+    return $fileAsset;
   }
 
   /********************************************************************************************************************/
@@ -495,6 +523,7 @@ EOT
   /*********************************************************************************************************************/
 
   private $_isMinify = true;
+  private $_isRemote = true;
   private $_isTplEmbed = true;
   private $_isTplExport = false;
   private $_isDependencies = false;
@@ -509,6 +538,7 @@ EOT
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
     $this->_isMinify       = !$input->getOption('no-minify');
+    $this->_isRemote       = !$input->getOption('no-remote');
     $this->_isTplEmbed     = !$input->getOption('no-embed');
     $this->_isDependencies = !$input->getOption('no-dependencies');
     $this->_isTplExport    = $input->getOption('exported');
@@ -523,6 +553,7 @@ EOT
     if ($input->getOption('watch')) {
       $this->_isMinify       = false;
       $this->_isReformat     = false;
+      $this->_isRemote       = false;
       $this->_isDependencies = true;
 
       $this->_watch($input, $output);
