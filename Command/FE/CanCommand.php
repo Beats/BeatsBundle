@@ -39,6 +39,7 @@ class  CanCommand extends ServiceCommand {
     $this
       ->setName($name)
       ->setDescription('Builds the front-end engine')
+      ->addOption('no-popup', 'P', InputOption::VALUE_NONE, 'Do not popup on errors')
       ->addOption('no-minify', 'M', InputOption::VALUE_NONE, 'Do not minify the build')
       ->addOption('no-remote', 'R', InputOption::VALUE_NONE, 'Do not fetch remote dependencies')
       ->addOption('no-embed', 'E', InputOption::VALUE_NONE, 'Whether to embed the templates')
@@ -114,6 +115,13 @@ EOT
 
   private function _scriptID(AssetInterface $asset, $fext, $prefix = 'beats') {
     return strtolower(sprintf('%s.%s.%s', $prefix, str_replace('/', '.', $asset->getSourcePath()), $fext));
+  }
+
+
+  private function _popup($info, $message) {
+    if ($this->_isPopup) {
+      exec(sprintf('zenity --warning --no-wrap --text="<b>%s</b> - %s"', escapeshellcmd($info), escapeshellcmd($message)));
+    }
   }
 
   /*********************************************************************************************************************/
@@ -313,6 +321,7 @@ EOT
       }
     } catch (\Exception $ex) {
       $output->writeln(" <info>Fail</info>");
+      $this->_popup($path, $ex->getMessage());
       return null;
     }
     $output->writeln(" <info>Done</info>");
@@ -339,6 +348,7 @@ EOT
           $fileAsset->getLastModified();
         } catch (\Exception $ex) {
           $output->writeln(" <error>Fail</error>");
+          $this->_popup($href, $ex->getMessage());
           return null;
         }
       }
@@ -354,6 +364,7 @@ EOT
           $this->_write($file, $hrefAsset->dump());
         } catch (\Exception $ex) {
           $output->writeln(" <error>Fail</error>");
+          $this->_popup($href, $ex->getMessage());
           return null;
         }
       }
@@ -522,6 +533,7 @@ EOT
 
   /*********************************************************************************************************************/
 
+  private $_isPopup = true;
   private $_isMinify = true;
   private $_isRemote = true;
   private $_isTplEmbed = true;
@@ -537,6 +549,7 @@ EOT
    * @see Command
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
+    $this->_isPopup        = !$input->getOption('no-popup');
     $this->_isMinify       = !$input->getOption('no-minify');
     $this->_isRemote       = !$input->getOption('no-remote');
     $this->_isTplEmbed     = !$input->getOption('no-embed');
@@ -554,6 +567,7 @@ EOT
       $this->_isMinify       = false;
       $this->_isReformat     = false;
       $this->_isRemote       = false;
+      $this->_isPopup        = true;
       $this->_isDependencies = true;
 
       $this->_watch($input, $output);
