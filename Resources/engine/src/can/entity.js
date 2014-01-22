@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  can.Construct.extend('Beats.Entity', {
+  Beats.Entity = can.Construct.extend({
     id: 'id',
     const: {
     }
