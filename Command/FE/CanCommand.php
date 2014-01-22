@@ -528,7 +528,12 @@ EOT
   }
 
   private function _changed($file, $mtime, $crc32, BaseAsset $asset) {
-    return $mtime < $asset->getLastModified() || $crc32 != $this->_crc32($asset);
+    try {
+      return $mtime < $asset->getLastModified() || $crc32 != $this->_crc32($asset);
+    } catch (\Exception $ex) {
+      $this->_popup($file, $ex->getMessage());
+      return false;
+    }
   }
 
   /*********************************************************************************************************************/
@@ -590,8 +595,8 @@ EOT
     $this->_build($input, $output);
     $period  = $input->getOption('period');
     $changed = true;
-    do {
-      try {
+    try {
+      do {
         foreach ($this->_watcher as $name => $files) {
           foreach ($files as $file => $data) {
             if ($this->_changed($file, $data['mtime'], $data['crc32'], $data['asset'])) {
@@ -607,10 +612,10 @@ EOT
           $output->writeln(sprintf("**** DONE **** @ <comment>%s</comment>\n", date('H:i:s')));
         }
         sleep($period);
-      } catch (\Exception $ex) {
-        $output->writeln('<error>[error]</error> ' . $ex->getMessage());
-      }
-    } while (true);
+      } while (true);
+    } catch (\Exception $ex) {
+      $output->writeln('<error>[error]</error> ' . $ex->getMessage());
+    }
   }
 
 }
