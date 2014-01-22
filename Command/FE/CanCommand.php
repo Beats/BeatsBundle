@@ -120,7 +120,9 @@ EOT
 
   private function _popup($info, $message) {
     if ($this->_isPopup) {
-      exec(sprintf('zenity --warning --no-wrap --text="<b>%s</b> - %s"', escapeshellcmd($info), escapeshellcmd($message)));
+      exec(sprintf('zenity --warning --no-wrap --title="beats:fe:can" --text="<b>%s</b> - %s"',
+        escapeshellcmd($info), escapeshellcmd($message)
+      ));
     }
   }
 
@@ -615,6 +617,7 @@ EOT
       } while (true);
     } catch (\Exception $ex) {
       $output->writeln('<error>[error]</error> ' . $ex->getMessage());
+      $this->_popup('Script stopped', $ex->getMessage());
     }
   }
 
