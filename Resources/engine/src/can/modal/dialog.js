@@ -31,6 +31,45 @@
           break
       }
       return button
+    },
+
+    bootstrap: function (self) {
+
+      self.element.modal({
+        backdrop: self.options.backdrop,
+        keyboard: self.options.keyboard,
+        remote: self.options.remote,
+        show: false
+      })
+
+      self.element.on({
+        'show.bs.modal': _.proxy(self, 'show'),
+        'shown.bs.modal': _.proxy(self, 'shown'),
+        'hide.bs.modal': _.proxy(self, 'hide'),
+        'hidden.bs.modal': function (evt) {
+          //noinspection JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage
+          if (self.options.value | 0) {
+            self.options.deferred.resolveWith(self, [self.options.value, self.options.data])
+          } else {
+            self.options.deferred.rejectWith(self, [self.options.value, self.options.data])
+          }
+          _.trigger(self, 'hidden', self)
+
+          if (self.options.destroy) {
+            self.element.remove()
+          }
+        }
+      })
+
+      self.element.trigger(jQuery.Event('beats.modal.dialog.built'), [
+        self.element.find('.modal-body'),
+        self.element.find('.modal-header'),
+        self.element.find('.modal-footer')
+      ])
+
+      if (self.options.show) {
+        self.show(self.options.deferred)
+      }
     }
   }
   /******************************************************************************************************************/
@@ -50,6 +89,7 @@
       header: true,
       close: true,
       value: 0,
+      data: null,
       title: null,
       footer: true,
       body: null,
@@ -133,67 +173,44 @@
       this._super.apply(this, arguments)
       var self = this
 
-      if (Beats.empty(self.options.id)) {
-        self.options.id = 'beats-dialog-' + (++_.id)
-      }
+      if (Beats.empty(self.options.view)) {
 
-      $.each(['id',
-        'header', 'close', 'value', 'title',
-        'body',
-        'footer', 'buttons'
-      ], function (idx, field) {
-        self.options.tplV[field] = self.options[field]
-      })
+        _.bootstrap(self)
 
-      self.element.html(self.options.view, self.options.tplV, function () {
-        self.element.addClass('modal fade')
-        self.element.attr({
-          id: self.options.id,
-          tabindex: '-1',
-          role: 'dialog',
-          'aria-hidden': 'true',
-          'aria-labelledby': self.options.id + '-modal-title'
-        })
+      } else {
 
-        self.element.modal({
-          backdrop: self.options.backdrop,
-          keyboard: self.options.keyboard,
-          remote: self.options.remote,
-          show: false
-        })
-        self.element.on({
-          'show.bs.modal': _.proxy(self, 'show'),
-          'shown.bs.modal': _.proxy(self, 'shown'),
-          'hide.bs.modal': _.proxy(self, 'hide'),
-          'hidden.bs.modal': function (evt) {
-            //noinspection JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage
-            if (self.options.value | 0) {
-              self.options.deferred.resolveWith(self, [self.options.value])
-            } else {
-              self.options.deferred.rejectWith(self, [self.options.value])
-            }
-            _.trigger(self, 'hidden', self)
-            if (self.options.destroy) {
-              self.element.remove()
-            }
-          }
-        })
-
-        self.element.trigger(jQuery.Event('beats.modal.dialog.built'), [
-          self.element.find('.modal-body'),
-          self.element.find('.modal-header'),
-          self.element.find('.modal-footer')
-        ])
-
-        if (self.options.show) {
-          self.show(self.options.deferred)
+        if (Beats.empty(self.options.id)) {
+          self.options.id = 'beats-dialog-' + (++_.id)
         }
 
-      })
+        $.each(['id',
+          'header', 'close', 'value', 'title',
+          'body',
+          'footer', 'buttons'
+        ], function (idx, field) {
+          self.options.tplV[field] = self.options[field]
+        })
+
+        self.element.html(self.options.view, self.options.tplV, function () {
+          self.element.addClass('modal fade')
+          self.element.attr({
+            id: self.options.id,
+            tabindex: '-1',
+            role: 'dialog',
+            'aria-hidden': 'true',
+            'aria-labelledby': self.options.id + '-modal-title'
+          })
+
+          _.bootstrap(self)
+
+        })
+      }
+
     },
 
     show: function (dfd) {
       var self = this
+      self.options.value = null
       self.options.deferred = dfd || $.Deferred()
       self.options.deferred.$dialog = self.element
       self.element.data('deferred', self.options.deferred)
