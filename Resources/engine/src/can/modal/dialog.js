@@ -211,6 +211,7 @@
     show: function (dfd) {
       var self = this
       self.options.value = null
+      self.options.data = null
       self.options.deferred = dfd || $.Deferred()
       self.options.deferred.$dialog = self.element
       self.element.data('deferred', self.options.deferred)
