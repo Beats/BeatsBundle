@@ -242,7 +242,9 @@
           clearTimeout(self._timerID)
           self._timerID = null
         }
-        self.element.remove()
+        if (self.element) { // TODO@ion: WTF?
+          self.element.remove()
+        }
       }
     },
 
