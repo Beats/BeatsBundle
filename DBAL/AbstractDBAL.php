@@ -2,6 +2,7 @@
 namespace BeatsBundle\DBAL;
 
 use BeatsBundle\Entity\AbstractEntity;
+use BeatsBundle\Exception\DBALException;
 use BeatsBundle\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -536,4 +537,33 @@ class AbstractDBAL extends ContainerAware {
 
   /********************************************************************************************************************/
 
+  protected function _filter($sql, $params) {
+    $statement = $this->rdb()->pdo()->prepare($sql);
+    foreach ($params as $key => $val) {
+      $statement->bindValue($key, $val);
+    }
+
+    if (!$statement->execute()) {
+      $error = $statement->errorInfo();
+      throw new DBALException($error[2]);
+    }
+
+    $ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+    $rows = array();
+    if (empty($ids)) {
+      return $rows;
+    }
+    $data = $this->dom()->rug()->db()->herd($ids, true, true);
+
+    foreach ($data->rows as $row) {
+      if ($row->value->deleted) {
+        continue;
+      }
+      $rows[] = self::_buildEntity($row->doc);
+    }
+    return $rows;
+  }
+
+  /********************************************************************************************************************/
 }
