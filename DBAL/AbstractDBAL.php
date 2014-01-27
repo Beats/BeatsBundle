@@ -537,7 +537,7 @@ class AbstractDBAL extends ContainerAware {
 
   /********************************************************************************************************************/
 
-  protected function _filter($sql, $params) {
+  protected function _filterIDs($sql, $params) {
     $statement = $this->rdb()->pdo()->prepare($sql);
     foreach ($params as $key => $val) {
       $statement->bindValue($key, $val);
@@ -549,7 +549,10 @@ class AbstractDBAL extends ContainerAware {
     }
 
     $ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
+    return empty($ids) ? array() : $ids;
+  }
 
+  protected function _domHerd(array $ids) {
     $rows = array();
     if (empty($ids)) {
       return $rows;
@@ -557,7 +560,7 @@ class AbstractDBAL extends ContainerAware {
     $data = $this->dom()->rug()->db()->herd($ids, true, true);
 
     foreach ($data->rows as $row) {
-      if ($row->value->deleted) {
+      if ($row->value->deleted || !empty($row->error)) {
         continue;
       }
       $rows[] = self::_buildEntity($row->doc);
