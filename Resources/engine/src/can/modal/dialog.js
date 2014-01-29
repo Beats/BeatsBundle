@@ -48,10 +48,10 @@
         'hide.bs.modal': _.proxy(self, 'hide'),
         'hidden.bs.modal': function (evt) {
           //noinspection JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage
-          if (self.options.value | 0) {
-            self.options.deferred.resolveWith(self, [self.options.value, self.options.data])
-          } else {
+          if (Beats.empty(self.options.value)) {
             self.options.deferred.rejectWith(self, [self.options.value, self.options.data])
+          } else {
+            self.options.deferred.resolveWith(self, [self.options.value, self.options.data])
           }
           _.trigger(self, 'hidden', self)
 
@@ -72,6 +72,7 @@
       }
     }
   }
+
   /******************************************************************************************************************/
 
   Beats.Modal.Dialog = Beats.Control({
@@ -107,17 +108,18 @@
       }
     },
 
-    show: function (options) {
+    make: function (options) {
       var $dialog = $("<div></div>")
-        , dfd = $.Deferred()
-
       $('body').append($dialog)
+      return new this($dialog, options)
+    },
 
-      $dialog.beats_modal_dialog($.extend(options || {}, {
+    show: function (options) {
+      var dfd = $.Deferred()
+      this.make($.extend(options || {}, {
         deferred: dfd,
         destroy: true
       }))
-
       return dfd
     },
 
@@ -140,7 +142,7 @@
 
       options.buttons.push(_.button(ok, 1, true, 'Yes', 'btn-primary'))
       options.buttons.push(_.button(no, 0, true, 'No'))
-      return Beats.Modal.Dialog.show(options)
+      return this.show(options)
     },
 
     caution: function (message, title, button) {
@@ -161,10 +163,10 @@
       }
       if (button === false) {
         options.footer = false
-        return Beats.Modal.Dialog.show(options)
+        return this.show(options)
       }
       options.buttons.push(_.button(button, 1, true, 'OK', 'btn-primary'))
-      return Beats.Modal.Dialog.show(options)
+      return this.show(options)
     }
 
   }, {
@@ -219,7 +221,13 @@
       return self.options.deferred
     },
 
-    hide: function () {
+    hide: function (value, data) {
+      if (value !== undefined) {
+        this.options.value = value
+      }
+      if (data !== undefined) {
+        this.options.data = data
+      }
       this.element.modal('hide')
     },
 
