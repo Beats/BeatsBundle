@@ -15,7 +15,9 @@
   {% endif %}
 {% endmacro %}
 
-{% macro input(type, name, value, label, class) %}
+{% macro input(type, name, default, label, class) %}
+  {% set _field = app._field(name) %}
+  {% set value = _field is not empty ? _field.getValue : app.request.get(name, default, true) %}
   <input class="{{ class }}" type="{{ type }}" placeholder="{{ label }}"
          id="{{ name }}" name="{{ name }}" autocomplete="off"
     {% if type in ['checkbox'] %}
