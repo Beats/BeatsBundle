@@ -9,9 +9,9 @@
     }
   }, {
 
-    init: function (el, opts) {
-      this._super.apply(this, arguments)
+    init: function () {
       var self = this
+      self._super.apply(self, arguments)
     },
 
     'keypress': function ($el, event) {

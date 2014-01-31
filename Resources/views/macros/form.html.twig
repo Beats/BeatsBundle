@@ -1,0 +1,152 @@
+{% macro classes(name) %}
+  {% set _field = app._field(name) %}
+  {% if _field is not empty and _field.isError %}has-error{% endif %}
+{% endmacro %}
+
+{% macro messages(name, hClass) %}
+  {% set _field = app._field(name) %}
+  {% set hClass = hclass|default('help-block') %}
+  {% if _field is not empty and _field.isError %}
+    {% for text in _field.getText %}
+      <span class="{{ hClass }}">{{ text }}</span>
+    {% endfor %}
+  {% else %}
+    <span class="{{ hClass }}"></span>
+  {% endif %}
+{% endmacro %}
+
+{% macro input(type, name, value, label, class) %}
+  <input class="{{ class }}" type="{{ type }}" placeholder="{{ label }}"
+         id="{{ name }}" name="{{ name }}" autocomplete="off"
+    {% if type in ['checkbox'] %}
+      {{ value is empty ? '' : 'checked="checked"' }}
+      value="1"
+    {% else %}
+      value="{{ value }}"
+    {% endif %}
+    />
+{% endmacro %}
+
+{% macro _field_date(name, value, gClass, label, type, opts) %}
+  {% set clear = opts.clear is defined ? opts.clear : false %}
+  {% if clear is not iterable %}
+    {% set clear = {y: clear, m: clear, d: clear} %}
+  {% endif %}
+  {% set months = {
+  abbr: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  full: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  } %}
+
+  <label class="control-label" for="{{ name }}">{{ label }}</label>
+  <div class="row">
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <select class="form-control" data-fld="m" autocomlete="off">
+        {% if clear is not empty %}
+          <option data-hidden="true" value="">{{ clear.m }}</option>
+        {% endif %}
+        {% for m in 0..11 %}
+          <option value="{{ "%02d"|format( m + 1) }}">{{ months.abbr[m] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <select class="form-control" data-fld="d" autocomlete="off">
+        {% if clear is not empty %}
+          <option data-hidden="true" value="">{{ clear.d }}</option>
+        {% endif %}
+        {% for d in 0..30 %}
+          <option value="{{ "%02d"|format( d + 1) }}">{{ "%02d"|format( d + 1) }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <select class="form-control" data-fld="y" autocomlete="off">
+        {% if clear is not empty %}
+          <option data-hidden="true" value="">{{ clear.y }}</option>
+        {% endif %}
+        {% for y in opts.year.from..opts.year.till %}
+          <option value="{{ y }}">{{ "%04d"|format(y) }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% if clear is not empty %}
+    <button type="button" class="btn btn-light pull-right" aria-hidden="true" style="display: none;">Clear Date</button>
+  {% endif %}
+{% endmacro %}
+
+{% macro field(name, value, gClass, label, type, opts) %}
+  {% set opts = opts|default({}) %}
+  {% import _self as self %}
+
+  {% if type in ['date'] %}
+    <input type="hidden" id="{{ name }}" name="{{ name }}" value="{{ value }}" autocomplete="off"/>
+    <div class="{{ gClass }} {{ self.classes(name) }}">
+      {{ self._field_date(name, value, gClass, label, type, opts) }}
+      {{ self.messages(name) }}
+    </div>
+  {% else %}
+    <div class="{{ gClass }} {{ self.classes(name) }}">
+      {% if type in ['checkbox', 'radio'] %}
+        <div class="{{ type }}">
+          <label class="control-label" for="{{ name }}">
+            {{ self.input(type, name, value, label) }}
+            {{ label }}
+          </label>
+        </div>
+      {% elseif type in ['date'] %}
+        {{ self._field_date(name, value, gClass, label, type, opts) }}
+      {% else %}
+        <label class="control-label" for="{{ name }}">{{ label }}</label>
+        {% if opts.addon is defined %}
+          <div class="input-group">
+            <span class="input-group-addon">{{ opts.addon|raw }}</span>
+            {{ self.input(type, name, value, label, 'form-control') }}
+          </div>
+        {% else %}
+          {{ self.input(type, name, value, label, 'form-control') }}
+        {% endif %}
+      {% endif %}
+      {{ self.messages(name) }}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro text(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {{ self.field(name, value, gClass, label, 'text', opts) }}
+{% endmacro %}
+
+{% macro date(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {{ self.field(name, value, gClass, label, 'date', opts) }}
+{% endmacro %}
+
+{% macro check(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {{ self.field(name, value, gClass, label, 'checkbox', opts) }}
+{% endmacro %}
+
+{% macro radio(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {{ self.field(name, value, gClass, label, 'radio', opts) }}
+{% endmacro %}
+
+{% macro phone(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {% set opts = { addon: '<i class="icon-phone"></i>' }|merge(opts|default({})) %}
+  {{ self.field(name, value, gClass, label, 'tel', opts) }}
+{% endmacro %}
+
+{% macro email(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {% set opts = {addon: '<i class="icon-envelope"></i>'}|merge(opts|default({})) %}
+  {{ self.field(name, value, gClass, label, 'email', opts) }}
+{% endmacro %}
+
+{% macro other(name, value, gClass, label, opts) %}
+  {% import _self as self %}
+  {% set opts = {addon: '<i class="icon-ellipsis-horizontal"></i>'}|merge(opts|default({})) %}
+  {{ self.field(name, value, gClass, label, 'text', opts) }}
+{% endmacro %}
+
