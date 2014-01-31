@@ -1,38 +1,11 @@
-beatsmx:
-  ignore: true
-  version: 0.1
-  dependencies:
-#    - '@BeatsBundle/Resources/public/js/jquery/jquery-1.9.1.js'
-#    - '@BeatsBundle/Resources/public/js/jquery-plugins/js/jquery-migrate-1.2.1.js'
-#    - 'http://code.jquery.com/jquery-1.9.1.js'
-#    - 'http://code.jquery.com/jquery-migrate-1.2.1.js'
-  javascripts:
-    - 'mx/beats'
-    - 'mx/date'
-    - 'mx/model'
-    - 'mx/controller'
-    - 'mx/view'
-    - 'mx/router'
-    - 'mx/browser'
-    - 'mx/flasher'
-    - 'mx/blocker'
-    - 'mx/reditor'
-    - 'mx/field'
-    - 'mx/field/widget'
-    - 'mx/field/datepicker'
-    - 'mx/field/number'
-    - 'mx/modal/dialog'
-  templates:
-    - 'mx/flasher/message'
-    - 'mx/field/datepicker'
-    - 'mx/modal/dialog'
-
 beats-can:
   version: 0.1
   dependencies:
     - '@BeatsBundle/Resources/public/js/ecma-extend.js'
     - '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js'
+    - '@BeatsBundle/Resources/public/js/jquery-extend.js'
     - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.js'
+    - '@BeatsBundle/Resources/public/js/bootstrap-extend.js'
 #    - '//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.css'
     - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
     - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
@@ -45,6 +18,20 @@ beats-can:
     - 'can/flasher'
     - 'can/modal'
     - 'can/modal/dialog'
+  templates:
+    - 'can/flasher/message'
+    - 'can/modal/dialog'
+
+#beats-can-modal:
+#  version: 0.1
+#  javascripts:
+#    - 'can/modal/dialog'
+#  templates:
+#    - 'can/modal/dialog'
+
+beats-can-form:
+  version: 0.1
+  javascripts:
     - 'can/field'
     - 'can/field/widget'
     - 'can/field/hronos'
@@ -53,8 +40,6 @@ beats-can:
     - 'can/field/hronos/datetime'
     - 'can/field/number'
   templates:
-    - 'can/flasher/message'
-    - 'can/modal/dialog'
     - 'can/field/hronos/date'
     - 'can/field/hronos/time'
     - 'can/field/hronos/datetime'
