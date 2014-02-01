@@ -130,7 +130,7 @@
         , messages = []
       self._super.apply(self, arguments)
       if (_.instance) {
-        throw new Beats.Error('Already exists')
+        throw new Beats.Error(self, 'Already exists')
       }
       _.instance = self
 

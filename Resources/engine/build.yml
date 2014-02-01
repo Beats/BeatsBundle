@@ -34,16 +34,10 @@ beats-can-form:
   javascripts:
     - 'can/field'
     - 'can/field/widget'
-    - 'can/field/hronos'
-    - 'can/field/hronos/date'
-    - 'can/field/hronos/time'
-    - 'can/field/hronos/datetime'
+    - 'can/field/datetime'
     - 'can/field/number'
   templates:
-    - 'can/field/hronos/date'
-    - 'can/field/hronos/time'
-    - 'can/field/hronos/datetime'
-
+    - 'can/field/datetime'
 ecma-jquery-boostrap:
   version: 0.1
   dependencies:

@@ -1,5 +1,5 @@
 /**
- * Beats Field Hronos
+ * Beats Field DateTime
  */
 (function ($) {
 
@@ -8,16 +8,129 @@
   var _ = {
     pad: function (value) {
       return (value < 10 ? '0' : '') + value
+    },
+    setup: function (self) {
+      switch (self.options.type) {
+        case 'datetime':
+          this.setupBoth(self)
+          break;
+        case 'date':
+          this.setupDate(self)
+          break;
+        case 'time':
+          this.setupTime(self)
+          break;
+        default:
+          throw new Beats.Error(self, 'Invalid datetime type: ' + self.options.type)
+      }
+    },
+    setupBoth: function (self) {
+      if (Beats.empty(self.options.fields)) {
+        self.options.fields = [
+          ['m', 'd', 'y'],
+          ['H', 'i', 'p']
+        ]
+      }
+      if (Beats.empty(self.options.clearButton)) {
+        self.options.clearButton = 'Clear Date'
+      }
+      $.extend(self, {
+        _iso2structure: function (iso) {
+          return this.constructor.isoDateTime2structure(iso)
+        },
+        _structure2iso: function (structure) {
+          return this.constructor.structure2isoDateTime(structure)
+        },
+        _defaulter: function (value) {
+          var self = this
+          if (Beats.empty(value) && !self.isClearable()) {
+            var date = Date.now()
+            date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+            value = date.toISODateTime()
+          }
+          return value
+        },
+        _isInvalid: function (value, structure) {
+          var date = Date.fromISO(value)
+          return (date.getMonth() != structure.m - 1)
+        }
+      })
+    },
+    setupDate: function (self) {
+      if (Beats.empty(self.options.fields)) {
+        self.options.fields = [
+          ['m', 'd', 'y']
+        ]
+      }
+      if (Beats.empty(self.options.clearButton)) {
+        self.options.clearButton = 'Clear Date'
+      }
+      $.extend(self, {
+        _iso2structure: function (iso) {
+          return this.constructor.isoDate2structure(iso)
+        },
+        _structure2iso: function (structure) {
+          return this.constructor.structure2isoDate(structure)
+        },
+        _defaulter: function (value) {
+          var self = this
+          if (Beats.empty(value) && !self.isClearable()) {
+            value = Date.now().toISODate()
+          }
+          return value
+        },
+        _isInvalid: function (value, structure) {
+          var date = Date.fromISO(value)
+          return (date.getMonth() != structure.m - 1)
+        }
+      })
+    },
+    setupTime: function (self) {
+      if (Beats.empty(self.options.fields)) {
+        self.options.fields = [
+          ['H', 'i', 'p']
+        ]
+      }
+      if (Beats.empty(self.options.clearButton)) {
+        self.options.clearButton = 'Clear Time'
+      }
+
+      $.extend(self, {
+        _iso2structure: function (iso) {
+          return this.constructor.isoTime2structure(iso)
+        },
+        _structure2iso: function (structure) {
+          return this.constructor.structure2isoTime(structure)
+        },
+        _defaulter: function (value) {
+          var self = this
+          if (Beats.empty(value) && !self.isClearable()) {
+            var date = Date.now()
+            date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+            value = date.toISOTime()
+          }
+          return value
+        },
+        _isInvalid: function (value, structure) {
+          return false
+        }
+      })
     }
   }
 
   /******************************************************************************************************************/
 
-  Beats.Field.Hronos = Beats.Field.extend({
+  Beats.Field.DateTime = Beats.Field.extend({
+    pluginName: 'beats_field_datetime',
     defaults: {
-      selectpicker: null,
-      incomplete: null,
+      type: 'datetime',
+      incomplete: 'The value is incomplete',
       invalid: 'The date is invalid',
+      selectpicker: null,
+      yearsUpper: null,
+      yearsLower: null,
+      fields: null,
+      clearButton: null,
       clear: {
         y: 'Year',
         m: 'Month',
@@ -28,10 +141,13 @@
         H: 'Hours',
         p: 'AM/PM'
       },
+      view: 'beats.can.field.datetime.ejs',
       tplV: {
+        fields: null,
         label: null,
         alert: null,
         clear: null,
+        clearButton: null,
         value: {
           y: null,
           m: null,
@@ -233,29 +349,35 @@
 
   }, {
 
-    _iso2structure: function (iso) {
-      return this.constructor.isoDateTime2structure(iso)
-    },
-
-    _structure2iso: function (structure) {
-      return this.constructor.structure2isoDateTime(structure)
-    },
-
-    _defaulter: function (value) {
+    init: function () {
       var self = this
-      if (Beats.empty(value) && !self.isClearable()) {
-        var date = Date.now()
-        date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
-        value = date.toISODateTime()
-      }
-
-      return value
+      _.setup(self)
+      self._super.apply(self, arguments)
     },
 
     _beforeRender: function () {
       var self = this
       self._super.apply(self, arguments)
+
+      self.options.tplV.fields = self.options.fields
       self.options.tplV.clear = self.options.clear
+      self.options.tplV.clearButton = self.options.clearButton
+
+      if (!self.options.yearsUpper) {
+        self.options.yearsUpper = Date.now().getFullYear()
+      }
+      if (!self.options.yearsLower) {
+        self.options.yearsLower = self.options.yearsUpper + 2
+      }
+      if (self.options.yearsUpper < self.options.yearsLower) {
+        for (var year = self.options.yearsUpper; year <= self.options.yearsLower; year++) {
+          self.options.tplV.parts.y.push({val: year, lbl: year})
+        }
+      } else {
+        for (var year = self.options.yearsUpper; self.options.yearsLower <= year; year--) {
+          self.options.tplV.parts.y.push({val: year, lbl: year})
+        }
+      }
     },
 
     _afterRender: function () {
@@ -346,12 +468,8 @@
     },
 
     _isInvalid: function (value, structure) {
-      if (structure.m !== undefined) {
-        var date = Date.fromISO(value)
-        return (date.getMonth() != structure.m - 1)
-      } else {
-        return false
-      }
+      var date = Date.fromISO(value)
+      return (date.getMonth() != structure.m - 1)
     },
 
     _validate: function () {
@@ -387,6 +505,6 @@
 
   /******************************************************************************************************************/
 
-  return Beats.Field.Date
+  return Beats.Field.DateTime
 
 })(jQuery)

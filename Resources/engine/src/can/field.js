@@ -14,9 +14,9 @@
         label: null,
         alert: null,
 
-        labelClass: null,
-        alertClass: null,
-        groupClass: null,
+        labelClass: 'control-label',
+        alertClass: 'help-block',
+        groupClass: 'form-group',
 
         validator: null,
         success: null,
@@ -86,7 +86,7 @@
       },
 
       $alert: function () {
-        return this.$group().find('.help-block')
+        return this.$group().find('.' + this.options.alertClass)
       },
 
       reset: function () {

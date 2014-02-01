@@ -39,7 +39,7 @@
       this._super.apply(this, arguments)
       var self = this
       if (_.instance) {
-        throw new Beats.Error('Already exists')
+        throw new Beats.Error(self, 'Already exists')
       }
       _.instance = self
 

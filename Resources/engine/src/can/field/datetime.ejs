@@ -1,0 +1,25 @@
+<div class="<%= groupClass %>">
+
+  <label class="<%= labelClass %>" for="<%= name %>"><%== label %></label>
+
+  <% for (var row = 0; row < fields.length; row++) { var cols = fields[row]; %>
+  <div class="row">
+    <% for (var col = 0; col < cols.length; col++) { var field = cols[col]; %>
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <select class="form-control" data-fld="<%= field %>" autocomlete="off">
+        <% if (clear) { %>
+        <option data-hidden="true" value=""><%= clear[field] %></option>
+        <% } %>
+        <%== Beats._helpers.options(parts[field], value[field]) %>
+      </select>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (clear) { %>
+  <button type="button" class="btn btn-light pull-right" aria-hidden="true" style="display: none;"><%== clearButton %></button>
+  <% } %>
+
+  <span class="<%= alertClass %>"> <%= alert %></span>
+</div>
