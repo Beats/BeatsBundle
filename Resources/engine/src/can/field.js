@@ -78,7 +78,10 @@
       },
 
       $group: function () {
-        return this.element.next()
+        if (this.element.is('input[type="hidden"]')) {
+          return this.element.next()
+        }
+        return this.element.parents('.' + this.options.groupClass)
       },
 
       $label: function () {
@@ -98,9 +101,8 @@
 
       _validate: function () {
         var self = this
-          , value = self.element.val()
         if ($.isFunction(self.options.validator)) {
-          return self.options.validator.apply(self, [value])
+          return self.options.validator.apply(self, [self.element.val()])
         }
         return false;
       },

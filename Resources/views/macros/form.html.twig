@@ -29,7 +29,7 @@
     />
 {% endmacro %}
 
-{% macro _field_date(name, value, gClass, label, type, opts) %}
+{% macro _field_date(name, value, groupClass, label, type, opts) %}
   {% set clear = opts.clear is defined ? opts.clear : false %}
   {% if clear is not iterable %}
     {% set clear = {y: clear, m: clear, d: clear} %}
@@ -77,18 +77,18 @@
   {% endif %}
 {% endmacro %}
 
-{% macro field(name, value, gClass, label, type, opts) %}
+{% macro field(name, value, groupClass, label, type, opts) %}
   {% set opts = opts|default({}) %}
   {% import _self as self %}
 
   {% if type in ['date'] %}
     <input type="hidden" id="{{ name }}" name="{{ name }}" value="{{ value }}" autocomplete="off"/>
-    <div class="{{ gClass }} {{ self.classes(name) }}">
-      {{ self._field_date(name, value, gClass, label, type, opts) }}
+    <div class="{{ groupClass }} {{ self.classes(name) }}">
+      {{ self._field_date(name, value, groupClass, label, type, opts) }}
       {{ self.messages(name) }}
     </div>
   {% else %}
-    <div class="{{ gClass }} {{ self.classes(name) }}">
+    <div class="{{ groupClass }} {{ self.classes(name) }}">
       {% if type in ['checkbox', 'radio'] %}
         <div class="{{ type }}">
           <label class="control-label" for="{{ name }}">
@@ -97,7 +97,7 @@
           </label>
         </div>
       {% elseif type in ['date'] %}
-        {{ self._field_date(name, value, gClass, label, type, opts) }}
+        {{ self._field_date(name, value, groupClass, label, type, opts) }}
       {% else %}
         <label class="control-label" for="{{ name }}">{{ label }}</label>
         {% if opts.addon is defined %}
@@ -114,41 +114,41 @@
   {% endif %}
 {% endmacro %}
 
-{% macro text(name, value, gClass, label, opts) %}
+{% macro text(name, value, groupClass, label, opts) %}
   {% import _self as self %}
-  {{ self.field(name, value, gClass, label, 'text', opts) }}
+  {{ self.field(name, value, groupClass, label, 'text', opts) }}
 {% endmacro %}
 
-{% macro date(name, value, gClass, label, opts) %}
+{% macro date(name, value, groupClass, label, opts) %}
   {% import _self as self %}
-  {{ self.field(name, value, gClass, label, 'date', opts) }}
+  {{ self.field(name, value, groupClass, label, 'date', opts) }}
 {% endmacro %}
 
-{% macro check(name, value, gClass, label, opts) %}
+{% macro check(name, value, groupClass, label, opts) %}
   {% import _self as self %}
-  {{ self.field(name, value, gClass, label, 'checkbox', opts) }}
+  {{ self.field(name, value, groupClass, label, 'checkbox', opts) }}
 {% endmacro %}
 
-{% macro radio(name, value, gClass, label, opts) %}
+{% macro radio(name, value, groupClass, label, opts) %}
   {% import _self as self %}
-  {{ self.field(name, value, gClass, label, 'radio', opts) }}
+  {{ self.field(name, value, groupClass, label, 'radio', opts) }}
 {% endmacro %}
 
-{% macro phone(name, value, gClass, label, opts) %}
+{% macro phone(name, value, groupClass, label, opts) %}
   {% import _self as self %}
   {% set opts = { addon: '<i class="icon-phone"></i>' }|merge(opts|default({})) %}
-  {{ self.field(name, value, gClass, label, 'tel', opts) }}
+  {{ self.field(name, value, groupClass, label, 'tel', opts) }}
 {% endmacro %}
 
-{% macro email(name, value, gClass, label, opts) %}
+{% macro email(name, value, groupClass, label, opts) %}
   {% import _self as self %}
   {% set opts = {addon: '<i class="icon-envelope"></i>'}|merge(opts|default({})) %}
-  {{ self.field(name, value, gClass, label, 'email', opts) }}
+  {{ self.field(name, value, groupClass, label, 'email', opts) }}
 {% endmacro %}
 
-{% macro other(name, value, gClass, label, opts) %}
+{% macro other(name, value, groupClass, label, opts) %}
   {% import _self as self %}
   {% set opts = {addon: '<i class="icon-ellipsis-horizontal"></i>'}|merge(opts|default({})) %}
-  {{ self.field(name, value, gClass, label, 'text', opts) }}
+  {{ self.field(name, value, groupClass, label, 'text', opts) }}
 {% endmacro %}
 
