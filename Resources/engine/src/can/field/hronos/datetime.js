@@ -24,6 +24,7 @@
 
     _beforeRender: function () {
       var self = this
+      self._super.apply(self, arguments)
       if (!self.options.yearsUpper) {
         self.options.yearsUpper = Date.now().getFullYear()
       }

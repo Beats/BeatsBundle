@@ -234,21 +234,6 @@
 
   }, {
 
-    init: function () {
-      var self = this
-      self._super.apply(self, arguments)
-
-      if (Beats.empty(self.options.view)) {
-        self._afterRender()
-      } else {
-        self.options.tplV.clear = self.options.clear
-        self._beforeRender()
-        self.element.after(self.options.view, self.options.tplV, function () {
-          self._afterRender()
-        })
-      }
-    },
-
     _iso2structure: function (iso) {
       return this.constructor.isoDateTime2structure(iso)
     },
@@ -265,10 +250,14 @@
     },
 
     _beforeRender: function () {
+      var self = this
+      self._super.apply(self, arguments)
+      self.options.tplV.clear = self.options.clear
     },
 
     _afterRender: function () {
       var self = this
+      self._super.apply(self, arguments)
       if (self.options.selectpicker) {
         self.$selects().selectpicker(self.options.selectpicker)
       }

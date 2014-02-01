@@ -14,9 +14,9 @@
       self._super.apply(self, arguments)
     },
 
-    'keypress': function ($el, event) {
-      if (event.charCode && (event.charCode < 48 || 57 < event.charCode )) {
-        event.preventDefault()
+    'keypress': function ($el, evt) {
+      if (evt.charCode && (evt.charCode < 48 || 57 < evt.charCode )) {
+        evt.prevtDefault()
       }
     }
 
