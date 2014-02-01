@@ -9,21 +9,28 @@
   Beats.Field = Beats.Control.extend({
 
       defaults: {
+        default: null,
+
         label: null,
-        error: null,
+        alert: null,
 
-        groupClass: null,
         labelClass: null,
+        alertClass: null,
+        groupClass: null,
 
-        reditor: false,
+        validator: null,
+        success: null,
+        failure: null,
+        defaulter: null,
 
         view: null,
         tplV: {
           label: null,
-          error: null,
+          alert: null,
 
           groupClass: null,
-          labelClass: null
+          labelClass: null,
+          alertClass: null
         }
       }
 
@@ -33,37 +40,105 @@
         var self = this
         self._super.apply(self, arguments)
 
+        self.options.default = (
+          $.isFunction(self.options.defaulter)
+            ? self.options.defaulter
+            : self._defaulter
+          )
+          .apply(self, [self.element.val()])
+
         if (Beats.empty(self.options.view)) {
-          self._afterRender()
+          self._afterRender.apply(self, [])
         } else {
-          self._beforeRender()
+          self._beforeRender.apply(self, [])
           self.element.after(self.options.view, self.options.tplV, function () {
-            self._afterRender()
+            self._afterRender.apply(self, [])
           })
         }
       },
 
       _beforeRender: function () {
         var self = this
+
         self.options.tplV.label = self.options.label
-        self.options.tplV.error = self.options.error
-        self.options.tplV.groupClass = self.options.groupClass
+        self.options.tplV.alert = self.options.alert
+
         self.options.tplV.labelClass = self.options.labelClass
+        self.options.tplV.alertClass = self.options.alertClass
+        self.options.tplV.groupClass = self.options.groupClass
       },
 
       _afterRender: function () {
+        this._update(true)
       },
 
-      toggleDisable: function (disabled) {
-        this.element.prop('disabled', true)
+      _defaulter: function (value) {
+        var self = this
+        return value
       },
-      disable: function () {
-        this.element.prop('disabled', true)
+
+      $group: function () {
+        return this.element.next()
       },
-      enable: function () {
-        this.element.prop('disabled', false)
+
+      $label: function () {
+        return this.$group().find('label')
+      },
+
+      $alert: function () {
+        return this.$group().find('.help-block')
+      },
+
+      reset: function () {
+        var self = this
+        self.element.val(self.options.default)
+        self._update()
+        return self
+      },
+
+      _validate: function () {
+        var self = this
+          , value = self.element.val()
+        if ($.isFunction(self.options.validator)) {
+          return self.options.validator.apply(self, [value])
+        }
+        return false;
+      },
+
+      _update: function (initial) {
+        var self = this
+          , failure
+
+        self.$group().removeClass('has-error has-success')
+        self.$alert().empty()
+
+        if (failure = self._validate()) {
+          self._setFailure(self.options.failure || failure, initial)
+          return false
+        } else {
+          self._setSuccess(self.options.success, initial)
+          return true
+        }
+      },
+
+      _setFailure: function (failure, initial) {
+        var self = this
+        self.$group().addClass('has-error')
+        self.$alert().html(failure)
+      },
+
+      _setSuccess: function (success, initial) {
+        var self = this
+        if (initial) {
+          return
+        }
+        self.$group().addClass('has-success')
+        self.$alert().html(success)
+      },
+
+      isValid: function () {
+        return !this.$group().hasClass('has-error')
       }
-
 
     }
   )

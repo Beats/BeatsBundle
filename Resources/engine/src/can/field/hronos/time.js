@@ -25,12 +25,13 @@
       return false
     },
 
-    _setupValue: function (value) {
+    _defaulter: function (value) {
       var self = this
       if (Beats.empty(value) && !self.isClearable()) {
-        value = Date.now().toISOTime()
+        var date = Date.now()
+        date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+        value = date.toISOTime()
       }
-      self.options.value = value
       return value
     }
 

@@ -17,12 +17,21 @@
     defaults: {
       selectpicker: null,
       incomplete: null,
-      validator: null,
       invalid: 'The date is invalid',
-      clear: null,
+      clear: {
+        y: 'Year',
+        m: 'Month',
+        d: 'Day',
+        h: 'Hours',
+        i: 'Minutes',
+        s: 'Seconds',
+        H: 'Hours',
+        p: 'AM/PM'
+      },
       tplV: {
         label: null,
-        error: null,
+        alert: null,
+        clear: null,
         value: {
           y: null,
           m: null,
@@ -154,16 +163,6 @@
             { val: '0', lbl: 'AM'},
             { val: '1', lbl: 'PM'}
           ]
-        },
-        clear: {
-          y: 'Year',
-          m: 'Month',
-          d: 'Day',
-          h: 'Hours',
-          i: 'Minutes',
-          s: 'Seconds',
-          H: 'Hours',
-          p: 'AM/PM'
         }
       }
     },
@@ -242,10 +241,14 @@
       return this.constructor.structure2isoDateTime(structure)
     },
 
-    _setupValue: function (value) {
+    _defaulter: function (value) {
       var self = this
-      self.options.value = value
-      self.structure(self._iso2structure(value))
+      if (Beats.empty(value) && !self.isClearable()) {
+        var date = Date.now()
+        date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+        value = date.toISODateTime()
+      }
+
       return value
     },
 
@@ -257,53 +260,36 @@
 
     _afterRender: function () {
       var self = this
-      self._super.apply(self, arguments)
+
       if (self.options.selectpicker) {
         self.$selects().selectpicker(self.options.selectpicker)
       }
 
-      self.$selects().on('change', function () {
-        var valid = self.validate()
-          , value = self.element.val()
-        self.element.trigger(jQuery.Event('beats.field.change'), [value, valid])
+      self.structure(self._iso2structure(self.options.default))
+      self._super.apply(self, arguments)
+
+      self.$selects().on('change', function (evt) {
+        evt.stopPropagation()
+        self._update()
       })
-      self.$clear().on('click', function () {
-        self.structure(self._iso2structure(self.options.value = ''))
+      self.$clear().on('click', function (evt) {
+        evt.stopPropagation()
+        self.structure(self._iso2structure())
+        self._update()
       })
 
-      self.structure(self._iso2structure(self._setupValue(self.element.val())))
-      self.validate()
-
-    },
-
-    $widget: function () {
-      return this.element.next()
     },
 
     $selects: function () {
-      return this.$widget().find('select')
-    },
-
-    $errors: function () {
-      return this.$widget().find('.help-block')
+      return this.$group().find('select')
     },
 
     $clear: function () {
-      return this.$widget().find('button[aria-hidden]')
+      return this.$group().find('button[aria-hidden]')
     },
 
     isClearable: function () {
-      return this.$clear().length > 0
-    },
-
-    initialize: function () {
-      var self = this
-        , value = self.element.val()
-      if (Beats.empty(value) && !self.isClearable()) {
-        value = Date.now().toISODateTime()
-      }
-      self.options.value = value
-      self.structure(self._iso2structure(value))
+      return !Beats.empty(this.options.clear)
     },
 
     structure: function (structure) {
@@ -354,7 +340,8 @@
 
     reset: function () {
       var self = this
-      self.structure(self._iso2structure(self.options.value))
+      self.structure(self._iso2structure(self.options.default))
+      self._update()
       return self
     },
 
@@ -367,45 +354,33 @@
       }
     },
 
-    validate: function () {
+    _validate: function () {
       var self = this
+        , oldValue = self.element.val()
         , structure = self.structure()
-        , value = self._structure2iso(structure)
-
-        , $widget = self.$widget()
-        , $errors = self.$errors()
+        , newValue = self._structure2iso(structure)
         , error = false
 
-      $widget.removeClass('has-error')
-      $errors.empty()
-      self.element.val('')
-
-      if (Beats.empty(value)) {
+      if (Beats.empty(newValue)) {
+        self.$clear().hide()
         if (!Beats.empty(structure)) {
           error = self.options.incomplete
         }
-        self.$clear().hide()
       } else {
-        if (self._isInvalid(value, structure)) {
-          error = 'The date is invalid'
+        self.$clear().show()
+        if (self._isInvalid(newValue, structure)) {
+          error = self.options.invalid
         } else if ($.isFunction(self.options.validator)) {
-          error = self.options.validator(value, structure)
+          error = self.options.validator.apply(self, [newValue, structure])
         }
-        self.$clear().toggle(!error)
       }
-
       if (error) {
-        $widget.addClass('has-error')
-        $errors.html(error)
-        return false
-      } else {
-        self.element.val(value)
-        return true
+        newValue = ''
       }
-    },
-
-    isValid: function () {
-      return !this.$widget().hasClass('has-error')
+      if (oldValue !== newValue) {
+        self.element.val(newValue).trigger(jQuery.Event('change'), [newValue, !error])
+      }
+      return error
     }
 
   })

@@ -1,4 +1,4 @@
-<div class="form-group <%= groupClass %> <%= error ? 'has-error' : '' %>">
+<div class="form-group <%= groupClass %>">
 
   <label class="control-label <%= labelClass %>" for="<%= name %>"><%== label %></label>
 
@@ -58,5 +58,5 @@
   <% if (clear) { %>
   <button type="button" class="btn btn-light pull-right" aria-hidden="true" style="display: none;">Clear Date</button>
   <% } %>
-  <span class="help-block"> <%= error %></span>
+  <span class="help-block"> <%= alert %></span>
 </div>

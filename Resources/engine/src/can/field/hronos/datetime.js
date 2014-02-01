@@ -31,7 +31,6 @@
       if (!self.options.yearsLower) {
         self.options.yearsLower = self.options.yearsUpper + 2
       }
-
       if (self.options.yearsUpper < self.options.yearsLower) {
         for (var year = self.options.yearsUpper; year <= self.options.yearsLower; year++) {
           self.options.tplV.parts.y.push({val: year, lbl: year})
@@ -41,16 +40,6 @@
           self.options.tplV.parts.y.push({val: year, lbl: year})
         }
       }
-    },
-
-    _setupValue: function (value) {
-      var self = this
-      if (Beats.empty(value) && !self.isClearable()) {
-        value = Date.now().toISODate()
-      }
-      self.options.value = value
-      self.structure(self.constructor.isoDate2structure(value))
-      return value
     }
 
   })
