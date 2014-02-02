@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 class Chronos extends ContainerAware {
 
   const SESSION_TIMEZONE = 'beats.chronos.timezone';
-  const CONFIG_TIMEZONE  = 'beats.chronos.timezone';
-  const COOKIE_TIMEZONE  = 'beats_tz';
+  const COOKIE_TIMEZONE = 'beats.chronos.timezone';
 
   /*********************************************************************************************************************/
 
@@ -29,7 +28,7 @@ class Chronos extends ContainerAware {
   public function getDefaultTimezone() {
     static $zone;
     if (empty($zone)) {
-      $zone = UTC::createTimeZone($this->container->getParameter(self::CONFIG_TIMEZONE));
+      $zone = UTC::createTimeZone($this->_options->get('timezone'));
     }
     return $zone;
   }
@@ -51,14 +50,16 @@ class Chronos extends ContainerAware {
    * @param Request $request
    */
   public function setupTimezone(Request $request) {
-    $session  = $this->_session();
+    $session = $this->_session();
     $security = $this->_security();
-
     if ($session->has(self::SESSION_TIMEZONE)) {
       $zone = $session->get(self::SESSION_TIMEZONE);
     } else {
-      if ($security->isGranted('ROLE_USER')) {
-        $user = $this->_security()->getToken()->getUser();
+      $token = $security->getToken();
+
+      $zone = null;
+      if ($token && $security->isGranted('ROLE_USER')) {
+        $user = $token->getUser();
         if ($user instanceof Member) {
           $zone = $user->getTimezone();
         }

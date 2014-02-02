@@ -59,10 +59,12 @@
 
     <service id="beats.chronos" class="%beats.chronos.class%">
       <argument type="service" id="service_container"/>
+      <argument>%beats.chronos%</argument>
     </service>
 
     <service id="beats.mailer" class="%beats.mailer.class%">
       <argument type="service" id="service_container"/>
+      <argument>%beats.mailer%</argument>
     </service>
 
     <service id="beats.routing.exporter" class="%beats.routing.exporter.class%">
@@ -94,6 +96,7 @@
 
     <service id="beats.flasher" class="%beats.flasher.class%" public="true">
       <argument type="service" id="service_container"/>
+      <argument>%beats.flasher%</argument>
     </service>
 
 
@@ -116,11 +119,11 @@
 
 
     <service id="beats.dbal.rdb" class="%beats.dbal.rdb.class%" public="true">
-      <argument>%beats.rdb%</argument>
+      <argument>%beats.dbal.rdb%</argument>
     </service>
 
     <service id="beats.dbal.dom" class="%beats.dbal.dom.class%" public="true">
-      <argument>%beats.dom%</argument>
+      <argument>%beats.dbal.dom%</argument>
     </service>
 
     <service id="beats.dbal.mix" class="%beats.dbal.mix.class%" public="true">

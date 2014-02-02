@@ -5,8 +5,6 @@ use BeatsBundle\Service\Mailer\Mail;
 
 class Mailer extends ContainerAware {
 
-  const CONFIG_MAILER_MAILS = 'mailer_mails';
-
   /**
    * @return \Swift_Mailer
    */
@@ -17,9 +15,12 @@ class Mailer extends ContainerAware {
   /*********************************************************************************************************************/
 
   protected function _mails($type = 'default') {
-    $mails = $this->container->getParameter(self::CONFIG_MAILER_MAILS);
+    $mails = $this->_options->get('mails');
     if (empty($type)) {
       return $mails;
+    }
+    if (empty($mails)) {
+      return null;
     }
     if (empty($mails[$type])) {
       $type = 'default';
@@ -29,14 +30,23 @@ class Mailer extends ContainerAware {
 
   /*********************************************************************************************************************/
 
+  /**
+   * @param string      $mail
+   * @param string|null $name
+   * @return array
+   */
   public function toAddress($mail, $name = null) {
     $default = (object)$this->_mails();
     return array((empty($mail) ? $default->mail : $mail) => (empty($name) ? $default->name : $name));
   }
 
+  /**
+   * @param $type
+   * @return array|null
+   */
   public function getMail($type) {
     if (is_string($type)) {
-      if (strpos($type, '@')) { // LATER@ion:Create a better email validation
+      if (strpos($type, '@')) { // LATER@ion:Create a better email check
         $mail = array('mail' => $type);
       } else {
         $mail = $this->_mails($type);
@@ -46,6 +56,9 @@ class Mailer extends ContainerAware {
     } else {
       $mail = $this->_mails();
     }
+    if (empty($mail)) {
+      return $mail;
+    }
     $mail = (object)array_merge(array(
       'mail' => null,
       'name' => null,
@@ -53,6 +66,9 @@ class Mailer extends ContainerAware {
     return $this::toAddress($mail->mail, $mail->name);
   }
 
+  /**
+   * @return array
+   */
   public function getMails() {
     return $this->_mails(false);
   }

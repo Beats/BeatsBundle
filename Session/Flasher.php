@@ -5,8 +5,6 @@ use BeatsBundle\Service\ContainerAware;
 
 class Flasher extends ContainerAware {
 
-  const CONFIG_TEMPLATE = 'flasher.template';
-
   const FLASH_MESSAGE = 'flasher.message';
   const FLASH_PAGE    = 'flasher.page';
 
@@ -71,7 +69,7 @@ class Flasher extends ContainerAware {
   }
 
   public function getTemplate($default = null) {
-    $template = $this->container->getParameter(self::CONFIG_TEMPLATE);
+    $template = $this->_options->has('template') ? $this->_options->get('template'): null;
     return empty($template) ? $default : $template;
   }
 

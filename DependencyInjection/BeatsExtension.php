@@ -22,18 +22,15 @@ class BeatsExtension extends Extension {
   public function load(array $configs, ContainerBuilder $container) {
     $config = $this->processConfiguration(new Configuration(), $configs);
 
-    $container->setParameter('beats.rdb', $config['rdb']);
-    $container->setParameter('beats.dom', $config['dom']);
+    $container->setParameter('beats.dbal.rdb', $config['dbal']['rdb']);
+    $container->setParameter('beats.dbal.dom', $config['dbal']['dom']);
 
     $container->setParameter('beats.oauth.providers', $config['oauth']['providers']);
     $container->setParameter('beats.oauth.callback', $config['oauth']['callback']);
 
-    $container->setParameter(Mailer::CONFIG_MAILER_MAILS, $config['mailer']['mails']);
-
-//    $container->setParameter(Mailer::CONFIG_MAIL_FROM, $config['mailer']['from']);
-//    $container->setParameter(Mailer::CONFIG_MAIL_NAME, $config['mailer']['name']);
-    $container->setParameter(Chronos::CONFIG_TIMEZONE, $config['chronos']['timezone']);
-    $container->setParameter(Flasher::CONFIG_TEMPLATE, $config['flasher']['template']);
+    $container->setParameter('beats.mailer' , $config['mailer']);
+    $container->setParameter('beats.flasher', $config['flasher']);
+    $container->setParameter('beats.chronos', $config['chronos']);
 
     $container->setParameter('beats.security.service.id', $config['security']['persister']);
     $container->setParameter('beats.security.default', $config['security']['default']);

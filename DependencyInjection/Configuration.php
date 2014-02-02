@@ -20,8 +20,7 @@ class Configuration implements ConfigurationInterface {
 
     $rootNode = $treeBuilder->root('beats');
 
-    $this->_setupRDB($rootNode);
-    $this->_setupDOM($rootNode);
+    $this->_setupDBAL($rootNode);
     $this->_setupOAuth($rootNode);
 
     $this->_setupMailer($rootNode);
@@ -36,14 +35,21 @@ class Configuration implements ConfigurationInterface {
     return $treeBuilder;
   }
 
+  protected function _setupDBAL(NodeDefinition $node) {
+    $dbalNode = $node->children()->arrayNode('dbal')->addDefaultsIfNotSet();
+    $this->_setupRDB($dbalNode);
+    $this->_setupDOM($dbalNode);
+    return $dbalNode->end()->end();
+  }
+
   protected function _setupRDB(NodeDefinition $node) {
     /** @noinspection PhpUndefinedMethodInspection */
     return $node->children()
-      ->arrayNode('rdb')
+      ->arrayNode('rdb')->addDefaultsIfNotSet()
       ->children()
-      ->scalarNode('drvr')->cannotBeEmpty()->isRequired()->end()
+      ->scalarNode('drvr')->cannotBeEmpty()->isRequired()->defaultValue('pgsql')->end()
       ->scalarNode('host')->defaultValue('localhost')->end()
-      ->scalarNode('port')->end()
+      ->scalarNode('port')->defaultValue(5432)->end()
       ->scalarNode('name')->end()
       ->scalarNode('user')->end()
       ->scalarNode('pass')->end()
@@ -55,11 +61,11 @@ class Configuration implements ConfigurationInterface {
   protected function _setupDOM(NodeDefinition $node) {
     /** @noinspection PhpUndefinedMethodInspection */
     return $node->children()
-      ->arrayNode('dom')
+      ->arrayNode('dom')->addDefaultsIfNotSet()
       ->children()
-      ->scalarNode('drvr')->cannotBeEmpty()->isRequired()->end()
+      ->scalarNode('drvr')->cannotBeEmpty()->isRequired()->defaultValue('couchdb')->end()
       ->scalarNode('host')->defaultValue('localhost')->end()
-      ->scalarNode('port')->end()
+      ->scalarNode('port')->defaultValue(5984)->end()
       ->scalarNode('name')->end()
       ->scalarNode('user')->end()
       ->scalarNode('pass')->end()
@@ -72,7 +78,7 @@ class Configuration implements ConfigurationInterface {
   protected function _setupOAuth(NodeDefinition $node) {
     /** @noinspection PhpUndefinedMethodInspection */
     return $node->children()
-      ->arrayNode('oauth')
+      ->arrayNode('oauth')->addDefaultsIfNotSet()
       ->children()
       ->scalarNode('callback')->defaultValue('beats.oauth.connect')->end()
       ->arrayNode('providers')->isRequired()->useAttributeAsKey('name')->prototype('array')->addDefaultsIfNotSet()
@@ -95,9 +101,10 @@ class Configuration implements ConfigurationInterface {
   protected function _setupMailer(NodeDefinition $node) {
     /** @noinspection PhpUndefinedMethodInspection */
     $node->children()
-      ->arrayNode('mailer')
+      ->arrayNode('mailer')->addDefaultsIfNotSet()
       ->children()
-      ->arrayNode('mails')->isRequired()->useAttributeAsKey('type')->prototype('array')->addDefaultsIfNotSet()
+      ->arrayNode('mails')->isRequired()->requiresAtLeastOneElement()->useAttributeAsKey('type')
+      ->prototype('array')->addDefaultsIfNotSet()
       ->children()
       ->scalarNode('mail')->cannotBeEmpty()->isRequired()->end()
       ->scalarNode('name')->cannotBeEmpty()->isRequired()->end()
