@@ -57,11 +57,15 @@ class Chronos extends ContainerAware {
     if ($session->has(self::SESSION_TIMEZONE)) {
       $zone = $session->get(self::SESSION_TIMEZONE);
     } else {
-      if ($security->isGranted('ROLE_USER')) {
-        $user = $this->_security()->getToken()->getUser();
-        if ($user instanceof Member) {
-          $zone = $user->getTimezone();
+      try {
+        if ($security->isGranted('ROLE_USER')) {
+          $user = $this->_security()->getToken()->getUser();
+          if ($user instanceof Member) {
+            $zone = $user->getTimezone();
+          }
         }
+      } catch(\Exception $ex) {
+        $zone = null;
       }
       if (empty($zone) && $request->cookies->has(self::COOKIE_TIMEZONE)) {
         $zone = $request->cookies->get(self::COOKIE_TIMEZONE);
