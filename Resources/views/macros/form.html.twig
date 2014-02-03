@@ -84,6 +84,7 @@
   {% import _self as self %}
   {% set opts = {
   multiple: false,
+  clear: false,
   options: {},
   }|merge(opts|default({})) %}
   <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
