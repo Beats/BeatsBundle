@@ -15,6 +15,42 @@
   {% endif %}
 {% endmacro %}
 
+{% macro _form_element_attrs(opts) %}
+  {% set name = opts.name| default('') %}
+  {% set id = opts.id|default(name) %}
+  {% if id is not empty %}
+    id="{{ id }}"
+  {% endif %}
+  {% if name is not empty %}
+    name="{{ opts.name }}"
+  {% endif %}
+  class="{{ opts.inputClass }}"
+  autocomplete="{{ opts.autocomplete ? "on" : "off" }}"
+  {% for key,val in data|default({}) %}
+    data-{{ key }}="{{ val }}"
+  {% endfor %}
+{% endmacro %}
+
+{% macro _form_input_attrs(opts, value) %}
+  type="{{ opts.type }}"
+  placeholder="{{ opts.placeholder|default(opts.label) }}"
+  {% if opts.type in ['checkbox'] %}
+    {{ value is empty ? '' : 'checked="checked"' }}
+    value="1"
+  {% else %}
+    value="{{ value }}"
+  {% endif %}
+{% endmacro %}
+
+{% macro _form_select_attrs(opts) %}
+  {% if opts.multiple %}multiple="multiple"{% endif %}
+{% endmacro %}
+
+{% macro _form_textarea_attrs(opts) %}
+  {% if opts.rows %}rows="{{ opts.rows }}"{% endif %}
+  {% if opts.cols %}cols="{{ opts.cols }}"{% endif %}
+{% endmacro %}
+
 {% macro label(opts) %}
   {% if opts.label is not empty %}
     <label class="{{ opts.labelClass }}" for="{{ opts.name }}">
@@ -23,14 +59,12 @@
   {% endif %}
 {% endmacro %}
 
-{% macro input(opts) %}
+{% macro _input(opts, value, _field) %}
   {% import _self as self %}
-  {% set _field = app._field(opts.name) %}
-  {% set value = _field is not empty
-  ? _field.getValue
-  : app.request.get(opts.name, opts.default|default(opts.value), true) %}
-
-  {% if opts.addon is defined and opts.addon is not empty %}
+  {% set opts = {
+  addon: null,
+  }|merge(opts|default({})) %}
+  {% if opts.addon is not empty %}
     <div class="input-group">
       {% if opts.addon.l is defined %}
         <span class="input-group-addon">{{ opts.addon.l|raw }}</span>
@@ -41,68 +75,106 @@
       {% endif %}
     </div>
   {% else %}
-    <input class="{{ opts.inputClass }}"
-           type="{{ opts.type }}"
-           id="{{ opts.id|default(opts.name) }}"
-           name="{{ opts.name }}"
-           autocomplete="{{ opts.autocomplete ? "on" : "off" }}"
-           placeholder="{{ opts.placeholder|default(opts.label) }}"
-      {% if opts.type in ['checkbox'] %}
-        {{ opts.value is empty ? '' : 'checked="checked"' }}
-        value="1"
-      {% else %}
-        value="{{ opts.value }}"
-      {% endif %}
-      />
+    <input {{ self._form_element_attrs(opts) }} {{ self._form_input_attrs(opts, value) }}/>
   {% endif %}
+
 {% endmacro %}
 
-{% macro select(opts) %}
+{% macro _select(opts, value, _field) %}
   {% import _self as self %}
+  {% set opts = {
+  multiple: false,
+  options: {},
+  }|merge(opts|default({})) %}
+  <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
+    {% if opts.clear is not empty %}
+      <option data-hidden="true" value="">{{ opts.clear|raw }}</option>
+    {% endif %}
+    {% for key, lbl in opts.options %}
+      <option value="{{ key }}" {{ value == key ? 'selected="selected"': '' }}>{{ lbl }}</option>
+    {% endfor %}
+  </select>
+
+{% endmacro %}
+
+{% macro _textarea(opts, value, _field) %}
+  {% import _self as self %}
+  {% set opts = {
+  cols: null,
+  rows: null,
+  }|merge(opts|default({})) %}
+  <textarea {{ self._form_element_attrs(opts) }} {{ self._form_textarea_attrs(opts) }}>{{ value|raw }}</textarea>
+{% endmacro %}
+
+{% macro input(opts) %}
+  {% import _self as self %}
+  {% set opts = {
+  id: null,
+  name: '',
+  data: {},
+  value: null,
+  default: null,
+  placeholder: null,
+  autocomplete: false,
+  disabled: false,
+  readonly: false,
+  }|merge(opts|default({})) %}
+  {% set _field = app._field(opts.name) %}
+  {% set value = _field is not empty ? _field.getValue : app.request.get(opts.name, opts.default|default(opts.value), true) %}
+
+  {% if opts.type in ['select'] %}
+    {{ self._select(opts, value, _field) }}
+  {% elseif opts.type in ['textarea'] %}
+    {{ self._textarea(opts, value, _field) }}
+  {% else %}
+    {{ self._input(opts, value, _field) }}
+  {% endif %}
 {% endmacro %}
 
 {% macro _field_date(opts) %}
   {% import _self as self %}
+  {% set _field = app._field(opts.name) %}
+  {% set value = _field is not empty ? _field.getValue : app.request.get(opts.name, opts.default|default(opts.value), true) %}
+  {% set value = value|default('--')|split('-') %}
+
   {% set clear = opts.clear is defined ? opts.clear : false %}
   {% if clear is not iterable %}
     {% set clear = {y: clear, m: clear, d: clear} %}
   {% endif %}
-  {% set months = {
-  abbr: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  full: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  {% set options = {
+  y: dateY(opts.yearsUpper|default(null), opts.yearsLower|default(null)),
+  m: dateM(opts.months|default(true)),
+  d: dateD(),
   } %}
 
   {{ self.label(opts) }}
   <div class="row">
     <div class="col-md-4 col-sm-4 col-xs-12">
-      <select class="{{ opts.inputClass }}" data-fld="m" autocomlete="off">
-        {% if clear is not empty %}
-          <option data-hidden="true" value="">{{ clear.m }}</option>
-        {% endif %}
-        {% for m in 0..11 %}
-          <option value="{{ "%02d"|format( m + 1) }}">{{ months.abbr[m] }}</option>
-        {% endfor %}
-      </select>
+      {{ self._select({
+      inputClass: opts.inputClass,
+      autocomplete: false,
+      data: {fld: 'm'},
+      clear: opts.clear.m,
+      options: options.m,
+      }, value[1], _field) }}
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12">
-      <select class="{{ opts.inputClass }}" data-fld="d" autocomlete="off">
-        {% if clear is not empty %}
-          <option data-hidden="true" value="">{{ clear.d }}</option>
-        {% endif %}
-        {% for d in 0..30 %}
-          <option value="{{ "%02d"|format( d + 1) }}">{{ "%02d"|format( d + 1) }}</option>
-        {% endfor %}
-      </select>
+      {{ self._select({
+      inputClass: opts.inputClass,
+      autocomplete: false,
+      data: {fld: 'd'},
+      clear: opts.clear.d,
+      options: options.d,
+      }, value[2], _field) }}
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12">
-      <select class="{{ opts.inputClass }}" data-fld="y" autocomlete="off">
-        {% if clear is not empty %}
-          <option data-hidden="true" value="">{{ clear.y }}</option>
-        {% endif %}
-        {% for y in opts.year.from..opts.year.till %}
-          <option value="{{ y }}">{{ "%04d"|format(y) }}</option>
-        {% endfor %}
-      </select>
+      {{ self._select({
+      inputClass: opts.inputClass,
+      autocomplete: false,
+      data: {fld: 'y'},
+      clear: opts.clear.y,
+      options: options.y,
+      }, value[0], _field) }}
     </div>
   </div>
   {% if clear is not empty %}
@@ -206,5 +278,19 @@
   {{ self.field(opts|default({})|merge({
   type: 'text',
   addon: { l: '<i class="icon-ellipsis-horizontal"></i>', },
+  })) }}
+{% endmacro %}
+
+{% macro textarea(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+  type: 'textarea',
+  })) }}
+{% endmacro %}
+
+{% macro select(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+  type: 'select',
   })) }}
 {% endmacro %}

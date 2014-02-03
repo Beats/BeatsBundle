@@ -35,7 +35,60 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'flash'          => new Twig_Function_Method($this, 'renderFlash', array('is_safe' => array('html'))),
       'oauthConnect'   => new Twig_Function_Method($this, 'oauthConnect', array('is_safe' => array('html'))),
       'oauthProviders' => new Twig_Function_Method($this, 'oauthProviders', array('is_safe' => array('html'))),
+
+      'dateY'          => new Twig_Function_Method($this, 'dateY'),
+      'dateM'          => new Twig_Function_Method($this, 'dateM'),
+      'dateD'          => new Twig_Function_Method($this, 'dateD'),
+
     );
+  }
+
+  public function dateY($upper = null, $lower = null) {
+    if (empty($upper)) {
+      $upper = date('Y');
+    }
+    if (empty($lower)) {
+      $lower = $upper + 2;
+    }
+    $opts = array();
+    if ($upper < $lower) {
+      for ($y = $upper; $y <= $lower; $y++) {
+        $y        = sprintf('%04d', $y);
+        $opts[$y] = $y;
+      }
+    } else {
+      for ($y = $upper; $lower <= $y; $y--) {
+        $y        = sprintf('%04d', $y);
+        $opts[$y] = $y;
+      }
+    }
+    return $opts;
+  }
+
+  public function dateM($months = true) {
+    if (!is_array($months)) {
+      $months = $months
+        ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    }
+    $opts = array();
+    foreach ($months as $m => $label) {
+      $opts[sprintf('%02d', $m + 1)] = $label;
+    }
+    return $opts;
+  }
+
+  public function dateD() {
+    $opts = array();
+    for ($i = 1; $i < 10; $i++) {
+      $i        = '0' . $i;
+      $opts[$i] = $i;
+    }
+    for ($i = 10; $i <= 31; $i++) {
+      $i        = '' . $i;
+      $opts[$i] = $i;
+    }
+    return $opts;
   }
 
   public function isTraversable($value) {
