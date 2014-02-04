@@ -21,6 +21,16 @@
       self.editing(false)
       self.element.data('old', self.value())
 
+
+      self.element.on({
+        'init.beats.field.reditor': function () {
+          self._editInit()
+        },
+        'done.beats.field.reditor': function () {
+          self._editDone()
+        }
+      })
+
       if (self.options.onEnter === undefined) {
         self.options.onEnter = self.element.is(':text')
       }
