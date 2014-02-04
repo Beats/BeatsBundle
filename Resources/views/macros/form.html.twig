@@ -87,13 +87,15 @@
   clear: false,
   options: {},
   }|merge(opts|default({})) %}
-
+  {% if not opts.multiple %}
+    {% set value = [value] %}
+  {% endif %}
   <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
     {% if opts.clear is not empty %}
       <option data-hidden="true" value="">{{ opts.clear|raw }}</option>
     {% endif %}
     {% for key, lbl in opts.options %}
-      <option value="{{ key }}" {{ value == key ? 'selected="selected"': '' }}>{{ lbl }}</option>
+      <option value="{{ key }}" {{ key in value ? 'selected="selected"': '' }}>{{ lbl }}</option>
     {% endfor %}
   </select>
 
