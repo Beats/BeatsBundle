@@ -485,7 +485,7 @@
         })
     },
 
-    _validate: function (oldValue) {
+    _validate: function (oldValue, initial) {
       var self = this
         , structure = self.structure()
         , newValue = self._structure2iso(structure)

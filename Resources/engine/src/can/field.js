@@ -99,7 +99,24 @@
         return self
       },
 
-      _validate: function (value) {
+      value: function (value) {
+        if (this.element.is(':checkbox,:radio')) {
+          if (value === undefined) {
+            return this.element.prop('checked') ? 1 : 0
+          } else {
+            this.element.prop('checked', !!value)
+          }
+        } else {
+          if (value === undefined) {
+            return this.element.val()
+          } else {
+            this.element.val(value)
+          }
+        }
+        return this
+      },
+
+      _validate: function (value, initial) {
         var self = this
         if (Beats.empty(self.options.validator)) {
           return $.Deferred().resolveWith(self, [false, value])
@@ -120,21 +137,13 @@
         self.$group().removeClass('has-error has-success')
         self.$alert().empty()
 
-        return self._validate(self.element.val())
-          .done(function () {
+        return self._validate(self.element.val(), initial)
+          .done(function (failure, value) {
             self._setSuccess(self.options.success, initial)
           })
-          .fail(function (failure) {
+          .fail(function (failure, value) {
             self._setFailure(self.options.failure || failure, initial)
           })
-
-//        if (failure = self._validate()) {
-//          self._setFailure(self.options.failure || failure, initial)
-//          return false
-//        } else {
-//          self._setSuccess(self.options.success, initial)
-//          return true
-//        }
       },
 
       _setFailure: function (failure, initial) {

@@ -33,6 +33,7 @@ beats-can-form:
   version: 0.1
   javascripts:
     - 'can/field'
+    - 'can/field/reditor'
     - 'can/field/widget'
     - 'can/field/datetime'
     - 'can/field/number'
