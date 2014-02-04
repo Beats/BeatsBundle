@@ -3,9 +3,6 @@
  */
 (function ($) {
 
-  var _ = {
-  }
-
   Beats.Field = Beats.Control.extend({
 
       defaults: {
@@ -73,7 +70,6 @@
       },
 
       _defaulter: function (value) {
-        var self = this
         return value
       },
 
@@ -126,7 +122,9 @@
       _setFailure: function (failure, initial) {
         var self = this
         self.$group().addClass('has-error')
-        self.$alert().html(failure)
+        if ($.type(failure) === 'string') {
+          self.$alert().html(failure)
+        }
       },
 
       _setSuccess: function (success, initial) {
@@ -135,7 +133,9 @@
           return
         }
         self.$group().addClass('has-success')
-        self.$alert().html(success)
+        if ($.type(success) === 'string') {
+          self.$alert().html(success)
+        }
       },
 
       isValid: function () {
