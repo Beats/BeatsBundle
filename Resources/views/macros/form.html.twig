@@ -26,7 +26,7 @@
   {% endif %}
   class="{{ opts.inputClass }}"
   autocomplete="{{ opts.autocomplete ? "on" : "off" }}"
-  {% for key,val in data|default({}) %}
+  {% for key,val in opts.data|default({}) %}
     data-{{ key }}="{{ val }}"
   {% endfor %}
 {% endmacro %}
@@ -87,6 +87,7 @@
   clear: false,
   options: {},
   }|merge(opts|default({})) %}
+
   <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
     {% if opts.clear is not empty %}
       <option data-hidden="true" value="">{{ opts.clear|raw }}</option>
@@ -147,7 +148,6 @@
   m: dateM(opts.months|default(true)),
   d: dateD(),
   } %}
-
   {{ self.label(opts) }}
   <div class="row">
     <div class="col-md-4 col-sm-4 col-xs-12">

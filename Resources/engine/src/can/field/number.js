@@ -49,14 +49,17 @@
       }
     },
 
-    _validate: function () {
+    _validate: function (value) {
       var self = this
-        , value = self.element.val()
       if (self.options.hasMin && value < self.options.min) {
-        return Beats.empty(self.options.minError) || self.options.minError.replace('%d', self.options.min)
+        return $.Deferred().rejectWith(self, [
+          Beats.empty(self.options.minError) || self.options.minError.replace('%d', self.options.min)
+        ])
       }
       if (self.options.hasMax && self.options.max < value) {
-        return Beats.empty(self.options.maxError) || self.options.maxError.replace('%d', self.options.max)
+        return $.Deferred().rejectWith(self, [
+          Beats.empty(self.options.maxError) || self.options.maxError.replace('%d', self.options.max)
+        ])
       }
       return self._super.apply(self, arguments)
     }

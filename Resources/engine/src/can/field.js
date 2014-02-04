@@ -37,6 +37,10 @@
         var self = this
         self._super.apply(self, arguments)
 
+        if (!self.element.is(':input')) {
+          throw new Beats.Error(self, 'The field must be a HTML form field')
+        }
+
         self.options.default = (
           $.isFunction(self.options.defaulter)
             ? self.options.defaulter
@@ -95,28 +99,42 @@
         return self
       },
 
-      _validate: function () {
+      _validate: function (value) {
         var self = this
-        if ($.isFunction(self.options.validator)) {
-          return self.options.validator.apply(self, [self.element.val()])
+        if (Beats.empty(self.options.validator)) {
+          return $.Deferred().resolveWith(self, [false, value])
+        } else if ($.isFunction(self.options.validator.promise)) {
+          return self.options.validator
+        } else if ($.isFunction(self.options.validator)) {
+          var dfd = $.Deferred()
+            , error = self.options.validator.apply(self, arguments)
+          return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
+        } else {
+          return $.when(self.options.validator)
         }
-        return false;
       },
 
       _update: function (initial) {
         var self = this
-          , failure
 
         self.$group().removeClass('has-error has-success')
         self.$alert().empty()
 
-        if (failure = self._validate()) {
-          self._setFailure(self.options.failure || failure, initial)
-          return false
-        } else {
-          self._setSuccess(self.options.success, initial)
-          return true
-        }
+        return self._validate(self.element.val())
+          .done(function () {
+            self._setSuccess(self.options.success, initial)
+          })
+          .fail(function (failure) {
+            self._setFailure(self.options.failure || failure, initial)
+          })
+
+//        if (failure = self._validate()) {
+//          self._setFailure(self.options.failure || failure, initial)
+//          return false
+//        } else {
+//          self._setSuccess(self.options.success, initial)
+//          return true
+//        }
       },
 
       _setFailure: function (failure, initial) {

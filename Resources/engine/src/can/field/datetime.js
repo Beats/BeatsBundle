@@ -357,6 +357,7 @@
 
     _beforeRender: function () {
       var self = this
+        , year
       self._super.apply(self, arguments)
 
       self.options.tplV.fields = self.options.fields
@@ -370,11 +371,11 @@
         self.options.yearsLower = self.options.yearsUpper + 2
       }
       if (self.options.yearsUpper < self.options.yearsLower) {
-        for (var year = self.options.yearsUpper; year <= self.options.yearsLower; year++) {
+        for (year = self.options.yearsUpper; year <= self.options.yearsLower; year++) {
           self.options.tplV.parts.y.push({val: year, lbl: year})
         }
       } else {
-        for (var year = self.options.yearsUpper; self.options.yearsLower <= year; year--) {
+        for (year = self.options.yearsUpper; self.options.yearsLower <= year; year--) {
           self.options.tplV.parts.y.push({val: year, lbl: year})
         }
       }
@@ -472,33 +473,35 @@
       return (date.getMonth() != structure.m - 1)
     },
 
-    _validate: function () {
+    _update: function (initial) {
       var self = this
         , oldValue = self.element.val()
+      return self._super.apply(self, arguments)
+        .always(function (failure, newValue) {
+          self.$clear().toggle(!Beats.empty(newValue))
+          if (oldValue !== newValue) {
+            self.element.val(newValue).trigger(jQuery.Event('change'), [newValue, !failure])
+          }
+        })
+    },
+
+    _validate: function (oldValue) {
+      var self = this
         , structure = self.structure()
         , newValue = self._structure2iso(structure)
         , error = false
-
       if (Beats.empty(newValue)) {
-        self.$clear().hide()
         if (!Beats.empty(structure)) {
           error = self.options.incomplete
         }
-      } else {
-        self.$clear().show()
-        if (self._isInvalid(newValue, structure)) {
-          error = self.options.invalid
-        } else if ($.isFunction(self.options.validator)) {
-          error = self.options.validator.apply(self, [newValue, structure])
-        }
+      } else if (self._isInvalid(newValue, structure)) {
+        error = self.options.invalid
       }
       if (error) {
         newValue = ''
+        return $.Deferred().rejectWith(self, [error, newValue])
       }
-      if (oldValue !== newValue) {
-        self.element.val(newValue).trigger(jQuery.Event('change'), [newValue, !error])
-      }
-      return error
+      return self._super.apply(self, [newValue])
     }
 
   })
