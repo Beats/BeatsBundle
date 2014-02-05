@@ -158,7 +158,9 @@
           options.close = false
           options.header = false
         } else {
-          options.title = 'Alert'
+          options.title = '&nbsp;'
+          options.close = true
+          options.header = true
         }
       }
       if (button === false) {
