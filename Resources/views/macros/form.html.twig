@@ -25,7 +25,10 @@
     name="{{ opts.name }}"
   {% endif %}
   class="{{ opts.inputClass }}"
-  autocomplete="{{ opts.autocomplete ? "on" : "off" }}"
+  {% if opts.autocomplete is defined %}autocomplete="{{ opts.autocomplete ? "on" : "off" }}"{% endif %}
+  {% if opts.autofocus is defined and opts.autofocus %}autofocus="autofocus"{% endif %}
+  {% if opts.tabindex is defined and opts.tabindex > 0 %}tabindex="{{ opts.tabindex }}"{% endif %}
+  {% if opts.style is defined and opts.style is not empty %}style="{{ opts.style }}"{% endif %}
   {% for key,val in opts.data|default({}) %}
     data-{{ key }}="{{ val }}"
   {% endfor %}
@@ -195,12 +198,15 @@
   type: 'text',
   value: null,
   default: null,
+  style: null,
   groupClass: 'form-group',
   labelClass: 'control-label',
   inputClass: 'form-control',
   label: null,
   placeholder: null,
   autocomplete: false,
+  autofocus: false,
+  tabindex: 0,
   }|merge(opts|default({})) %}
 
   {% if opts.type in ['date'] %}
@@ -236,6 +242,13 @@
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
   type: 'text',
+  })) }}
+{% endmacro %}
+
+{% macro pass(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+  type: 'password',
   })) }}
 {% endmacro %}
 
