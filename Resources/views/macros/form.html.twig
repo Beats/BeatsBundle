@@ -17,7 +17,11 @@
 
 {% macro _form_element_attrs(opts) %}
   {% set name = opts.name| default('') %}
-  {% set id = opts.id|default(name) %}
+  {% if opts.type in ['radio'] and opts.id is empty %}
+    {% set id = name ~ '-' ~ opts.value %}
+  {% else %}
+    {% set id = opts.id|default(name) %}
+  {% endif %}
   {% if id is not empty %}
     id="{{ id }}"
   {% endif %}
@@ -37,9 +41,13 @@
 {% macro _form_input_attrs(opts, value) %}
   type="{{ opts.type }}"
   placeholder="{{ opts.placeholder|default(opts.label) }}"
+  {% if opts.required is defined and opts.required %}required="required"{% endif %}
   {% if opts.type in ['checkbox'] %}
     {{ value is empty ? '' : 'checked="checked"' }}
     value="1"
+  {% elseif opts.type in ['radio'] %}
+    {{ value != opts.value ? '' : 'checked="checked"' }}
+    value="{{ opts.value }}"
   {% else %}
     value="{{ value }}"
   {% endif %}
@@ -55,8 +63,13 @@
 {% endmacro %}
 
 {% macro label(opts) %}
+  {% if opts.type in ['radio'] and opts.id is empty %}
+    {% set id = opts.name| default('') ~ '-' ~ opts.value %}
+  {% else %}
+    {% set id = opts.id|default(opts.name| default('')) %}
+  {% endif %}
   {% if opts.label is not empty %}
-    <label class="{{ opts.labelClass }}" for="{{ opts.name }}">
+    <label class="{{ opts.labelClass }}" for="{{ id }}">
       {{ opts.label|raw }}
     </label>
   {% endif %}
@@ -125,10 +138,10 @@
   autocomplete: false,
   disabled: false,
   readonly: false,
+  required: false,
   }|merge(opts|default({})) %}
   {% set _field = app._field(opts.name) %}
   {% set value = _field is not empty ? _field.getValue : app.request.get(opts.name, opts.default|default(opts.value), true) %}
-
   {% if opts.type in ['select'] %}
     {{ self._select(opts, value, _field) }}
   {% elseif opts.type in ['textarea'] %}
@@ -215,9 +228,21 @@
       {{ self._field_date(opts) }}
       {{ self.messages(opts.name) }}
     </div>
+  {% elseif opts.type in ['hidden'] %}
+    {{ self.input(opts) }}
   {% else %}
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
-      {% if opts.type in ['checkbox', 'radio'] %}
+      {% if opts.type in ['radio'] %}
+        {{ self.label(opts) }}
+        {% for value, label in opts.options|default({}) %}
+          <div class="{{ opts.type }}">
+            {{ self.label(opts|merge({
+            value: value,
+            label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
+            })) }}
+          </div>
+        {% endfor %}
+      {% elseif opts.type in ['checkbox'] %}
         <div class="{{ opts.type }}">
           {% if opts.label is not empty %}
             {{ self.label(opts|merge({
@@ -236,6 +261,13 @@
       {{ self.messages(opts.name) }}
     </div>
   {% endif %}
+{% endmacro %}
+
+{% macro hidden(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+  type: 'hidden',
+  })) }}
 {% endmacro %}
 
 {% macro text(opts) %}
