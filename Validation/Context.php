@@ -103,6 +103,51 @@ class Context extends ContainerAware {
     return $this->_messages;
   }
 
+  /**
+   * @param $name
+   * @return Validation
+   */
+  public function getValidation($name) {
+    return $this->_validations->get($name, null, true);
+  }
+
+
+  /**
+   * @param string|$name
+   * @param string|null $text
+   * @return $this
+   */
+  public function forceError($name, $text = null) {
+    $validation = $this->getValidation($name);
+    $validation->forceSuccess(false);
+    $message = $validation->getMessage();
+    if (!empty($text)) {
+      $message->setText($text);
+    }
+    $this->_valids->remove($name);
+    $this->_messages->set($name, $message);
+    $this->_errors->set($name, $message);
+    return $this;
+  }
+
+  /**
+   * @param string|$name
+   * @param string|null $text
+   * @return $this
+   */
+  public function forceValid($name, $text = null) {
+    $validation = $this->getValidation($name);
+    $validation->forceSuccess(true);
+    $message = $validation->getMessage();
+    if (!empty($text)) {
+      $message->setText($text);
+    }
+    $this->_errors->remove($name);
+    $this->_messages->set($name, $message);
+    $this->_valids->set($name, $message);
+    return $this;
+  }
+
 
   /**
    * @return boolean

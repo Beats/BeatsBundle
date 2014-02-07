@@ -30,7 +30,7 @@ class Validation {
   protected $_executed;
 
   public function __construct($name, Constraint $constraint) {
-    $this->_name = $name;
+    $this->_name       = $name;
     $this->_constraint = $constraint;
   }
 
@@ -60,6 +60,14 @@ class Validation {
     return $this->_name;
   }
 
+  /**
+   * @param boolean $success
+   * @return $this
+   */
+  public function forceSuccess($success = false) {
+    $this->_success = $success;
+    return $this;
+  }
 
   public function getValue() {
     return $this->_constraint->getTransformed();
@@ -87,10 +95,10 @@ class Validation {
       }
       $this->_executed = false;
     }
-    $this->_success = $constraint->execute($value, $context);
+    $this->_success  = $constraint->execute($value, $context);
     $this->_optional = $constraint->isOptional();
-    $value = $constraint->getTransformed();
-    $this->_empty = $value === null || $value === '';
+    $value           = $constraint->getTransformed();
+    $this->_empty    = $value === null || $value === '';
     $this->_executed = true;
     return $this->_success;
   }

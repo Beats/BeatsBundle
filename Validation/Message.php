@@ -34,6 +34,11 @@ class Message {
     return $this->_text;
   }
 
+  public function setText($text) {
+    $this->_text  = is_array($text) ? $text : array($text);
+    return $this;
+  }
+
   public function getType() {
     return $this->_type;
   }
@@ -52,7 +57,7 @@ class Message {
       return $text;
     }
     $texts = array();
-    array_walk_recursive($text, function($text) use (&$texts) {
+    array_walk_recursive($text, function ($text) use (&$texts) {
       array_push($texts, $text);
     });
     return implode(";", $texts);
