@@ -75,7 +75,7 @@
   {% endif %}
 {% endmacro %}
 
-{% macro _input(opts, value, _field) %}
+{% macro _input(opts, value) %}
   {% import _self as self %}
   {% set opts = {
   addon: null,
@@ -96,7 +96,7 @@
 
 {% endmacro %}
 
-{% macro _select(opts, value, _field) %}
+{% macro _select(opts, value) %}
   {% import _self as self %}
   {% set opts = {
   multiple: false,
@@ -117,7 +117,7 @@
 
 {% endmacro %}
 
-{% macro _textarea(opts, value, _field) %}
+{% macro _textarea(opts, value) %}
   {% import _self as self %}
   {% set opts = {
   cols: null,
@@ -140,23 +140,20 @@
   readonly: false,
   required: false,
   }|merge(opts|default({})) %}
-  {% set _field = app._field(opts.name) %}
-  {% set value = _field is not empty ? _field.getValue : app.request.get(opts.name, opts.default|default(opts.value), true) %}
+  {% set value = app._value(opts.name, opts.default|default(opts.value)) %}
   {% if opts.type in ['select'] %}
-    {{ self._select(opts, value, _field) }}
+    {{ self._select(opts, value) }}
   {% elseif opts.type in ['textarea'] %}
-    {{ self._textarea(opts, value, _field) }}
+    {{ self._textarea(opts, value) }}
   {% else %}
-    {{ self._input(opts, value, _field) }}
+    {{ self._input(opts, value) }}
   {% endif %}
 {% endmacro %}
 
 {% macro _field_date(opts) %}
   {% import _self as self %}
-  {% set _field = app._field(opts.name) %}
-  {% set value = _field is not empty ? _field.getValue : app.request.get(opts.name, opts.default|default(opts.value), true) %}
+  {% set value = app._value(opts.name, opts.default|default(opts.value)) %}
   {% set value = value|default('--')|split('-') %}
-
   {% set clear = opts.clear is defined ? opts.clear : false %}
   {% if clear is not iterable %}
     {% set clear = {y: clear, m: clear, d: clear} %}
@@ -175,7 +172,7 @@
       data: {fld: 'm'},
       clear: opts.clear.m,
       options: options.m,
-      }, value[1], _field) }}
+      }, value[1]) }}
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12">
       {{ self._select({
@@ -184,7 +181,7 @@
       data: {fld: 'd'},
       clear: opts.clear.d,
       options: options.d,
-      }, value[2], _field) }}
+      }, value[2]) }}
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12">
       {{ self._select({
@@ -193,7 +190,7 @@
       data: {fld: 'y'},
       clear: opts.clear.y,
       options: options.y,
-      }, value[0], _field) }}
+      }, value[0]) }}
     </div>
   </div>
   {% if clear is not empty %}

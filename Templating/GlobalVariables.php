@@ -149,6 +149,14 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     return $this->_validator()->getMessages()->get($path, null, true);
   }
 
+  public function get_value($path, $default = null) {
+    $field = $this->get_field($path);
+    if (empty($field)) {
+      return $this->_request()->get($path, $default, true);
+    }
+    return $field->getValue();
+  }
+
   /********************************************************************************************************************/
 
   public function getLang() {
