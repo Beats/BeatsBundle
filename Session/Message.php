@@ -8,7 +8,7 @@ class Message implements \Serializable {
   const TYPE_COUNSEL = 'info';
   const TYPE_WARNING = 'block';
   const TYPE_SUCCESS = 'success';
-  const TYPE_FAILURE = 'error'; // Danger
+  const TYPE_FAILURE = 'danger';
 
   /********************************************************************************************************************/
 
