@@ -23,6 +23,7 @@ class  CanCommand extends ServiceCommand {
   const DIR_NAME   = 'beats-can';
   const FILE_BUILD = 'build.yml';
 
+  private $_minified = array();
 
   /**
    * @param $path
@@ -308,7 +309,7 @@ EOT
   }
 
   private function _loadInternal(Bundle $bundle, $path, $srcHome, $fext, OutputInterface $output) {
-    $output->write(sprintf("      %s <info>%s</info>", 'Loading', $path));
+    $output->write(sprintf("      %s <info>%s</info>", 'Loading', $path . '.' . $fext));
 
     $file = $srcHome . DIRECTORY_SEPARATOR . $path . '.' . $fext;
 
@@ -326,7 +327,7 @@ EOT
       $this->_popup($path, $ex->getMessage());
       return null;
     }
-    $output->writeln(" <info>Done</info>");
+    $output->writeln(" Done");
     $this->_observe($bundle, $file, $asset);
     return $asset;
   }
@@ -342,7 +343,7 @@ EOT
 
     if ($this->_isRemote) {
       try {
-        $output->write(sprintf(" <info>Caching</info> %s", $file));
+        $output->write(sprintf(" Caching <info>%s</info>", $file));
         $this->_write($file, $hrefAsset->dump());
       } catch (\Exception $ex) {
         $output->write(" <error>Fail</error> trying cached");
@@ -362,7 +363,7 @@ EOT
         try {
           $output->write(" <error>Fail</error> trying remote");
 
-          $output->write(sprintf(" <info>Caching</info> %s", $file));
+          $output->write(sprintf(" Caching <info>%s</info>", $file));
           $this->_write($file, $hrefAsset->dump());
         } catch (\Exception $ex) {
           $output->writeln(" <error>Fail</error>");
@@ -371,7 +372,7 @@ EOT
         }
       }
     }
-    $output->writeln(" <info>Done</info>");
+    $output->writeln(" Done");
     $this->_observe($bundle, $file, $fileAsset);
     return $fileAsset;
   }
@@ -383,10 +384,17 @@ EOT
     if (empty($fext)) {
       $fext = self::_fext($path);
     }
-    $output->write(sprintf("      %s <info>%s</info>", 'Minifying', $path));
-    $dstPath = $dstHome . DIRECTORY_SEPARATOR . $asset->getSourcePath() . '.min.' . $fext;
-    $this->_write($dstPath, $asset->dump($this->_minFilter($fext)));
-    $output->writeln(" <info>Done</info>");
+    $srcPath = $asset instanceof FileAsset ? $path . '.' . $fext : $path;
+
+    if (isset($this->_minified[$srcPath])) {
+      $output->write(sprintf("      %s <comment>%s</comment>", 'Minified', $srcPath));
+    } else {
+      $output->write(sprintf("      %s <info>%s</info>", 'Minifying', $srcPath));
+      $dstPath = $dstHome . DIRECTORY_SEPARATOR . $asset->getSourcePath() . '.min.' . $fext;
+      $this->_write($dstPath, $asset->dump($this->_minFilter($fext)));
+      $this->_minified[$srcPath] = $dstPath;
+    }
+    $output->writeln(" Done");
   }
 
   private function _bundle($config, $outHome, $external, $internal, $fext, OutputInterface $output) {
@@ -396,10 +404,10 @@ EOT
     $this->_write($dstSrc);
     $output->writeln(sprintf("      %s <info>%s</info>", 'Bundling', $dstSrc));
     foreach ($external[$fext] as $asset) {
-      $this->_append($asset, $dstSrc, null, $output);
+      $this->_append($asset, $fext, $dstSrc, null, $output);
     }
     foreach ($internal[$fext] as $asset) {
-      $this->_append($asset, $dstSrc, null, $output);
+      $this->_append($asset, $fext, $dstSrc, null, $output);
     }
 
     if ($this->_isMinify) {
@@ -409,10 +417,10 @@ EOT
       $this->_write($dstMin);
       $output->writeln(sprintf("      %s <info>%s</info>", 'Bundling', $dstMin));
       foreach ($external[$fext] as $asset) {
-        $this->_append($asset, $dstMin, $this->_minFilter($fext), $output);
+        $this->_append($asset, $fext, $dstMin, $this->_minFilter($fext), $output);
       }
       foreach ($internal[$fext] as $asset) {
-        $this->_append($asset, $dstMin, $this->_minFilter($fext), $output);
+        $this->_append($asset, $fext, $dstMin, $this->_minFilter($fext), $output);
       }
     }
   }
@@ -436,22 +444,22 @@ EOT
       $id = $this->_scriptID($asset, $fext, $prefix);
       if ($this->_isTplEmbed) {
         $filters = array($this->_tplFilter($id, $fext));
-        $this->_append($asset, $dstSrc, new FilterCollection($filters), $output);
+        $this->_append($asset, $fext, $dstSrc, new FilterCollection($filters), $output);
       }
       if ($this->_isTplExport) {
         $filters = array();
-        $this->_append($asset, $outHome[$fext] . DIRECTORY_SEPARATOR . $id, new FilterCollection($filters), $output);
+        $this->_append($asset, $fext, $outHome[$fext] . DIRECTORY_SEPARATOR . $id, new FilterCollection($filters), $output);
       }
     }
     foreach ($internal[$fext] as $asset) {
       $id = $this->_scriptID($asset, $fext, $prefix);
       if ($this->_isTplEmbed) {
         $filters = array($this->_tplFilter($id, $fext));
-        $this->_append($asset, $dstSrc, new FilterCollection($filters), $output);
+        $this->_append($asset, $fext, $dstSrc, new FilterCollection($filters), $output);
       }
       if ($this->_isTplExport) {
         $filters = array();
-        $this->_append($asset, $outHome[$fext] . DIRECTORY_SEPARATOR . $id, new FilterCollection($filters), $output);
+        $this->_append($asset, $fext, $outHome[$fext] . DIRECTORY_SEPARATOR . $id, new FilterCollection($filters), $output);
       }
     }
 
@@ -504,8 +512,9 @@ EOT
 
   }
 
-  private function _append(AssetInterface $asset, $dstPath, $filter = null, OutputInterface $output) {
-    $output->writeln(sprintf("        %s <info>%s</info>", 'Packaging', $asset->getSourcePath()));
+  private function _append(AssetInterface $asset, $fext, $dstPath, $filter = null, OutputInterface $output) {
+    $srcPath = $asset instanceof FileAsset ? $asset->getSourcePath() . '.' . $fext : $asset->getSourcePath();
+    $output->writeln(sprintf("        %s <info>%s</info>", 'Packaging', $srcPath));
     $this->_write($dstPath, $asset->dump($filter), true);
   }
 
