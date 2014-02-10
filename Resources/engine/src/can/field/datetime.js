@@ -388,7 +388,7 @@
         self.$selects().selectpicker(self.options.selectpicker)
       }
 
-      self.structure(self._iso2structure(self.options.default))
+      self.structure(self._iso2structure(self.options.preset))
       self._super.apply(self, arguments)
 
       self.$selects().on('change', function (evt) {
@@ -463,7 +463,7 @@
 
     reset: function () {
       var self = this
-      self.structure(self._iso2structure(self.options.default))
+      self.structure(self._iso2structure(self.options.preset))
       self._update()
       return self
     },

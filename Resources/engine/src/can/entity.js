@@ -5,7 +5,7 @@
 
   Beats.Entity = can.Construct.extend({
     id: 'id',
-    const: {
+    constant: {
     }
   }, {
     /**

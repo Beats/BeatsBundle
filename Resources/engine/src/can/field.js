@@ -6,7 +6,7 @@
   Beats.Field = Beats.Control.extend({
 
       defaults: {
-        default: null,
+        preset: null,
 
         label: null,
         alert: null,
@@ -41,7 +41,7 @@
           throw new Beats.Error(self, 'The field must be a HTML form field')
         }
 
-        self.options.default = (
+        self.options.preset = (
           $.isFunction(self.options.defaulter)
             ? self.options.defaulter
             : self._defaulter
@@ -94,7 +94,7 @@
 
       reset: function () {
         var self = this
-        self.element.val(self.options.default)
+        self.element.val(self.options.preset)
         self._update()
         return self
       },
