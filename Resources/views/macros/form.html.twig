@@ -99,6 +99,7 @@
 {% macro _select(opts, value) %}
   {% import _self as self %}
   {% set opts = {
+  type: 'select',
   multiple: false,
   clear: false,
   options: {},
@@ -120,6 +121,7 @@
 {% macro _textarea(opts, value) %}
   {% import _self as self %}
   {% set opts = {
+  type: 'textarea',
   cols: null,
   rows: null,
   }|merge(opts|default({})) %}
@@ -306,7 +308,6 @@
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
   type: 'tel',
-  addon: { l: '<i class="icon-phone"></i>', },
   })) }}
 {% endmacro %}
 
@@ -314,15 +315,6 @@
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
   type: 'email',
-  addon: { l: '<i class="icon-envelope"></i>', },
-  })) }}
-{% endmacro %}
-
-{% macro other(opts) %}
-  {% import _self as self %}
-  {{ self.field(opts|default({})|merge({
-  type: 'text',
-  addon: { l: '<i class="icon-ellipsis-horizontal"></i>', },
   })) }}
 {% endmacro %}
 
