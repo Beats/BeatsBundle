@@ -12,6 +12,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
   public function getTests() {
     return array(
       'traversable' => new \Twig_Test_Method($this, 'isTraversable'),
+      'scalar'      => new \Twig_Test_Function('is_scalar')
     );
   }
 

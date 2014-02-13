@@ -112,7 +112,7 @@
       <option data-hidden="true" value="">{{ opts.clear|raw }}</option>
     {% endif %}
     {% for key, lbl in opts.options %}
-      <option value="{{ key }}" {{ key in value ? 'selected="selected"': '' }}>{{ lbl }}</option>
+      <option value="{{ key }}" {{ key in value ? 'selected="selected"': '' }}>{{ lbl|raw }}</option>
     {% endfor %}
   </select>
 
