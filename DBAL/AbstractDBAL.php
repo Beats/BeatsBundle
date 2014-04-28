@@ -211,7 +211,7 @@ class AbstractDBAL extends ContainerAware {
 
   protected function _toEntity($id = null, $class = null) {
     if (empty($class)) {
-      $class = $this->_model;
+      $class = $this->_entity;
     }
     $entity = new $class();
     if ($entity instanceof AbstractEntity) {
