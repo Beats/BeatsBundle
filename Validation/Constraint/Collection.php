@@ -28,6 +28,9 @@ class Collection extends Traversable {
   }
 
   public function transform($value) {
+    if(empty($value)) {
+      return array();
+    }
     return array_filter($value);
   }
 
