@@ -28,10 +28,12 @@ class Collection extends Traversable {
   }
 
   public function transform($value) {
-    if(empty($value)) {
-      return array();
+    $transformed = parent::transform($value);
+    if (is_array($transformed)) {
+      return array_filter($transformed);
     }
-    return array_filter($value);
+    // TODO@ion: filter Traversable;
+    return $transformed;
   }
 
 }
