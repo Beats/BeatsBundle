@@ -42,9 +42,8 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
   static public function _provider($kind) {
     //TODO@ion: Remove static and parametrize
     static $providers = array(
-      1 => 'Google',
-      2 => 'Facebook',
-      3 => 'Live',
+      'facebook' => 'Facebook',
+      'google'   => 'Google',
     );
     if (isset($providers[$kind])) {
       return $providers[$kind];
