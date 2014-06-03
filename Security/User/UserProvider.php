@@ -6,6 +6,7 @@ use BeatsBundle\Security\Core\User\Member;
 use BeatsBundle\Security\PersisterInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,6 +34,13 @@ class UserProvider extends ContainerAware implements UserProviderInterface {
   /********************************************************************************************************************/
 
   /**
+   * @return Request
+   */
+  final protected function _request() {
+    return $this->container->get('request');
+  }
+
+  /**
    * @return SessionInterface
    */
   final protected function _session() {
@@ -55,7 +63,8 @@ class UserProvider extends ContainerAware implements UserProviderInterface {
   public function loadUserByUsername($identity) {
     $md = $this->_persister();
 
-    $auth = $md->findAuth(strtolower(trim($identity)));
+    $kind = $this->_request()->get('_auth_kind', 0);
+    $auth = $md->findAuth(strtolower(trim($identity)), strtolower(trim($kind)));
     $user = $md->findUserByID($auth->getUserID());
     return $md->buildMember($user, $auth, static::USER_CLASS);
   }
@@ -67,6 +76,7 @@ class UserProvider extends ContainerAware implements UserProviderInterface {
    * totally reloaded (e.g. from the database), or if the UserInterface
    * object can just be merged into some internal array of users / identity
    * map.
+   *
    * @param UserInterface $user
    *
    * @return UserInterface

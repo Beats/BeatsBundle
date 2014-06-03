@@ -116,6 +116,9 @@ trait Service {
 
   /*********************************************************************************************************************/
 
+  final protected function _trans($id, array $parameters = array(), $domain = null, $locale = null) {
+    return $this->_translator()->trans($id, $parameters, $domain, $locale);
+  }
 }
 
 
