@@ -49,9 +49,12 @@ class ResourceProviderMap extends ContainerAware {
     parent::__construct($container);
     $this->_httpUtils   = $httpUtils;
     $this->_configs     = new FrozenParameterBag($providers);
-    $this->_names       = array_keys($providers);
     $this->_providers   = new ParameterBag(array());
     $this->_callbackURI = $callbackURI;
+    $this->_names       = array();
+    foreach ($providers as $kind => $data) {
+      $this->_names[$kind] = $this->_trans('beats.oauth.providers.' . $kind);
+    }
   }
 
 
