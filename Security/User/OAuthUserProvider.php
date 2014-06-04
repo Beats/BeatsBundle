@@ -22,7 +22,7 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
   static private $_default;
 
   public function __construct(ContainerInterface $container, $serviceID, $default = '') {
-    parent::__construct($container, $serviceID);
+    parent::__construct($container, $serviceID, $default);
     self::$_default = $default;
   }
 

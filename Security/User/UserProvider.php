@@ -21,14 +21,16 @@ class UserProvider extends ContainerAware implements UserProviderInterface {
 
   /********************************************************************************************************************/
 
-  /**
-   * @var string
-   */
+  /** @var string */
   private $_persisterServiceID;
 
-  public function __construct(ContainerInterface $container, $serviceID) {
+  /** @var  string */
+  private $_kind;
+
+  public function __construct(ContainerInterface $container, $serviceID, $kind) {
     $this->setContainer($container);
     $this->_persisterServiceID = $serviceID;
+    $this->_kind               = $kind;
   }
 
   /********************************************************************************************************************/
@@ -63,7 +65,7 @@ class UserProvider extends ContainerAware implements UserProviderInterface {
   public function loadUserByUsername($identity) {
     $md = $this->_persister();
 
-    $kind = $this->_request()->get('_auth_kind', 0);
+    $kind = $this->_request()->get('_auth_kind', $this->_kind);
     $auth = $md->findAuth(strtolower(trim($identity)), strtolower(trim($kind)));
     $user = $md->findUserByID($auth->getUserID());
     return $md->buildMember($user, $auth, static::USER_CLASS);
