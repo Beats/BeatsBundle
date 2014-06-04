@@ -26,7 +26,7 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     self::$_default = $default;
   }
 
-  static public function _kind($name) {
+  static private function _kind($name) {
     //TODO@ion: Remove static and parametrize
     static $kinds = array(
       'google'   => 1,
@@ -39,11 +39,12 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     return 0;
   }
 
-  static public function _provider($kind) {
+  static private function _provider($kind) {
     //TODO@ion: Remove static and parametrize
     static $providers = array(
       'facebook' => 'Facebook',
       'google'   => 'Google',
+      'windows'  => 'Live',
     );
     if (isset($providers[$kind])) {
       return $providers[$kind];
@@ -62,7 +63,8 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     $md = $this->_persister();
 
     try {
-      $kind = self::_kind($provider->getName());
+//      $kind = self::_kind($provider->getName());
+      $kind = $provider->getName();
 
       $auth = $md->findAuth($info->getID(), $kind, false);
       if (empty($auth)) {
