@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface {
     $this->_setupChronos($rootNode);
     $this->_setupFlasher($rootNode);
     $this->_setupSecurity($rootNode);
+    $this->_setupTranslator($rootNode);
 
     // Here you should define the parameters that are allowed to
     // configure your bundle. See the documentation linked above for
@@ -144,6 +145,21 @@ class Configuration implements ConfigurationInterface {
       ->children()
       ->scalarNode('persister')->isRequired()->defaultValue(null)->end()
       ->scalarNode('default')->isRequired()->defaultValue(null)->end()
+      ->end()
+      ->end()
+      ->end();
+  }
+
+  protected function _setupTranslator(NodeDefinition $node) {
+    /** @noinspection PhpUndefinedMethodInspection */
+    $node->children()
+      ->arrayNode('translation')->addDefaultsIfNotSet()
+      ->children()
+      ->arrayNode('locales')->isRequired()->end()
+      ->arrayNode('locales')->isRequired()->requiresAtLeastOneElement()->useAttributeAsKey('code')
+      ->prototype('array')->addDefaultsIfNotSet()
+      ->children()
+      ->scalarNode('name')->cannotBeEmpty()->isRequired()->end()
       ->end()
       ->end()
       ->end();

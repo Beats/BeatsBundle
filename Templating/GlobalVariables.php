@@ -159,8 +159,11 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
 
   /********************************************************************************************************************/
 
+  public function getLocale() {
+    return $this->container->get('translator')->getLocale();
+  }
   public function getLang() {
-    $locale = $this->container->get('translator')->getLocale();
+    $locale = $this->getLocale();
 //    language[_territory][.codeset][@modifier]
     preg_match('#(?<lang>\w{2})(_(?<_territory>\w+))?(.(?<codeset>\w+))?(.(?<modifier>\w+))?#', $locale, $matches);
     return $matches['lang'];

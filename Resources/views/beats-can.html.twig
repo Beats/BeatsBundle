@@ -9,6 +9,8 @@
 
 {% block javascripts %}
 
+  <script type="text/javascript" src="/translations/translation.{{ app.locale }}.js"></script>
+
   {% javascripts output="js/ecma-jquery-bootstrap-canjs.js"
   'routes.js'
   '@BeatsBundle/Resources/public/js/beats-can/v0.1/beats-can.js' %}

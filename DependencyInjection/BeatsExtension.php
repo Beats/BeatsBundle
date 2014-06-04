@@ -2,9 +2,7 @@
 
 namespace BeatsBundle\DependencyInjection;
 
-use BeatsBundle\Service\Chronos;
 use BeatsBundle\Service\Mailer;
-use BeatsBundle\Session\Flasher;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -28,12 +26,14 @@ class BeatsExtension extends Extension {
     $container->setParameter('beats.oauth.providers', $config['oauth']['providers']);
     $container->setParameter('beats.oauth.callback', $config['oauth']['callback']);
 
-    $container->setParameter('beats.mailer' , $config['mailer']);
+    $container->setParameter('beats.mailer', $config['mailer']);
     $container->setParameter('beats.flasher', $config['flasher']);
     $container->setParameter('beats.chronos', $config['chronos']);
 
     $container->setParameter('beats.security.service.id', $config['security']['persister']);
     $container->setParameter('beats.security.default', $config['security']['default']);
+
+    $container->setParameter('beats.translation.locales', $config['translation']['locales']);
 
     // All service parameters and configuration should be
     // defined in /app/config/beats.yml file

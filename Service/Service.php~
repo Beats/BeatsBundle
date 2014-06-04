@@ -2,9 +2,9 @@
 namespace BeatsBundle\Service;
 
 use BeatsBundle\Model\AbstractModel;
-use BeatsBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templater;
+use BeatsBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Kernel;

@@ -13,6 +13,7 @@ beats-can:
     - 'can/beats'
     - 'can/entity'
     - 'can/router'
+    - 'can/translator'
     - 'can/control'
     - 'can/blocker'
     - 'can/flasher'
