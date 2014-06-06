@@ -38,6 +38,7 @@
 
     <parameter key="beats.scheduler.at.class">BeatsBundle\Scheduler\AtScheduler</parameter>
 
+    <parameter key="beats.dbal.xml.class">BeatsBundle\DBAL\XML</parameter>
     <parameter key="beats.dbal.rdb.class">BeatsBundle\DBAL\RDB</parameter>
     <parameter key="beats.dbal.dom.class">BeatsBundle\DBAL\DOM</parameter>
     <parameter key="beats.dbal.mix.class">BeatsBundle\DBAL\MIX</parameter>
@@ -56,7 +57,10 @@
       <argument type="service" id="buzz.client"/>
     </service>
 
-    <service id="beats.security.authentication.handler" class="%beats.security.authentication.handler.class%" public="false" abstract="true">
+    <service id="beats.security.authentication.handler"
+             class="%beats.security.authentication.handler.class%"
+             public="false"
+             abstract="true">
       <argument type="service" id="service_container"/>
       <argument type="collection"/>
     </service>
@@ -127,6 +131,9 @@
       <argument type="service" id="service_container"/>
     </service>
 
+    <service id="beats.dbal.xml" class="%beats.dbal.xml.class%" public="true">
+      <argument>%beats.dbal.xml%</argument>
+    </service>
 
     <service id="beats.dbal.rdb" class="%beats.dbal.rdb.class%" public="true">
       <argument>%beats.dbal.rdb%</argument>

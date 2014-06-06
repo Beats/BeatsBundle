@@ -20,6 +20,7 @@ class BeatsExtension extends Extension {
   public function load(array $configs, ContainerBuilder $container) {
     $config = $this->processConfiguration(new Configuration(), $configs);
 
+    $container->setParameter('beats.dbal.xml', $config['dbal']['xml']);
     $container->setParameter('beats.dbal.rdb', $config['dbal']['rdb']);
     $container->setParameter('beats.dbal.dom', $config['dbal']['dom']);
 
@@ -43,6 +44,6 @@ class BeatsExtension extends Extension {
     $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
     $loader->load('services.xml');
     $loader->load('oauth.xml');
-
   }
+
 }
