@@ -71,7 +71,9 @@ class XML extends AbstractDB {
           $node->addChild($key, $val);
         }
       } else {
-        $node->addAttribute($key, $value);
+        if ($key[0] != '_') {
+          $node->addAttribute($key, $value);
+        }
       }
     }
     return $node;
