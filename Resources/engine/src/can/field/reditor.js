@@ -205,7 +205,7 @@
     'beats.field.save.failure': function ($el, evt, error) {
       var self = this
       self.$group().addClass('has-error').removeClass('has-success')
-      self.$alert.html(error.message).show()
+      self.$alert().html(error.message).show()
     },
     'beats.field.save.cleanup': function ($el, evt, data) {
       var self = this
