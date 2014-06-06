@@ -41,7 +41,7 @@ class XML extends AbstractDB {
    * @return BeatsXMLElement
    * @throws \BeatsBundle\Exception\DBALException
    */
-  protected function _xml($model) {
+  public function root($model) {
     if (empty($this->_root[$model])) {
       if (empty($this->_file[$model])) {
         $this->_file[$model] = implode(DIRECTORY_SEPARATOR, array($this->_home, "$model.xml"));
@@ -106,13 +106,6 @@ class XML extends AbstractDB {
     return $root;
   }
 
-
-  protected function _locate(BeatsXMLElement $root, $model, $id) {
-    $xpath = sprintf("/root/%s[@%s='%s']", $model, self::pk($model), $id);
-    $node  = $root->xpathOne($xpath);
-    return empty($node) ? null : $node;
-  }
-
   /**
    * @param string $model
    *
@@ -126,6 +119,40 @@ class XML extends AbstractDB {
       throw new DBALException("File not XML parseable: {$this->_class}@$file");
     }
     return $root;
+  }
+
+  protected function _xpath($model, $path, $isID = false) {
+    if ($isID) {
+      $path = sprintf("[@%s='%s']", self::pk($model), $path);
+    }
+    return sprintf("/root/%s%s", $model, $path);
+  }
+
+  protected function _locate(BeatsXMLElement $root, $model, $id) {
+    $xpath = $this->_xpath($model, $id, true);
+    $node  = $root->xpathOne($xpath);
+    return empty($node) ? null : $node;
+  }
+
+  public function one($model, $path, BeatsXMLElement $root = null) {
+    if (empty($root)) {
+      $root = $this->root($model);
+    }
+    $xpath = $this->_xpath($model, $path);
+    $node  = $root->xpathOne($xpath);
+    return empty($node) ? null : $this->_parse($model, $node);
+  }
+
+  public function all($model, $path, BeatsXMLElement $root = null) {
+    if (empty($root)) {
+      $root = $this->root($model);
+    }
+    $xpath = $this->_xpath($model, $path);
+    $data  = array();
+    foreach ($root->xpath($xpath) as $node) {
+      $data[] = $this->_parse($model, $node);
+    }
+    return $data;
   }
 
 
@@ -142,7 +169,7 @@ class XML extends AbstractDB {
    * @return object|mixed
    */
   public function locate($model, $id) {
-    $root = $this->_xml($model);
+    $root = $this->root($model);
     $node = $this->_locate($root, $model, $id);
     return empty($node) ? null : $this->_parse($model, $node);
   }
@@ -176,7 +203,7 @@ class XML extends AbstractDB {
       $data[$pk] = self::uuid();
     }
     $id   = $data[$pk];
-    $root = $this->_xml($model);
+    $root = $this->root($model);
     $node = $this->_locate($root, $model, $id);
     if ($node) {
       return $this->update($model, $data);
@@ -200,7 +227,7 @@ class XML extends AbstractDB {
       return $this->insert($model, $data);
     }
     $id   = $data[$pk];
-    $root = $this->_xml($model);
+    $root = $this->root($model);
     $node = $this->_locate($root, $model, $id);
     unset($node);
     $this->_setup($data, $model, $pk, true);
@@ -222,7 +249,7 @@ class XML extends AbstractDB {
       return false;
     }
     $id   = $data[$pk];
-    $root = $this->_xml($model);
+    $root = $this->root($model);
     $node = $this->_locate($root, $model, $id);
     unset($node);
     $root = $this->_save($model, $root);
@@ -235,7 +262,7 @@ class XML extends AbstractDB {
    * @return mixed
    */
   public function truncate($model) {
-    $count               = count($this->_xml($model)->$model);
+    $count               = count($this->root($model)->$model);
     $this->_root[$model] = $this->_save($model, simplexml_load_string("<root/>", $this->_class));
     return $count;
   }
