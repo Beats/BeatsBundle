@@ -26,7 +26,7 @@
         }
         var value = self._message[name];
         for (var key in params) {
-          value = value.replaceAll('%' + key + '%', params[key])
+          value = value.replace('/%' + key + '%/g', params[key])
         }
         return value;
       }
