@@ -5,7 +5,7 @@
 
   /******************************************************************************************************************/
 
-  var _ = {
+  var __ = {
     pad: function (value) {
       return (value < 10 ? '0' : '') + value
     },
@@ -320,7 +320,7 @@
       if (jQuery.count(value) < 3) {
         return null
       }
-      return [value.y, _.pad(value.m), _.pad(value.d)].join('-')
+      return [value.y, __.pad(value.m), __.pad(value.d)].join('-')
     },
     structure2isoTime: function (value) {
       if (jQuery.count(value) < 3) {
@@ -332,7 +332,7 @@
       if (value.s === undefined) {
         value.s = 0
       }
-      return [_.pad(value.h), _.pad(value.i), _.pad(value.s)].join(':')
+      return [__.pad(value.h), __.pad(value.i), __.pad(value.s)].join(':')
     },
     structure2isoDateTime: function (value) {
       if (jQuery.count(value) < 6) {
@@ -351,7 +351,7 @@
 
     init: function () {
       var self = this
-      _.setup(self)
+      __.setup(self)
       self._super.apply(self, arguments)
     },
 

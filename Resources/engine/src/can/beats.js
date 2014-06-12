@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  var _ = {
+  var __ = {
     _tag: null,
     tag: function () {
       if (!this._tag) {
@@ -38,7 +38,7 @@
   window.Beats = {
     _version: '0.1',
 
-    timezone: _.cookie('beats_tz'),
+    timezone: __.cookie('beats_tz'),
 
     Error: function (self, message, id) {
       var error = new Error(message, id)
@@ -80,7 +80,7 @@
       if (this.empty(html)) {
         return ""
       }
-      var tag = _.tag();
+      var tag = __.tag();
       tag.innerHTML = html;
       return tag.textContent || tag.innerText;
     },
@@ -105,10 +105,10 @@
     },
 
     encodeEntities: function (s) {
-      return $(_.tag()).text(s).html();
+      return $(__.tag()).text(s).html();
     },
     decodeEntities: function (s) {
-      return $(_.tag()).html(s).text();
+      return $(__.tag()).html(s).text();
     },
 
     invoke: function (callback, scope, arguments) {
@@ -157,7 +157,7 @@
 
 // Determine the current user TimeZone
   if (!Beats.timezone) {
-    _.cookie('beats_tz', Beats.timezone = jstz.determine().name())
+    __.cookie('beats_tz', Beats.timezone = jstz.determine().name())
   }
 
   return Beats

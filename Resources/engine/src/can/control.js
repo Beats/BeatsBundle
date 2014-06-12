@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  var _ = {
+  var __ = {
     mergeData: function (self) {
       var data = self.element.data()
       if (jQuery.isPlainObject(data)) {
@@ -28,7 +28,7 @@
     }
   }, {
     init: function () {
-      _.mergeData(this)
+      __.mergeData(this)
     },
 
     block: function (show, text) {

@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  var _ = {
+  var __ = {
     id: 0,
     trigger: function (self, type, data) {
       self.element.trigger(jQuery.Event('beats.modal.dialog.' + type, {
@@ -12,7 +12,7 @@
     },
     proxy: function (self, type) {
       return function (evt) {
-        _.trigger(self, type, self)
+        __.trigger(self, type, self)
       }
     },
     button: function (button, value, dissmis, text, classes) {
@@ -43,9 +43,9 @@
       })
 
       self.element.on({
-        'show.bs.modal': _.proxy(self, 'show'),
-        'shown.bs.modal': _.proxy(self, 'shown'),
-        'hide.bs.modal': _.proxy(self, 'hide'),
+        'show.bs.modal': __.proxy(self, 'show'),
+        'shown.bs.modal': __.proxy(self, 'shown'),
+        'hide.bs.modal': __.proxy(self, 'hide'),
         'hidden.bs.modal': function (evt) {
           //noinspection JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage,JSBitwiseOperatorUsage
           if (Beats.empty(self.options.value)) {
@@ -53,7 +53,7 @@
           } else {
             self.options.deferred.resolveWith(self, [self.options.value, self.options.data])
           }
-          _.trigger(self, 'hidden', self)
+          __.trigger(self, 'hidden', self)
 
           if (self.options.destroy) {
             self.element.remove()
@@ -140,8 +140,8 @@
         }
       }
 
-      options.buttons.push(_.button(ok, 1, true, 'Yes', 'btn-primary'))
-      options.buttons.push(_.button(no, 0, true, 'No'))
+      options.buttons.push(__.button(ok, 1, true, 'Yes', 'btn-primary'))
+      options.buttons.push(__.button(no, 0, true, 'No'))
       return this.show(options)
     },
 
@@ -167,7 +167,7 @@
         options.footer = false
         return this.show(options)
       }
-      options.buttons.push(_.button(button, 1, true, 'OK', 'btn-primary'))
+      options.buttons.push(__.button(button, 1, true, 'OK', 'btn-primary'))
       return this.show(options)
     }
 
@@ -179,12 +179,12 @@
 
       if (Beats.empty(self.options.view)) {
 
-        _.bootstrap(self)
+        __.bootstrap(self)
 
       } else {
 
         if (Beats.empty(self.options.id)) {
-          self.options.id = 'beats-dialog-' + (++_.id)
+          self.options.id = 'beats-dialog-' + (++__.id)
         }
 
         $.each(['id',
@@ -205,7 +205,7 @@
             'aria-labelledby': self.options.id + '-modal-title'
           })
 
-          _.bootstrap(self)
+          __.bootstrap(self)
 
         })
       }

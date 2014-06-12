@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  var _ = {
+  var __ = {
     instance: null
   }
 
@@ -24,13 +24,13 @@
     },
 
     show: function (text, $el) {
-      return _.instance.show.apply(_.instance, arguments)
+      return __.instance.show.apply(__.instance, arguments)
     },
     hide: function (text, $ex) {
-      return _.instance.hide.apply(_.instance, arguments)
+      return __.instance.hide.apply(__.instance, arguments)
     },
     toggle: function (show, text, $el) {
-      return _.instance.toggle.apply(_.instance, arguments)
+      return __.instance.toggle.apply(__.instance, arguments)
     }
 
   }, {
@@ -38,10 +38,10 @@
     init: function (el, opts) {
       this._super.apply(this, arguments)
       var self = this
-      if (_.instance) {
+      if (__.instance) {
         throw new Beats.Error(self, 'Already exists')
       }
-      _.instance = self
+      __.instance = self
 
       self.element.data('elements', [])
 

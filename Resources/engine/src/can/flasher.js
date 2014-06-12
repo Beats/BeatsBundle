@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-  var _ = {
+  var __ = {
     types: {
       success: 'success',
       failure: 'danger',
@@ -74,54 +74,54 @@
     },
 
     success: function (message, heading, delay) {
-      _.message(message, heading, _.types.success, delay)
+      __.message(message, heading, __.types.success, delay)
     },
     failure: function (message, heading, delay) {
-      _.message(message, heading, _.types.failure, delay)
+      __.message(message, heading, __.types.failure, delay)
     },
     warning: function (message, heading, delay) {
-      _.message(message, heading, _.types.warning, delay)
+      __.message(message, heading, __.types.warning, delay)
     },
     counsel: function (message, heading, delay) {
-      _.message(message, heading, _.types.counsel, delay)
+      __.message(message, heading, __.types.counsel, delay)
     },
 
     exception: function (exception, heading, delay) {
       var message = exception ? exception.message : null
-      _.message(message || 'An error occurred. Please try again!', heading, _.types.failure, delay)
+      __.message(message || 'An error occurred. Please try again!', heading, __.types.failure, delay)
     },
 
     attach: function ($message) {
-      return _.instance.attach($message)
+      return __.instance.attach($message)
     },
     clear: function (immediately) {
-      return _.instance.clear(immediately)
+      return __.instance.clear(immediately)
     },
 
     redirectSuccess: function (redirect, message, heading) {
-      return _.redirect(redirect, message, _.types.success, heading)
+      return __.redirect(redirect, message, __.types.success, heading)
     },
     redirectFailure: function (redirect, message, heading) {
-      return _.redirect(redirect, message, _.types.failure, heading)
+      return __.redirect(redirect, message, __.types.failure, heading)
     },
     redirectWarning: function (redirect, message, heading) {
-      return _.redirect(redirect, message, _.types.warning, heading)
+      return __.redirect(redirect, message, __.types.warning, heading)
     },
     redirectCounsel: function (redirect, message, heading) {
-      return _.redirect(redirect, message, _.types.counsel, heading)
+      return __.redirect(redirect, message, __.types.counsel, heading)
     },
 
     pageSuccess: function (message, type, heading, title, href) {
-      return _.page(message, _.types.success, heading, title, href)
+      return __.page(message, __.types.success, heading, title, href)
     },
     pageFailure: function (message, type, heading, title, href) {
-      return _.page(message, _.types.failure, heading, title, href)
+      return __.page(message, __.types.failure, heading, title, href)
     },
     pageWarning: function (message, type, heading, title, href) {
-      return _.page(message, _.types.warning, heading, title, href)
+      return __.page(message, __.types.warning, heading, title, href)
     },
     pageCounsel: function (message, type, heading, title, href) {
-      return _.page(message, _.types.counsel, heading, title, href)
+      return __.page(message, __.types.counsel, heading, title, href)
     }
 
   }, {
@@ -129,10 +129,10 @@
       var self = this
         , messages = []
       self._super.apply(self, arguments)
-      if (_.instance) {
+      if (__.instance) {
         throw new Beats.Error(self, 'Already exists')
       }
-      _.instance = self
+      __.instance = self
 
       self.element.children().each(function (idx, span) {
         messages.push($(span).data())
@@ -141,7 +141,7 @@
 
       $.each(messages, function (idx, data) {
         if (!Beats.empty(data.type)) {
-          _.message(data.message, data.heading, data.type)
+          __.message(data.message, data.heading, data.type)
         }
       })
     },
@@ -174,7 +174,7 @@
       easing: 'swing',
       view: 'beats.can.flasher.message.ejs',
       tplV: {
-        type: _.types.warning,
+        type: __.types.warning,
         message: null,
         heading: null
       }

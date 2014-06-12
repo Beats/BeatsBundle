@@ -124,7 +124,7 @@
     }
   })
 
-  var _ = {
+  var __ = {
     empty: function (value) {
       return value === true || value === false || value === ''
     },
@@ -137,7 +137,7 @@
     build: function (instance, path, url, data) {
       var self = this, optional = false
       $.each(path.tokens, function (idx, token) {
-        var type = token[0], fn = _.token[type]
+        var type = token[0], fn = __.token[type]
         if ($.isFunction(fn)) {
           fn.call(self, instance, url, data, optional, token)
         } else {
@@ -153,7 +153,7 @@
       },
       variable: function (instance, url, data, optional, tokens) {
         var delimiter = tokens[1], pattern = tokens[2], key = tokens[3]
-          , val, def, rex = _.parseRegEx(pattern)
+          , val, def, rex = __.parseRegEx(pattern)
           , hasDefault = instance.hasDefault(key)
           , hasParam = key in data
 
@@ -179,11 +179,11 @@
 
           optional = false
 
-          if (!_.empty(val)) {
+          if (!__.empty(val)) {
             if (rex && !rex.test(val)) {
               throw Beats.Error(instance, 'Invalid parameter "' + key + '":"' + val + '" for route: ' + instance.name)
             }
-            url.unshift(_.encode(val))
+            url.unshift(__.encode(val))
             url.unshift(delimiter)
           }
         }
@@ -289,8 +289,8 @@
       self._hostname = options.hostname || self._hostname
       self._format = options.format || self._format
 
-      self._path = _.parseCompiled(options.path)
-      self._host = _.parseCompiled(options.host)
+      self._path = __.parseCompiled(options.path)
+      self._host = __.parseCompiled(options.host)
     },
 
     getName: function () {
@@ -343,9 +343,9 @@
       }
       $.extend(data, params)
 
-      _.build(self, self._path, path, data)
+      __.build(self, self._path, path, data)
 
-      path = _.cleanPath(path, data)
+      path = __.cleanPath(path, data)
 
       var scheme, port
       if (self.hasRequired('_scheme')) {
@@ -363,7 +363,7 @@
 
       if (absolute) {
         if (self._host.tokens.length) {
-          _.build(self, self._host, host, data)
+          __.build(self, self._host, host, data)
         } else {
           host = [self._hostname]
         }
