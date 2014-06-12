@@ -20,27 +20,32 @@ class AbstractDBAL extends ContainerAware {
   const P_RDB = 1;
   const P_DOM = 2;
   const P_MIX = 3;
+  const P_XML = 4;
 
   /**
    * DBAL type
+   *
    * @var int
    */
   private $_type;
 
   /**
    * The entity db model name
+   *
    * @var string
    */
   protected $_model;
 
   /**
    * The entity class name
+   *
    * @var string
    */
   protected $_entity;
 
   /**
    * Does the DB layer generates the id as a RDB sequence or the id is an UUID
+   *
    * @var bool
    */
   private $_sequence = false;
@@ -59,7 +64,7 @@ class AbstractDBAL extends ContainerAware {
 
   public function __construct(ContainerInterface $container, $type = self::P_MIX, $sequence = false) {
     $this->setContainer($container);
-    if (($type | self::P_MIX) != self::P_MIX) {
+    if ($type < self::P_RDB || $type > self::P_XML) {
       throw new Exception("Invalid DBAL type {$type}");
     }
     $this->_type = $type;
@@ -105,10 +110,22 @@ class AbstractDBAL extends ContainerAware {
     throw new Exception("MIX not supported by this DBAL");
   }
 
+  /**
+   * @return XML
+   * @throws Exception
+   */
+  public function xml() {
+    if ($this->isXML()) {
+      return $this->container->get('beats.dbal.xml');
+    }
+    throw new Exception("XML not supported by this DBAL");
+  }
+
   /********************************************************************************************************************/
 
   /**
-   * Returns the DBAL type: RDB, DOM, MIX
+   * Returns the DBAL type: RDB, DOM, MIX, XML
+   *
    * @return int
    */
   public function getType() {
@@ -123,8 +140,10 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Returns true if this DBAL has RDB persistence
-   * @param bool $strict
+   *
+   * @param bool     $strict
    * @param int|null $type
+   *
    * @return bool
    */
   public function isRDB($strict = false, $type = null) {
@@ -133,8 +152,10 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Returns true if this DBAL has DOM persistence
-   * @param bool $strict
+   *
+   * @param bool     $strict
    * @param int|null $type
+   *
    * @return bool
    */
   public function isDOM($strict = false, $type = null) {
@@ -143,12 +164,26 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Returns true if this DBAL has MIX persistence
-   * @param bool $strict
+   *
+   * @param bool     $strict
    * @param int|null $type
+   *
    * @return bool
    */
   public function isMIX($strict = false, $type = null) {
     return self::_isFlag($this->_type($type), self::P_MIX, true);
+  }
+
+  /**
+   * Returns true if this DBAL has XML persistence
+   *
+   * @param bool     $strict
+   * @param int|null $type
+   *
+   * @return bool
+   */
+  public function isXML($strict = false, $type = null) {
+    return self::_isFlag($this->_type($type), self::P_XML, true);
   }
 
   static protected function _isFlag($union, $flag, $strict = false) {
@@ -161,6 +196,7 @@ class AbstractDBAL extends ContainerAware {
     return (object)array(
       'rdb' => $this->isRDB() ? $this->rdb()->version() : 'N/a',
       'dom' => $this->isDOM() ? $this->dom()->version() : 'N/a',
+      'xml' => $this->isXML() ? $this->dom()->version() : 'N/a',
     );
   }
 
@@ -168,7 +204,9 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Returns a registered
+   *
    * @param string $model
+   *
    * @return AbstractDBAL
    */
   final protected function _dbal($model) {
@@ -178,7 +216,9 @@ class AbstractDBAL extends ContainerAware {
   /**
    * Returns a DBAL db type
    * Either forced or default.
+   *
    * @param $type
+   *
    * @return int
    */
   final protected function _type($type) {
@@ -187,6 +227,7 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * @param int $type
+   *
    * @return AbstractDB
    * @throws Exception
    */
@@ -204,6 +245,8 @@ class AbstractDBAL extends ContainerAware {
         return $this->rdb();
       case self::P_MIX:
         return $this->mix();
+      case self::P_XML:
+        return $this->xml();
       default:
         throw new Exception("Invalid db type [$type]");
     }
@@ -222,8 +265,10 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Builds an entity out of raw data received from the DB
+   *
    * @param array $row
-   * @param null $class
+   * @param null  $class
+   *
    * @internal param bool $map Whether to return a vector or an associative array of ID -> Entity
    * @return AbstractEntity
    */
@@ -239,9 +284,11 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Builds an array of entities out of raw data received from the DB
+   *
    * @param array $rows
-   * @param bool $map Whether to return a vector or an associative array of ID -> Entity
-   * @param null $class
+   * @param bool  $map Whether to return a vector or an associative array of ID -> Entity
+   * @param null  $class
+   *
    * @return array
    */
   protected function _buildCollection($rows, $map = false, $class = null) {
@@ -321,8 +368,9 @@ class AbstractDBAL extends ContainerAware {
   /********************************************************************************************************************/
 
   /**
-   * @param $id
+   * @param      $id
    * @param null $class
+   *
    * @return AbstractEntity|object
    */
   private function _locateDeep($id, $class = null) {
@@ -340,9 +388,10 @@ class AbstractDBAL extends ContainerAware {
   }
 
   /**
-   * @param mixed $id
-   * @param bool $deep
+   * @param mixed    $id
+   * @param bool     $deep
    * @param int|null $type
+   *
    * @return AbstractEntity|null
    */
   public function locate($id, $deep = true, $type = null) {
@@ -354,9 +403,10 @@ class AbstractDBAL extends ContainerAware {
   }
 
   /**
-   * @param $id
+   * @param      $id
    * @param bool $deep
    * @param null $type
+   *
    * @return AbstractEntity
    * @throws \BeatsBundle\Exception\Exception
    */
@@ -371,10 +421,11 @@ class AbstractDBAL extends ContainerAware {
   /**
    * @param array $where
    * @param array $order
-   * @param int $limit
-   * @param int $offset
-   * @param bool $equal
-   * @param null $type
+   * @param int   $limit
+   * @param int   $offset
+   * @param bool  $equal
+   * @param null  $type
+   *
    * @return AbstractEntity[]
    */
   public function select(array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true, $type = null) {
@@ -443,8 +494,9 @@ class AbstractDBAL extends ContainerAware {
   /**
    * @deprecated
    *
-   * @param $id
+   * @param      $id
    * @param null $type
+   *
    * @return mixed
    */
   public function drop($id, $type = null) {

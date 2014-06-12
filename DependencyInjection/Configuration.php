@@ -2,6 +2,7 @@
 
 namespace BeatsBundle\DependencyInjection;
 
+use BeatsBundle\DBAL\XML;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -38,9 +39,22 @@ class Configuration implements ConfigurationInterface {
 
   protected function _setupDBAL(NodeDefinition $node) {
     $dbalNode = $node->children()->arrayNode('dbal')->addDefaultsIfNotSet();
+    $this->_setupXML($dbalNode);
     $this->_setupRDB($dbalNode);
     $this->_setupDOM($dbalNode);
     return $dbalNode->end()->end();
+  }
+
+  protected function _setupXML(NodeDefinition $node) {
+    /** @noinspection PhpUndefinedMethodInspection */
+    return $node->children()
+      ->arrayNode('xml')->addDefaultsIfNotSet()
+      ->children()
+      ->scalarNode('home')->isRequired()->defaultValue(XML::DEFAULT_HOME)->end()
+      ->scalarNode('class')->defaultValue(XML::DEFAULT_CLASS)->end()
+      ->end()
+      ->end()
+      ->end();
   }
 
   protected function _setupRDB(NodeDefinition $node) {
