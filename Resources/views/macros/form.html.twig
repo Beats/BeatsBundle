@@ -75,6 +75,20 @@
   {% endif %}
 {% endmacro %}
 
+{% macro _addon(opts) %}
+  {% if not opts is iterable %}
+    {% set opts = {
+    type: 'addon',
+    html: opts,
+    } %}
+  {% endif %}
+  {% if opts.type == 'addon' %}
+    <span class="input-group-addon">{{ opts.html|raw }}</span>
+  {% else %}
+    <span class="input-group-btn">{{ opts.html|raw }}</span>
+  {% endif %}
+{% endmacro %}
+
 {% macro _input(opts, value) %}
   {% import _self as self %}
   {% set opts = {
@@ -83,11 +97,11 @@
   {% if opts.addon is not empty %}
     <div class="input-group">
       {% if opts.addon.l is defined %}
-        <span class="input-group-addon">{{ opts.addon.l|raw }}</span>
+        {{ self._addon(opts.addon.l) }}
       {% endif %}
       {{ self.input(opts|merge({addon: null})) }}
       {% if opts.addon.r is defined %}
-        <span class="input-group-addon">{{ opts.addon.r|raw }}</span>
+        {{ self._addon(opts.addon.r) }}
       {% endif %}
     </div>
   {% else %}
@@ -109,7 +123,11 @@
   {% endif %}
   <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
     {% if opts.clear is not empty %}
-      <option data-hidden="true" value="">{{ opts.clear|raw }}</option>
+      {% set clear = opts.clear is iterable ? opts.clear : {
+          html: opts.clear,
+          value: ''
+        } %}
+      <option data-hidden="true" value="{{ clear.value }}" style="display: none">{{ clear.html|raw }}</option>
     {% endif %}
     {% for key, lbl in opts.options %}
       <option value="{{ key }}" {{ key in value ? 'selected="selected"': '' }}>{{ lbl|raw }}</option>
