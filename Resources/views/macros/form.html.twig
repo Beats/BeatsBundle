@@ -123,11 +123,12 @@
   {% endif %}
   <select {{ self._form_element_attrs(opts) }} {{ self._form_select_attrs(opts) }}>
     {% if opts.clear is not empty %}
-      {% set clear = opts.clear is iterable ? opts.clear : {
-          html: opts.clear,
-          value: ''
-        } %}
-      <option data-hidden="true" value="{{ clear.value }}" style="display: none">{{ clear.html|raw }}</option>
+      {% set clear = opts.clear is iterable ? {html: 'N/a', value: '', style: ''}|merge(opts.clear) : {
+      html: opts.clear,
+      value: '',
+      style: 'display: none',
+      } %}
+      <option data-hidden="true" value="{{ clear.value }}" style="{{ clear.style }}">{{ clear.html|raw }}</option>
     {% endif %}
     {% for key, lbl in opts.options %}
       <option value="{{ key }}" {{ key in value ? 'selected="selected"': '' }}>{{ lbl|raw }}</option>
