@@ -141,7 +141,7 @@
       }
 
       options.buttons.push(__.button(ok, 1, true, 'Yes', 'btn-primary'))
-      options.buttons.push(__.button(no, 0, true, 'No'))
+      options.buttons.push(__.button(no, 0, true, 'No', 'btn-default'))
       return this.show(options)
     },
 
