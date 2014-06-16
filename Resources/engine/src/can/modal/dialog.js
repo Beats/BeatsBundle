@@ -233,6 +233,10 @@
       this.element.modal('hide')
     },
 
+    disable: function (toggle) {
+      this.element.find(':input').prop('disabled', toggle)
+    },
+
     'button click': function ($btn, evt) {
       var self = this
       if ($btn.data('dismiss')) {

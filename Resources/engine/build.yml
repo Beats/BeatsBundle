@@ -19,6 +19,8 @@ beats-can:
     - 'can/flasher'
     - 'can/modal'
     - 'can/modal/dialog'
+  stylesheets:
+    - 'can/blocker'
   templates:
     - 'can/flasher/message'
     - 'can/modal/dialog'

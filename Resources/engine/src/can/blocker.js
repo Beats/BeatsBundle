@@ -74,6 +74,9 @@
         , els = self.element.data('elements')
         , idx = self.blocking($el)
         , $td = self.element.find('td')
+      if (!$td.length) {
+        $td = self.element
+      }
       $td.html(text || self.options.show)
       if (!els.length) {
         dfd = $.Deferred()
@@ -97,6 +100,9 @@
         , els = self.element.data('elements')
         , idx = self.blocking($el)
         , $td = self.element.find('td')
+      if (!$td.length) {
+        $td = self.element
+      }
       $td.html(text || self.options.show)
 
       if (idx !== false) {
