@@ -26,7 +26,7 @@
     show: function (text, $el) {
       return __.instance.show.apply(__.instance, arguments)
     },
-    hide: function (text, $ex) {
+    hide: function (text, $el) {
       return __.instance.hide.apply(__.instance, arguments)
     },
     toggle: function (show, text, $el) {

@@ -230,6 +230,7 @@
   value: null,
   default: null,
   style: null,
+  inline: false,
   groupClass: 'form-group',
   labelClass: 'control-label',
   inputClass: 'form-control',
@@ -252,14 +253,26 @@
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
       {% if opts.type in ['radio'] %}
         {{ self.label(opts) }}
-        {% for value, label in opts.options|default({}) %}
-          <div class="{{ opts.type }}">
+        {% if opts.inline %}
+          <div>
+          {% for value, label in opts.options|default({}) %}
             {{ self.label(opts|merge({
             value: value,
+            labelClass: 'radio-inline',
             label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
             })) }}
+          {% endfor %}
           </div>
-        {% endfor %}
+        {% else %}
+          {% for value, label in opts.options|default({}) %}
+            <div class="{{ opts.type }}">
+              {{ self.label(opts|merge({
+              value: value,
+              label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
+              })) }}
+            </div>
+          {% endfor %}
+        {% endif %}
       {% elseif opts.type in ['checkbox'] %}
         <div class="{{ opts.type }}">
           {% if opts.label is not empty %}
