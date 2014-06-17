@@ -4,7 +4,7 @@
 (function ($) {
 
   Beats.Field = Beats.Control.extend({
-
+      pluginName: 'beats_field',
       defaults: {
         preset: null,
 
@@ -122,6 +122,11 @@
           return $.Deferred().resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator.promise)) {
           return self.options.validator
+        } else if (typeof self.options.validator === 'string') {
+          var dfd = $.Deferred()
+            , regexp = new RegExp(self.options.validator)
+            , error = !regexp.test(value)
+          return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator)) {
           var dfd = $.Deferred()
             , error = self.options.validator.apply(self, arguments)
@@ -134,8 +139,7 @@
       _update: function (initial) {
         var self = this
 
-        self.$group().removeClass('has-error has-success')
-        self.$alert().empty()
+        self.clear()
 
         return self._validate(self.element.val(), initial)
           .done(function (failure, value) {
@@ -167,6 +171,13 @@
 
       isValid: function () {
         return !this.$group().hasClass('has-error')
+      },
+
+      clear: function() {
+        var self = this
+
+        self.$group().removeClass('has-error has-success')
+        self.$alert().empty()
       }
 
     }
