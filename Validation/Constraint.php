@@ -36,8 +36,8 @@ abstract class Constraint extends ContainerAware {
   /********************************************************************************************************************/
 
   public function __construct($failure = 'The value is invalid', $success = 'The value is valid') {
-    $this->_messageFailure = $failure;
-    $this->_messageSuccess = $success;
+    $this->_messageFailure = $this->_trans($failure);
+    $this->_messageSuccess = $this->_trans($success);
   }
 
   public function setContainer(ContainerInterface $container = null) {

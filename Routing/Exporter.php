@@ -98,7 +98,7 @@ class Exporter extends WarmableContainerAware {
       dirname($this->_kernel()->getRootDir()), 'web', $file,
     ));
 
-    $content = sprintf('var %s = %s', $vars, json_encode($routes, JSON_PRETTY_PRINT));
+    $content = sprintf('var %s = %s;', $vars, json_encode($routes, JSON_PRETTY_PRINT));
     if (file_put_contents($path, $content) === false) {
       throw new \RuntimeException("Could not create a routing definition file: $path");
     }
