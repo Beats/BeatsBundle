@@ -36,8 +36,8 @@ abstract class Constraint extends ContainerAware {
   /********************************************************************************************************************/
 
   public function __construct($failure = 'The value is invalid', $success = 'The value is valid') {
-    $this->_messageFailure = $this->_trans($failure);
-    $this->_messageSuccess = $this->_trans($success);
+    $this->_messageFailure = $failure;
+    $this->_messageSuccess = $success;
   }
 
   public function setContainer(ContainerInterface $container = null) {
@@ -74,11 +74,11 @@ abstract class Constraint extends ContainerAware {
   }
 
   public function getMessageFailure() {
-    return $this->_messageFailure;
+    return $this->_trans($this->_messageFailure);
   }
 
   public function getMessageSuccess() {
-    return $this->_messageSuccess;
+    return $this->_trans($this->_messageSuccess);
   }
 
 
@@ -99,6 +99,7 @@ abstract class Constraint extends ContainerAware {
     if ($this->isEmpty() && $this->isOptional()) {
       return true;
     }
+
     return $this->validate($value, $context);
   }
 
@@ -108,6 +109,7 @@ abstract class Constraint extends ContainerAware {
     $value              = $this->transform($value);
     $this->_transformed = $value;
     $this->_empty       = $this->_checkEmpty($value);
+
     return $this;
   }
 
@@ -116,6 +118,7 @@ abstract class Constraint extends ContainerAware {
     if ($this->_toNULL && empty($value)) {
       return null;
     }
+
     return $value;
   }
 
