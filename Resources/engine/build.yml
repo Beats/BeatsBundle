@@ -7,6 +7,7 @@ beats-can:
     - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
     - '@BeatsBundle/Resources/public/js/bootstrap-extend.js'
     - '//cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js'
+    - '@BeatsBundle/Resources/public/js/jquery.hammer.js'
     - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
     - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
 #    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
