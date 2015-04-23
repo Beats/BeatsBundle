@@ -19,37 +19,8 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     return $this->container->get('beats.oauth.resource_provider.map');
   }
 
-  static private $_default;
-
   public function __construct(ContainerInterface $container, $serviceID, $default = '') {
     parent::__construct($container, $serviceID, $default);
-    self::$_default = $default;
-  }
-
-  static private function _kind($name) {
-    //TODO@ion: Remove static and parametrize
-    static $kinds = array(
-      'google'   => 1,
-      'facebook' => 2,
-      'windows'  => 3,
-    );
-    if (isset($kinds[$name])) {
-      return $kinds[$name];
-    }
-    return 0;
-  }
-
-  static private function _provider($kind) {
-    //TODO@ion: Remove static and parametrize
-    static $providers = array(
-      'facebook' => 'Facebook',
-      'google'   => 'Google',
-      'windows'  => 'Live',
-    );
-    if (isset($providers[$kind])) {
-      return $providers[$kind];
-    }
-    return self::$_default;
   }
 
   /********************************************************************************************************************/
@@ -63,12 +34,11 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     $md = $this->_persister();
 
     try {
-//      $kind = self::_kind($provider->getName());
       $kind = $provider->getName();
 
       $auth = $md->findAuth($info->getID(), $kind, false);
       if (empty($auth)) {
-        $user = $md->findUserByEmail($info->getEmail(), false);
+        $user = $md->findUserByIdentity($info->getEmail(), false);
         if (empty($user)) {
           $user = $md->signUpSocial($info, $kind);
         } else {
@@ -82,10 +52,12 @@ class OAuthUserProvider extends UserProvider implements OAuthUserProviderInterfa
     } catch (AuthenticationException $ex) {
       throw $ex;
     } catch (\Exception $ex) {
-      throw new AuthenticationException(sprintf(
-        "Error connecting external OAuth account<br/>\nProvider: %s<br/>\nUser: %s (%s)",
-        $provider->getName(), $info->getEmail(), $info->getID()
-      ));
+      throw new AuthenticationException(
+        sprintf(
+          "Error connecting external OAuth account<br/>\nProvider: %s<br/>\nUser: %s (%s)",
+          $provider->getName(), $info->getEmail(), $info->getID()
+        )
+      );
     }
     return $md->buildMember($user, $auth, static::USER_CLASS);
   }

@@ -11,15 +11,15 @@ interface PersisterInterface {
 
   /**
    * @param string $identity
-   * @param int $kind
-   * @param bool $throw
+   * @param int    $kind
+   * @param bool   $throw
    * @return AuthInterface|null
    * @throws UsernameNotFoundException
    */
   public function findAuth($identity, $kind = 0, $throw = true);
 
   /**
-   * @param $userID
+   * @param      $userID
    * @param bool $throw
    * @return UserInterface|null
    * @throws UnsupportedUserException
@@ -27,17 +27,17 @@ interface PersisterInterface {
   public function findUserByID($userID, $throw = true);
 
   /**
-   * @param $email
+   * @param      $identity
    * @param bool $throw
    * @return UserInterface|null
    * @throws UnsupportedUserException
    */
-  public function findUserByEmail($email, $throw = true);
+  public function findUserByIdentity($identity, $throw = true);
 
   /**
    * @param UserInterface $user
    * @param AuthInterface $auth
-   * @param $class
+   * @param               $class
    * @return \Symfony\Component\Security\Core\User\UserInterface
    */
   public function buildMember(UserInterface $user, AuthInterface $auth, $class);
@@ -45,7 +45,7 @@ interface PersisterInterface {
   /**
    * @param InfoInterface $info
    * @param AuthInterface $auth
-   * @param $kind
+   * @param               $kind
    * @return UserInterface
    */
   public function signUpDirect(InfoInterface $info, AuthInterface $auth, $kind = 0);
@@ -54,14 +54,14 @@ interface PersisterInterface {
    * @param UserInterface $user
    * @param InfoInterface $info
    * @param AuthInterface $auth
-   * @param $kind
+   * @param               $kind
    * @return UserInterface
    */
   public function attachDirect(UserInterface $user, InfoInterface $info, AuthInterface $auth, $kind = 0);
 
   /**
    * @param InfoInterface $info
-   * @param $kind
+   * @param               $kind
    * @return UserInterface
    */
   public function signUpSocial(InfoInterface $info, $kind);
@@ -69,7 +69,7 @@ interface PersisterInterface {
   /**
    * @param UserInterface $user
    * @param InfoInterface $info
-   * @param $kind
+   * @param               $kind
    * @return UserInterface
    */
   public function attachSocial(UserInterface $user, InfoInterface $info, $kind);
