@@ -52,11 +52,12 @@ class OAuthProvider implements AuthenticationProviderInterface {
 
     $user = $this->_userProvider->loadUserByOAuthToken($token, $provider);
 
+    $this->_userChecker->checkPreAuth($user);
+    $this->_userChecker->checkPostAuth($user);
+
     $token = new OAuthToken($token->getAccessToken(), $provider->getName(), $user->getRoles());
     $token->setUser($user);
     $token->setAuthenticated(true);
-
-    $this->_userChecker->checkPostAuth($user);
 
     return $token;
   }

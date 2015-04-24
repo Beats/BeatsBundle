@@ -113,7 +113,7 @@ abstract class AbstractResourceProvider extends ContainerAware implements Resour
     return implode(strpos($url, '?') === false ? '?' : '&', array($url, http_build_query($parameters)));
   }
 
-  private function _url($name, array $parameters = array()) {
+  protected function _url($name, array $parameters = array()) {
     $url = $this->_options->get($name);
     if (empty($parameters)) {
       return $url;
