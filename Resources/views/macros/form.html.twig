@@ -186,7 +186,7 @@
   } %}
   {{ self.label(opts) }}
   <div class="row">
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-4 col-xs-4">
       {{ self._select({
       inputClass: opts.inputClass,
       autocomplete: false,
@@ -195,7 +195,7 @@
       options: options.m,
       }, value[1]) }}
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-4 col-xs-4">
       {{ self._select({
       inputClass: opts.inputClass,
       autocomplete: false,
@@ -204,7 +204,7 @@
       options: options.d,
       }, value[2]) }}
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-4 col-xs-4">
       {{ self._select({
       inputClass: opts.inputClass,
       autocomplete: false,
@@ -258,7 +258,7 @@
           {% for value, label in opts.options|default({}) %}
             {{ self.label(opts|merge({
             value: value,
-            labelClass: 'radio-inline',
+            labelClass: 'radio-inline ' ~ opts.inputClass,
             label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
             })) }}
           {% endfor %}
