@@ -33,6 +33,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'hasImage'       => new Twig_Function_Method($this, 'hasImage'),
       'fsalURL'        => new Twig_Function_Method($this, 'fsalURL', array('is_save' => array('html'))),
       'routeCurrent'   => new Twig_Function_Method($this, 'routeCurrent', array('is_safe' => array('html'))),
+      'currentRoute'   => new Twig_Function_Method($this, 'currentRoute', array('is_safe' => array('html'))),
       'flash'          => new Twig_Function_Method($this, 'renderFlash', array('is_safe' => array('html'))),
       'oauthConnect'   => new Twig_Function_Method($this, 'oauthConnect', array('is_safe' => array('html'))),
       'oauthProviders' => new Twig_Function_Method($this, 'oauthProviders', array('is_safe' => array('html'))),
@@ -180,8 +181,13 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   /********************************************************************************************************************/
 
+  public function currentRoute($suffix = '') {
+    $route = $this->_request()->attributes->get('_route');
+    return empty($suffix) ? $route : implode('.', array($route, $suffix));
+  }
+
   public function routeCurrent($value, $active = 'active', $inactive = '') {
-    if (strcmp($this->_request()->attributes->get('_route'), $value)) {
+    if (strcmp($this->currentRoute(), $value)) {
       return $inactive;
     } else {
       return $active;
