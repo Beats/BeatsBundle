@@ -42,6 +42,9 @@ beats-can-form:
     - 'can/field/widget'
     - 'can/field/datetime'
     - 'can/field/number'
+    - 'can/field/image'
+  stylesheets:
+    - 'can/field/image'
   templates:
     - 'can/field/datetime'
 ecma-jquery-boostrap:

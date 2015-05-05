@@ -34,8 +34,8 @@
     }, {
 
       init: function () {
-        var self = this
-        self._super.apply(self, arguments)
+        var self = this;
+        self._super.apply(self, arguments);
 
         if (!self.element.is(':input')) {
           throw new Beats.Error(self, 'The field must be a HTML form field')
@@ -46,12 +46,12 @@
             ? self.options.defaulter
             : self._defaulter
           )
-          .apply(self, [self.element.val()])
+          .apply(self, [self.element.val()]);
 
         if (Beats.empty(self.options.view)) {
           self._afterRender.apply(self, [])
         } else {
-          self._beforeRender.apply(self, [])
+          self._beforeRender.apply(self, []);
           self.element.after(self.options.view, self.options.tplV, function () {
             self._afterRender.apply(self, [])
           })
@@ -59,14 +59,14 @@
       },
 
       _beforeRender: function () {
-        var self = this
+        var self = this;
 
-        self.options.tplV.label = self.options.label
-        self.options.tplV.alert = self.options.alert
+        self.options.tplV.label = self.options.label;
+        self.options.tplV.alert = self.options.alert;
 
-        self.options.tplV.labelClass = self.options.labelClass
-        self.options.tplV.alertClass = self.options.alertClass
-        self.options.tplV.groupClass = self.options.groupClass
+        self.options.tplV.labelClass = self.options.labelClass;
+        self.options.tplV.alertClass = self.options.alertClass;
+        self.options.tplV.groupClass = self.options.groupClass;
       },
 
       _afterRender: function () {
@@ -93,9 +93,9 @@
       },
 
       reset: function () {
-        var self = this
-        self.element.val(self.options.preset)
-        self._update()
+        var self = this;
+        self.element.val(self.options.preset);
+        self._update();
         return self
       },
 
@@ -117,7 +117,7 @@
       },
 
       _validate: function (value, initial) {
-        var self = this
+        var self = this;
         if (Beats.empty(self.options.validator)) {
           return $.Deferred().resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator.promise)) {
@@ -125,11 +125,11 @@
         } else if (typeof self.options.validator === 'string') {
           var dfd = $.Deferred()
             , regexp = new RegExp(self.options.validator)
-            , error = !regexp.test(value)
+            , error = !regexp.test(value);
           return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator)) {
           var dfd = $.Deferred()
-            , error = self.options.validator.apply(self, arguments)
+            , error = self.options.validator.apply(self, arguments);
           return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
         } else {
           return $.when(self.options.validator)
@@ -137,9 +137,9 @@
       },
 
       _update: function (initial) {
-        var self = this
+        var self = this;
 
-        self.clear()
+        self.clear();
 
         return self._validate(self.element.val(), initial)
           .done(function (failure, value) {
@@ -151,19 +151,19 @@
       },
 
       _setFailure: function (failure, initial) {
-        var self = this
-        self.$group().addClass('has-error')
+        var self = this;
+        self.$group().addClass('has-error');
         if ($.type(failure) === 'string') {
           self.$alert().html(failure)
         }
       },
 
       _setSuccess: function (success, initial) {
-        var self = this
+        var self = this;
         if (initial) {
           return
         }
-        self.$group().addClass('has-success')
+        self.$group().addClass('has-success');
         if ($.type(success) === 'string') {
           self.$alert().html(success)
         }
@@ -174,14 +174,14 @@
       },
 
       clear: function() {
-        var self = this
+        var self = this;
 
-        self.$group().removeClass('has-error has-success')
+        self.$group().removeClass('has-error has-success');
         self.$alert().empty()
       }
 
     }
-  )
+  );
 
   return Beats.Field
 

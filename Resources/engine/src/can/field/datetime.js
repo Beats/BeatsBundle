@@ -12,13 +12,13 @@
     setup: function (self) {
       switch (self.options.type) {
         case 'datetime':
-          this.setupBoth(self)
+          this.setupBoth(self);
           break;
         case 'date':
-          this.setupDate(self)
+          this.setupDate(self);
           break;
         case 'time':
-          this.setupTime(self)
+          this.setupTime(self);
           break;
         default:
           throw new Beats.Error(self, 'Invalid datetime type: ' + self.options.type)
@@ -32,7 +32,7 @@
         ]
       }
       if (Beats.empty(self.options.clearButton)) {
-        self.options.clearButton = 'Clear Date'
+        self.options.clearButton = _('beats.engine.can.field.datetime.clear.button')
       }
       $.extend(self, {
         _iso2structure: function (iso) {
@@ -42,16 +42,16 @@
           return this.constructor.structure2isoDateTime(structure)
         },
         _defaulter: function (value) {
-          var self = this
+          var self = this;
           if (Beats.empty(value) && !self.isClearable()) {
-            var date = Date.now()
-            date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+            var date = Date.now();
+            date = new Date(self.constructor.roundMinutes(date.getTime(), 5));
             value = date.toISODateTime()
           }
           return value
         },
         _isInvalid: function (value, structure) {
-          var date = Date.fromISO(value)
+          var date = Date.fromISO(value);
           return (date.getMonth() != structure.m - 1)
         }
       })
@@ -63,7 +63,7 @@
         ]
       }
       if (Beats.empty(self.options.clearButton)) {
-        self.options.clearButton = 'Clear Date'
+        self.options.clearButton = _('beats.engine.can.field.datetime.clear.button')
       }
       $.extend(self, {
         _iso2structure: function (iso) {
@@ -73,14 +73,14 @@
           return this.constructor.structure2isoDate(structure)
         },
         _defaulter: function (value) {
-          var self = this
+          var self = this;
           if (Beats.empty(value) && !self.isClearable()) {
             value = Date.now().toISODate()
           }
           return value
         },
         _isInvalid: function (value, structure) {
-          var date = Date.fromISO(value)
+          var date = Date.fromISO(value);
           return (date.getMonth() != structure.m - 1)
         }
       })
@@ -92,7 +92,7 @@
         ]
       }
       if (Beats.empty(self.options.clearButton)) {
-        self.options.clearButton = 'Clear Time'
+        self.options.clearButton = _('beats.engine.can.field.datetime.clear.button')
       }
 
       $.extend(self, {
@@ -103,10 +103,10 @@
           return this.constructor.structure2isoTime(structure)
         },
         _defaulter: function (value) {
-          var self = this
+          var self = this;
           if (Beats.empty(value) && !self.isClearable()) {
-            var date = Date.now()
-            date = new Date(self.constructor.roundMinutes(date.getTime(), 5))
+            var date = Date.now();
+            date = new Date(self.constructor.roundMinutes(date.getTime(), 5));
             value = date.toISOTime()
           }
           return value
@@ -116,7 +116,7 @@
         }
       })
     }
-  }
+  };
 
   /******************************************************************************************************************/
 
@@ -124,13 +124,13 @@
     pluginName: 'beats_field_datetime',
     defaults: {
       type: 'datetime',
-      incomplete: 'The value is incomplete',
-      invalid: 'The date is invalid',
+      incomplete: _('beats.engine.can.field.datetime.incomplete'),
+      invalid: _('beats.engine.can.field.datetime.invalid'),
       selectpicker: null,
       yearsUpper: null,
       yearsLower: null,
       fields: null,
-      clearButton: null,
+      clearButton: _('beats.engine.can.field.datetime.clear.button'),
       clear: {
         y: 'Year',
         m: 'Month',
@@ -161,18 +161,18 @@
         parts: {
           y: [],
           m: [
-            { val: '01', lbl: 'Jan'},
-            { val: '02', lbl: 'Feb'},
-            { val: '03', lbl: 'Mar'},
-            { val: '04', lbl: 'Apr'},
-            { val: '05', lbl: 'May'},
-            { val: '06', lbl: 'Jun'},
-            { val: '07', lbl: 'Jul'},
-            { val: '08', lbl: 'Aug'},
-            { val: '09', lbl: 'Sep'},
-            { val: '10', lbl: 'Oct'},
-            { val: '11', lbl: 'Nov'},
-            { val: '12', lbl: 'Dec'}
+            { val: '01', lbl: _('beats.engine.can.field.datetime.month.M.01')},
+            { val: '02', lbl: _('beats.engine.can.field.datetime.month.M.02')},
+            { val: '03', lbl: _('beats.engine.can.field.datetime.month.M.03')},
+            { val: '04', lbl: _('beats.engine.can.field.datetime.month.M.04')},
+            { val: '05', lbl: _('beats.engine.can.field.datetime.month.M.05')},
+            { val: '06', lbl: _('beats.engine.can.field.datetime.month.M.06')},
+            { val: '07', lbl: _('beats.engine.can.field.datetime.month.M.07')},
+            { val: '08', lbl: _('beats.engine.can.field.datetime.month.M.08')},
+            { val: '09', lbl: _('beats.engine.can.field.datetime.month.M.09')},
+            { val: '10', lbl: _('beats.engine.can.field.datetime.month.M.10')},
+            { val: '11', lbl: _('beats.engine.can.field.datetime.month.M.11')},
+            { val: '12', lbl: _('beats.engine.can.field.datetime.month.M.12')}
           ],
           d: [
             { val: '01', lbl: '1'},
@@ -287,7 +287,7 @@
       if (Beats.empty(value)) {
         return null
       }
-      var date = value.split('-')
+      var date = value.split('-');
       return {
         y: date[0],
         m: date[1],
@@ -299,7 +299,7 @@
         return null
       }
       var time = (value).split(':')
-        , hour = time[0] % 12
+        , hour = time[0] % 12;
       return {
         h: time[0],
         i: time[1],
@@ -312,7 +312,7 @@
       if (Beats.empty(value)) {
         return null
       }
-      var part = value.split(' ')
+      var part = value.split(' ');
       return $.extend({}, this.isoDate2structure(part[0]), this.isoTime2structure(part[1]))
     },
 
@@ -350,19 +350,19 @@
   }, {
 
     init: function () {
-      var self = this
-      __.setup(self)
+      var self = this;
+      __.setup(self);
       self._super.apply(self, arguments)
     },
 
     _beforeRender: function () {
       var self = this
-        , year
-      self._super.apply(self, arguments)
+        , year;
+      self._super.apply(self, arguments);
 
-      self.options.tplV.fields = self.options.fields
-      self.options.tplV.clear = self.options.clear
-      self.options.tplV.clearButton = self.options.clearButton
+      self.options.tplV.fields = self.options.fields;
+      self.options.tplV.clear = self.options.clear;
+      self.options.tplV.clearButton = self.options.clearButton;
 
       if (!self.options.yearsUpper) {
         self.options.yearsUpper = Date.now().getFullYear()
@@ -382,22 +382,22 @@
     },
 
     _afterRender: function () {
-      var self = this
+      var self = this;
 
       if (self.options.selectpicker) {
         self.$selects().selectpicker(self.options.selectpicker)
       }
 
-      self.structure(self._iso2structure(self.options.preset))
-      self._super.apply(self, arguments)
+      self.structure(self._iso2structure(self.options.preset));
+      self._super.apply(self, arguments);
 
       self.$selects().on('change', function (evt) {
-        evt.stopPropagation()
+        evt.stopPropagation();
         self._update()
-      })
+      });
       self.$clear().on('click', function (evt) {
-        evt.stopPropagation()
-        self.structure(self._iso2structure())
+        evt.stopPropagation();
+        self.structure(self._iso2structure());
         self._update()
       })
 
@@ -416,28 +416,28 @@
     },
 
     structure: function (structure) {
-      var self = this
+      var self = this;
       if (structure === undefined) {
         structure = {
-        }
+        };
         self.$selects().each(function () {
           var $el = $(this)
-            , val = $el.val()
+            , val = $el.val();
           if ($.isNumeric(val)) {
             structure[$el.data('fld')] = val | 0
           }
-        })
+        });
         if (structure.H) {
 
         }
         return structure
       } else {
-        var fn
+        var fn;
         if (Beats.empty(structure)) {
           fn = function () {
             var $el = $(this)
               , key = $el.data('fld')
-              , val = ''
+              , val = '';
             if ($el.data('selectpicker')) {
               $el.selectpicker('val', val)
             } else {
@@ -448,7 +448,7 @@
           fn = function () {
             var $el = $(this)
               , key = $el.data('fld')
-              , val = structure[key]
+              , val = structure[key];
             if ($el.data('selectpicker')) {
               $el.selectpicker('val', val)
             } else {
@@ -456,29 +456,29 @@
             }
           }
         }
-        self.$selects().each(fn)
+        self.$selects().each(fn);
         return structure
       }
     },
 
     reset: function () {
-      var self = this
-      self.structure(self._iso2structure(self.options.preset))
-      self._update()
+      var self = this;
+      self.structure(self._iso2structure(self.options.preset));
+      self._update();
       return self
     },
 
     _isInvalid: function (value, structure) {
-      var date = Date.fromISO(value)
+      var date = Date.fromISO(value);
       return (date.getMonth() != structure.m - 1)
     },
 
     _update: function (initial) {
       var self = this
-        , oldValue = self.element.val()
+        , oldValue = self.element.val();
       return self._super.apply(self, arguments)
         .always(function (failure, newValue) {
-          self.$clear().toggle(!Beats.empty(newValue))
+          self.$clear().toggle(!Beats.empty(newValue));
           if (oldValue !== newValue) {
             self.element.val(newValue).trigger(jQuery.Event('change'), [newValue, !failure])
           }
@@ -489,7 +489,7 @@
       var self = this
         , structure = self.structure()
         , newValue = self._structure2iso(structure)
-        , error = false
+        , error = false;
       if (Beats.empty(newValue)) {
         if (!Beats.empty(structure)) {
           error = self.options.incomplete
@@ -498,16 +498,16 @@
         error = self.options.invalid
       }
       if (error) {
-        newValue = ''
+        newValue = '';
         return $.Deferred().rejectWith(self, [error, newValue])
       }
       return self._super.apply(self, [newValue])
     }
 
-  })
+  });
 
   /******************************************************************************************************************/
 
   return Beats.Field.DateTime
 
-})(jQuery)
+})(jQuery);

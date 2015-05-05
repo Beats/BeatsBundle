@@ -1,0 +1,18 @@
+div.beats_field_avatar {
+    height: 100% !important;
+    line-height: 100% !important;
+    padding: 0 !important;
+}
+
+div.beats_field_avatar > img {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+}
+
+div.beats_field_avatar > div {
+    border-radius: 0 0 3px 3px;
+}
+
+div.beats_field_avatar > .progress {
+    margin-bottom: 0;
+}
