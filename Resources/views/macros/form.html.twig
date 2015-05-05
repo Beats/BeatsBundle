@@ -1,6 +1,9 @@
 {% macro classes(name) %}
   {% set _field = app._field(name) %}
-  {% if _field is not empty and _field.isError %}has-error{% endif %}
+  {% if _field is not empty %}
+    {% if _field.isError %}has-error{% else %}has-success{% endif %}
+  {% endif %}
+  {#{% if _field is not empty and _field.isError %}has-error{% endif %}#}
 {% endmacro %}
 
 {% macro messages(name, hClass) %}
@@ -175,9 +178,14 @@
   {% import _self as self %}
   {% set value = app._value(opts.name, opts.default|default(opts.value)) %}
   {% set value = value|default('--')|split('-') %}
+  {% set value = {y: value[0], m: value[1], d: value[2]} %}
   {% set clear = opts.clear is defined ? opts.clear : false %}
   {% if clear is not iterable %}
     {% set clear = {y: clear, m: clear, d: clear} %}
+  {% endif %}
+  {% set partsClass = opts.partsClass is defined ? opts.partsClass : '' %}
+  {% if partsClass is not iterable %}
+    {% set partsClass = {y:partsClass, m: partsClass, d: partsClass} %}
   {% endif %}
   {% set options = {
   y: dateY(opts.yearsUpper|default(null), opts.yearsLower|default(null)),
@@ -186,33 +194,17 @@
   } %}
   {{ self.label(opts) }}
   <div class="row">
-    <div class="col-md-4 col-sm-4 col-xs-4">
-      {{ self._select({
-      inputClass: opts.inputClass,
-      autocomplete: false,
-      data: {fld: 'm'},
-      clear: opts.clear.m,
-      options: options.m,
-      }, value[1]) }}
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-4">
-      {{ self._select({
-      inputClass: opts.inputClass,
-      autocomplete: false,
-      data: {fld: 'd'},
-      clear: opts.clear.d,
-      options: options.d,
-      }, value[2]) }}
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-4">
-      {{ self._select({
-      inputClass: opts.inputClass,
-      autocomplete: false,
-      data: {fld: 'y'},
-      clear: opts.clear.y,
-      options: options.y,
-      }, value[0]) }}
-    </div>
+    {% for part in (opts.format|default('dmy'))|split('') %}
+      <div class="{{ partsClass[part] }}">
+        {{ self._select({
+          inputClass: opts.inputClass,
+          autocomplete: false,
+          data: {fld: part},
+          clear: clear[part],
+          options: options[part],
+        }, value[part]) }}
+      </div>
+    {% endfor %}
   </div>
   {% if clear is not empty %}
     <button type="button" class="btn btn-light pull-right" aria-hidden="true" style="display: none;">
@@ -247,119 +239,122 @@
       {{ self._field_date(opts) }}
       {{ self.messages(opts.name) }}
     </div>
-  {% elseif opts.type in ['hidden'] %}
-    {{ self.input(opts) }}
   {% else %}
-    <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
-      {% if opts.type in ['radio'] %}
-        {{ self.label(opts) }}
-        {% if opts.inline %}
-          <div>
-          {% for value, label in opts.options|default({}) %}
-            {{ self.label(opts|merge({
-            value: value,
-            labelClass: 'radio-inline ' ~ opts.inputClass,
-            label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
-            })) }}
-          {% endfor %}
-          </div>
-        {% else %}
-          {% for value, label in opts.options|default({}) %}
-            <div class="{{ opts.type }}">
-              {{ self.label(opts|merge({
-              value: value,
-              label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
-              })) }}
+    {% if opts.type in ['hidden'] %}
+      {{ self.input(opts) }}
+    {% else %}
+      <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
+        {% if opts.type in ['radio'] %}
+          {{ self.label(opts) }}
+          {% if opts.inline %}
+            <div>
+              {% for value, label in opts.options|default({}) %}
+                {{ self.label(opts|merge({
+                  value: value,
+                  labelClass: 'radio-inline ' ~ opts.inputClass,
+                  label:  self.input(opts|merge({inputClass: null, value: value, default: opts.value})) ~ label,
+                })) }}
+              {% endfor %}
             </div>
-          {% endfor %}
-        {% endif %}
-      {% elseif opts.type in ['checkbox'] %}
-        <div class="{{ opts.type }}">
-          {% if opts.label is not empty %}
-            {{ self.label(opts|merge({
-            label:  self.input(opts|merge({inputClass: null})) ~ opts.label,
-            })) }}
           {% else %}
-            {{ self.input(opts) }}
+            {% for value, label in opts.options|default({}) %}
+              <div class="{{ opts.type }}">
+                {{ self.label(opts|merge({
+                  value: value,
+                  label:  self.input(opts|merge({inputClass: null, value: value})) ~ label,
+                })) }}
+              </div>
+            {% endfor %}
           {% endif %}
-        </div>
-      {% elseif opts.type in ['date'] %}
-        {{ self._field_date(opts) }}
-      {% else %}
-        {{ self.label(opts) }}
-        {{ self.input(opts) }}
-      {% endif %}
-      {{ self.messages(opts.name) }}
-    </div>
+        {% elseif opts.type in ['checkbox'] %}
+          <div class="{{ opts.type }}">
+            {% if opts.label is not empty %}
+              {{ self.label(opts|merge({
+                label:  self.input(opts|merge({inputClass: null})) ~ opts.label,
+              })) }}
+            {% else %}
+              {{ self.input(opts) }}
+            {% endif %}
+          </div>
+        {% elseif opts.type in ['date'] %}
+          {{ self.input(opts|merge({type: 'hidden'})) }}
+          {{ self._field_date(opts) }}
+        {% else %}
+          {{ self.label(opts) }}
+          {{ self.input(opts) }}
+        {% endif %}
+        {{ self.messages(opts.name) }}
+      </div>
+    {% endif %}
   {% endif %}
 {% endmacro %}
 
 {% macro hidden(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'hidden',
+    type: 'hidden',
   })) }}
 {% endmacro %}
 
 {% macro text(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'text',
+    type: 'text',
   })) }}
 {% endmacro %}
 
 {% macro pass(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'password',
+    type: 'password',
   })) }}
 {% endmacro %}
 
 {% macro date(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'date',
+    type: 'date',
   })) }}
 {% endmacro %}
 
 {% macro check(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'checkbox',
+    type: 'checkbox',
   })) }}
 {% endmacro %}
 
 {% macro radio(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'radio',
+    type: 'radio',
   })) }}
 {% endmacro %}
 
 {% macro phone(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'tel',
+    type: 'tel',
   })) }}
 {% endmacro %}
 
 {% macro email(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'email',
+    type: 'email',
   })) }}
 {% endmacro %}
 
 {% macro textarea(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'textarea',
+    type: 'textarea',
   })) }}
 {% endmacro %}
 
 {% macro select(opts) %}
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
-  type: 'select',
+    type: 'select',
   })) }}
 {% endmacro %}
