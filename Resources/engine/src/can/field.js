@@ -6,11 +6,13 @@
   Beats.Field = Beats.Control.extend({
       pluginName: 'beats_field',
       defaults: {
+        silent: false,
         preset: null,
 
         label: null,
         alert: null,
 
+        inputClass: '',
         labelClass: 'control-label',
         alertClass: 'help-block',
         groupClass: 'form-group',
@@ -25,6 +27,7 @@
           label: null,
           alert: null,
 
+          inputClass: null,
           groupClass: null,
           labelClass: null,
           alertClass: null
@@ -64,6 +67,7 @@
         self.options.tplV.label = self.options.label;
         self.options.tplV.alert = self.options.alert;
 
+        self.options.tplV.inputClass = self.options.inputClass;
         self.options.tplV.labelClass = self.options.labelClass;
         self.options.tplV.alertClass = self.options.alertClass;
         self.options.tplV.groupClass = self.options.groupClass;
@@ -160,7 +164,7 @@
 
       _setSuccess: function (success, initial) {
         var self = this;
-        if (initial) {
+        if (initial || self.options.silent) {
           return
         }
         self.$group().addClass('has-success');

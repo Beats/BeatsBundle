@@ -5,7 +5,7 @@
 
   var __ = {
     mergeData: function (self) {
-      var data = self.element.data()
+      var data = self.element.data();
       if (jQuery.isPlainObject(data)) {
         $.each(self.options, function (key) {
           if (data[key] !== undefined) {
@@ -23,7 +23,7 @@
     },
     factory: function (opts, tplV) {
       tplV = $.extend(true, {}, this.defaults.tplV, tplV || opts.tplV);
-      var df = can.view(this.defaults.view, tplV)
+      var df = can.view(this.defaults.view, tplV);
       return new this($(df.children), opts)
     }
   }, {
@@ -35,7 +35,7 @@
       return Beats.Blocker.toggle(show, text, this.element)
     }
 
-  })
+  });
 
   return Beats.Control
 

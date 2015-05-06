@@ -58,6 +58,7 @@
 
 {% macro _form_select_attrs(opts) %}
   {% if opts.multiple %}multiple="multiple"{% endif %}
+  {% if opts.size is defined %}size="{{ opts.size }}"{% endif %}
 {% endmacro %}
 
 {% macro _form_textarea_attrs(opts) %}
@@ -213,6 +214,25 @@
   {% endif %}
 {% endmacro %}
 
+{% macro _field_autocomplete(opts) %}
+  {% import _self as self %}
+  {% set value = app._value(opts.name, opts.default|default(opts.value)) %}
+  {% set id = opts.name| default('') ~ '-' %}
+  {% set display = '' %}
+
+  {{ self.label(opts|merge({id: id ~ 'display'})) }}
+  {{ self._input(opts|merge({
+    type: 'text',
+    id: id ~ 'display',
+    name: '',
+    autocomplete: false,
+  }), display) }}
+  {#<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>#}
+  <div class="panel panel-default" id="{{ id ~ 'options' }}" style="display: none">
+    <ul class="list-group"></ul>
+  </div>
+{% endmacro %}
+
 {% macro field(opts) %}
   {% import _self as self %}
   {% set opts = {
@@ -237,6 +257,12 @@
     {{ self.input(opts|merge({type: 'hidden'})) }}
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
       {{ self._field_date(opts) }}
+      {{ self.messages(opts.name) }}
+    </div>
+  {% elseif opts.type in ['autocomplete'] %}
+    {{ self.input(opts|merge({type: 'hidden'})) }}
+    <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
+      {{ self._field_autocomplete(opts) }}
       {{ self.messages(opts.name) }}
     </div>
   {% else %}
@@ -307,6 +333,13 @@
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
     type: 'password',
+  })) }}
+{% endmacro %}
+
+{% macro autocomplete(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+    type: 'autocomplete',
   })) }}
 {% endmacro %}
 

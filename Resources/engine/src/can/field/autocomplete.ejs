@@ -1,0 +1,21 @@
+<div class="<%= groupClass %>">
+
+  <label class="<%= labelClass %>" for="<%= name %>-display"><%== label %></label>
+
+  <input class="form-control <%= inputClass %>" type="text"
+         id="<%= name %>-display"
+         autocomplete="off"
+         placeholder="<%= label %>"
+         value="<%= display %>"
+    />
+
+  <div id="{{ id ~ 'options' }}" style="display: none"></div>
+
+  <div class="panel panel-default" style="display: none;"
+          id="<%= name %>-options"
+    >
+    <ul class="list-group"></ul>
+  </div>
+
+  <span class="<%= alertClass %>"> <%= alert %></span>
+</div>
