@@ -6,7 +6,7 @@ class Message implements \Serializable {
   const DEFAULT_MESSAGE = 'Just saying Hi :)';
 
   const TYPE_COUNSEL = 'info';
-  const TYPE_WARNING = 'block';
+  const TYPE_WARNING = 'warning';
   const TYPE_SUCCESS = 'success';
   const TYPE_FAILURE = 'danger';
 
