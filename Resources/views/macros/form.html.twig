@@ -29,7 +29,7 @@
     id="{{ id }}"
   {% endif %}
   {% if name is not empty %}
-    name="{{ opts.name }}"
+    name="{{ opts.name }}{{ opts.collection ? '[]' : '' }}"
   {% endif %}
   class="{{ opts.inputClass }}"
   {% if opts.autocomplete is defined %}autocomplete="{{ opts.autocomplete ? "on" : "off" }}"{% endif %}
@@ -251,16 +251,18 @@
   autocomplete: false,
   autofocus: false,
   tabindex: 0,
+  collection: false,
+  data:{},
   }|merge(opts|default({})) %}
 
   {% if opts.type in ['date'] %}
-    {{ self.input(opts|merge({type: 'hidden'})) }}
+    {{ self.input(opts|merge({type: 'hidden', data: {view: null}|merge(opts.data)})) }}
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
       {{ self._field_date(opts) }}
       {{ self.messages(opts.name) }}
     </div>
   {% elseif opts.type in ['autocomplete'] %}
-    {{ self.input(opts|merge({type: 'hidden'})) }}
+    {{ self.input(opts|merge({type: 'hidden', data: {view: null}|merge(opts.data)})) }}
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
       {{ self._field_autocomplete(opts) }}
       {{ self.messages(opts.name) }}
