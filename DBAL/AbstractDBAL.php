@@ -373,7 +373,7 @@ class AbstractDBAL extends ContainerAware {
    *
    * @return AbstractEntity|object
    */
-  private function _locateDeep($id, $class = null) {
+  protected function _locateDeep($id, $class = null) {
     if (empty($class)) {
       $class = $this->_entity;
     }
