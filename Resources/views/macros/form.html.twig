@@ -280,7 +280,10 @@
                 {{ self.label(opts|merge({
                   value: value,
                   labelClass: 'radio-inline ' ~ opts.inputClass,
-                  label:  self.input(opts|merge({inputClass: null, value: value, default: opts.value})) ~ label,
+                  label:  self.input(opts|merge({
+                    inputClass: null,
+                    value: value,
+                    default: opts.value|default(opts.default)})) ~ label,
                 })) }}
               {% endfor %}
             </div>

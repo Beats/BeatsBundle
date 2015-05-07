@@ -143,7 +143,9 @@
       _update: function (initial) {
         var self = this;
 
-        self.clear();
+        if (!initial) {
+          self.clear();
+        }
 
         return self._validate(self.element.val(), initial)
           .done(function (failure, value) {
