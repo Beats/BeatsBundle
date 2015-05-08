@@ -277,9 +277,18 @@ class AbstractDBAL extends ContainerAware {
       return null;
     }
     if (empty($class)) {
-      $class = $this->_entity;
+      $class = $this->_classFactory($row);
     }
     return new $class((array)$row);
+  }
+
+  /**
+   * Entity class factory
+   * @param array|object $row
+   * @return string
+   */
+  protected function _classFactory($row) {
+    return $this->_entity;
   }
 
   /**
@@ -436,35 +445,43 @@ class AbstractDBAL extends ContainerAware {
 
   public function save(AbstractEntity $entity, $type = null) {
     if ($this->isMIX() && $this->isMIX(false, $type)) {
-      $id = $this->_db()->transaction(function (RDB $rdb, DOM $dom, $sequence, AbstractEntity $entity) {
+      $id = $this->_db()->transaction(
+        function (RDB $rdb, DOM $dom, $sequence, AbstractEntity $entity) {
 
-        $model = $entity::getModel();
+          $model = $entity::getModel();
 
-        if ($entity->hasID()) {
-          $id = $rdb->update($model, $entity->_toDB(AbstractDBAL::P_RDB));
-        } else {
-          $id = $rdb->insert($model, $entity->_toDB(AbstractDBAL::P_RDB), $sequence);
-        }
-        if ($id === false) {
-          throw new Exception("Couldn't insert data into MIX->RDB [$model]"); // 403 Forbidden header('X-Reason', $ex->getMessage());
-        }
-
-        return $dom->transaction(function (DOM $dom, $model, AbstractEntity $entity, $id) {
           if ($entity->hasID()) {
-            $entity->setID($id);
-            return $dom->update($model, $entity->_toDB(AbstractDBAL::P_DOM));
+            $id = $rdb->update($model, $entity->_toDB(AbstractDBAL::P_RDB));
           } else {
-            $entity->setID($id);
-            return $dom->insert($model, $entity->_toDB(AbstractDBAL::P_DOM));
+            $id = $rdb->insert($model, $entity->_toDB(AbstractDBAL::P_RDB), $sequence);
           }
-        }, $model, $entity, $id);
-      }, $this->isSequence(), $entity);
+          if ($id === false) {
+            throw new Exception(
+              "Couldn't insert data into MIX->RDB [$model]"
+            ); // 403 Forbidden header('X-Reason', $ex->getMessage());
+          }
+
+          return $dom->transaction(
+            function (DOM $dom, $model, AbstractEntity $entity, $id) {
+              if ($entity->hasID()) {
+                $entity->setID($id);
+                return $dom->update($model, $entity->_toDB(AbstractDBAL::P_DOM));
+              } else {
+                $entity->setID($id);
+                return $dom->insert($model, $entity->_toDB(AbstractDBAL::P_DOM));
+              }
+            }, $model, $entity, $id
+          );
+        }, $this->isSequence(), $entity
+      );
 
       $result = $this->locate($id);
     } else {
-      $result = $this->_buildEntity($this->_db($type)->save(
-        $entity::getModel(), $entity->_toDB($this->_type($type)), $this->isSequence()
-      ));
+      $result = $this->_buildEntity(
+        $this->_db($type)->save(
+          $entity::getModel(), $entity->_toDB($this->_type($type)), $this->isSequence()
+        )
+      );
     }
     if (empty($result)) {
       throw new Exception("Entity not saved: " . $entity::getModel());
