@@ -1,18 +1,18 @@
-div.beats_field_avatar {
+.beats_field_image_control.form-control {
     height: 100% !important;
     line-height: 100% !important;
     padding: 0 !important;
 }
 
-div.beats_field_avatar > img {
+.beats_field_image_control.form-control > img {
     width: 100%;
     border-radius: 3px 3px 0 0;
 }
 
-div.beats_field_avatar > div {
+.beats_field_image_control.form-control > div {
     border-radius: 0 0 3px 3px;
 }
 
-div.beats_field_avatar > .progress {
+.beats_field_image_control.form-control > .progress {
     margin-bottom: 0;
 }
