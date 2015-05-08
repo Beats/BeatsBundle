@@ -3,7 +3,7 @@ beats.fsal.link:
   requirements:
     _method:  GET
     id: '(\w+[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})'
-    name: '[\w\-]+'
+    name: '[\w\-\.]+'
 
 beats.oauth.connect:
   pattern: /oauth/connect/{provider}
