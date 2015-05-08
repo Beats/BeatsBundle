@@ -132,14 +132,14 @@
       fields: null,
       clearButton: _('beats.engine.can.field.datetime.clear.button'),
       clear: {
-        y: 'Year',
-        m: 'Month',
-        d: 'Day',
-        h: 'Hours',
-        i: 'Minutes',
-        s: 'Seconds',
-        H: 'Hours',
-        p: 'AM/PM'
+        y: _('beats.engine.can.field.datetime.clear.y'),
+        m: _('beats.engine.can.field.datetime.clear.m'),
+        d: _('beats.engine.can.field.datetime.clear.d'),
+        h: _('beats.engine.can.field.datetime.clear.h'),
+        i: _('beats.engine.can.field.datetime.clear.i'),
+        s: _('beats.engine.can.field.datetime.clear.s'),
+        H: _('beats.engine.can.field.datetime.clear.H'),
+        p: _('beats.engine.can.field.datetime.clear.p')
       },
       view: 'beats.can.field.datetime.ejs',
       tplV: {

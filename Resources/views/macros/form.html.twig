@@ -184,7 +184,7 @@
   {% if clear is not iterable %}
     {% set clear = {y: clear, m: clear, d: clear} %}
   {% endif %}
-  {% set partsClass = opts.partsClass is defined ? opts.partsClass : '' %}
+  {% set partsClass = opts.partsClass is defined ? opts.partsClass : 'col-md-4 col-sm-4 col-xs-4' %}
   {% if partsClass is not iterable %}
     {% set partsClass = {y:partsClass, m: partsClass, d: partsClass} %}
   {% endif %}
