@@ -2,6 +2,7 @@
 namespace BeatsBundle\Model;
 
 
+use BeatsBundle\Exception\Exception;
 use BeatsBundle\Service\Aware\BrowserAware;
 use BeatsBundle\Service\Aware\DBALAware;
 use BeatsBundle\Service\Aware\FlasherAware;
@@ -57,6 +58,21 @@ abstract class AbstractModel extends ContainerAware {
     return $this->_logger()->error($ex->getMessage(), $ex->getTrace());
   }
 
+  /*********************************************************************************************************************/
+
+  protected function _getValidationSet(array $validations, $type) {
+    if (empty($type)) {
+      $type = false;
+    }
+    if (is_bool($type)) {
+      $type = $type ? 'update' : 'insert';
+    }
+    if (array_key_exists($type, $validations)) {
+      return $validations[$type];
+    }
+    throw new Exception("Unknown validation set: $type");
+
+  }
   /*********************************************************************************************************************/
 
 }
