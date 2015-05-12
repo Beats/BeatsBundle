@@ -36,6 +36,8 @@ beats-can:
 
 beats-can-form:
   version: 0.1
+  dependencies:
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/twitter/typeahead.js-0.11.1/dist/bloodhound.js'
   javascripts:
     - 'can/field'
     - 'can/field/reditor'
@@ -44,6 +46,7 @@ beats-can-form:
     - 'can/field/number'
     - 'can/field/image'
     - 'can/field/autocomplete'
+    - 'can/suggestioner'
   stylesheets:
     - 'can/field/image'
     - 'can/field/autocomplete'
