@@ -1,15 +1,15 @@
 beats-can:
   version: 0.1
   dependencies:
-    - '@BeatsBundle/Resources/public/js/ecma-extend.js'
+    - '@BeatsBundle/Resources/lib/js/ecma-extend.js'
     - '//code.jquery.com/jquery-1.11.2.js'
-    - '@BeatsBundle/Resources/public/js/jquery-extend.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
     - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
-    - '@BeatsBundle/Resources/public/js/bootstrap-extend.js'
+    - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
     - '//cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js'
-    - '@BeatsBundle/Resources/public/js/jquery.hammer.js'
+    - '@BeatsBundle/Resources/lib/js/jquery.hammer.js'
     - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
-    - '@BeatsBundle/Resources/public/js/canjs/can-2.0.3.js'
+    - '@BeatsBundle/Resources/lib/js/canjs/can-2.0.3.js'
 #    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
   javascripts:
     - 'can/beats'
@@ -56,8 +56,16 @@ beats-can-form:
 ecma-jquery-boostrap:
   version: 0.1
   dependencies:
-  - '@BeatsBundle/Resources/public/js/ecma-extend.js'
-  - '//code.jquery.com/jquery-1.11.2.js'
-  - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
-  - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
-#  - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
+    - '@BeatsBundle/Resources/lib/js/ecma-extend.js'
+    - '//code.jquery.com/jquery-1.11.2.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
+    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
+    - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
+#    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
+
+ecma-jquery:
+  version: 0.1
+  dependencies:
+    - '@BeatsBundle/Resources/lib/js/ecma-extend.js'
+    - '//code.jquery.com/jquery-1.11.2.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
