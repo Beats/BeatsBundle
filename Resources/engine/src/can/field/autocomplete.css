@@ -1,15 +1,3 @@
 .beats_field_autocomplete + div ul.list-group > li {
     border: none!important;
 }
-
-.beats_field_autocomplete + div ul.list-group > li:active {
-    background-image: none;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125) inset;
-    outline: 0 none;
-}
-
-.beats_field_autocomplete + div ul.list-group > li.hover,
-.beats_field_autocomplete + div ul.list-group > li:hover {
-    background-color: #337ab7;
-    color: #fff;
-}

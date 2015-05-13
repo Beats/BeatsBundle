@@ -30,7 +30,9 @@
         size: null
       }
     }
+
   }, {
+
     init: function () {
       var self = this;
 
@@ -59,94 +61,104 @@
 
       self._super.apply(self, arguments);
 
+      var suppressKeyPressRepeat, suppressNonChars;
+
       $display
-        .on('keydown', function (evt) {
-          self.suppressKeyPressRepeat = !$.inArray(evt.keyCode, [40,39,38,37,9,13,27]);
-          if (!self.isOptionsShown() && evt.keyCode == 40) {
-            self._lookup($(this).val());
-          } else {
-            self._move(evt);
+        .on('blur', function (evt) {
+          if (self.isOptionsShown()) {
+            self.revert();
           }
+        })
+
+        .on('keydown', function (evt) {
+          suppressKeyPressRepeat = ~$.inArray(evt.keyCode, [13, 27, 38, 40]);
+
+          if (self.isOptionsShown() && !evt.shiftKey) {
+            var handled = false;
+            switch (evt.keyCode) {
+              case 13: // Enter
+                self._select($options.find('li.active'));
+                handled = true;
+                break;
+
+              case 27: // Esc
+                self.revert();
+                handled = true;
+                break;
+
+              case 38: // Up arrow
+                self._shiftActive(-1);
+                handled = true;
+                break;
+
+              case 40: // Down arrow
+                self._shiftActive(+1);
+                handled = true;
+                break;
+            }
+            if (handled) {
+              evt.preventDefault();
+              evt.stopPropagation();
+            }
+          }
+
         })
         .on('keypress', function (evt) {
-          if (self.suppressKeyPressRepeat) {
+          if (suppressKeyPressRepeat) {
             return;
           }
-          self._move(evt);
+          suppressNonChars = !evt.which
         })
         .on('keyup', function (evt) {
-          //console.debug('keyup', $(this).val());
-          switch (evt.keyCode) {
-            case 40: // down arrow
-            case 39: // right arrow
-            case 38: // up arrow
-            case 37: // left arrow
-
-            case 16: // shift
-            case 17: // ctrl
-            case 18: // alt
-              break;
-
-            case 9: // tab
-            case 13: // enter
-              if (!self.isOptionsShown()) {
-                return;
-              }
-              //this.select();
-              break;
-
-            case 27: // escape
-              if (!self.isOptionsShown()) {
-                return;
-              }
-              self.toggleOptions(false);
-              break;
-
-            default:
-              self._lookup($(this).val());
+          if (suppressKeyPressRepeat || suppressNonChars) {
+            return;
           }
-
           evt.stopPropagation();
           evt.preventDefault();
+          self._lookup($(this).val());
         })
       ;
+
       $options
+        .on('mouseenter', 'li', function (evt) {
+          evt.stopPropagation();
+          self._activate($(evt.currentTarget));
+        })
         .on('click', 'li', function (evt) {
           evt.stopPropagation();
-          var $li = $(evt.target);
-          self.element.data('selected', $li);
-          self._update()
-        });
+          self._select($(evt.currentTarget));
+        })
+      ;
+
     },
 
-    _move: function(evt) {
-      //if (!this.isOptionsShown()) {
-      //  return;
-      //}
+    _activate: function ($newOption, $oldOption) {
+      if (!$oldOption) {
+        $oldOption = this.$options().find('li.active');
 
-      switch(evt.keyCode) {
-        case 9: // tab
-        case 13: // enter
-        case 27: // escape
-          evt.preventDefault();
-          break;
-
-        case 38: // up arrow
-          // with the shiftKey (this is actually the left parenthesis)
-          if (evt.shiftKey) return;
-          evt.preventDefault();
-          //this.prev();
-          break;
-
-        case 40: // down arrow
-          // with the shiftKey (this is actually the right parenthesis)
-          if (evt.shiftKey) return;
-          evt.preventDefault();
-          //this.next();
-          break;
       }
+      $oldOption.removeClass('active');
+      $newOption.addClass('active');
+    },
 
-      evt.stopPropagation();
+    _shiftActive: function (direction) {
+      var $oldActive = this.$options().find('.active')
+        , $newActive
+        ;
+      if (!direction) {
+        return;
+      } else if (0 < direction) {
+        $newActive = $oldActive.next();
+        if (!$newActive.length) {
+          $newActive = this.$options().find('li:first');
+        }
+      } else if (direction < 0) {
+        $newActive = $oldActive.prev();
+        if (!$newActive.length) {
+          $newActive = this.$options().find('li:last');
+        }
+      }
+      this._activate($newActive, $oldActive);
     },
 
     _lookup: function (term) {
@@ -169,13 +181,6 @@
       }
     },
 
-    isOptionsShown: function() {
-      return this.$options().is(':visible')
-    },
-    toggleOptions: function(show) {
-      this.$options().toggle(!!show);
-    },
-
     _buildOptions: function (items) {
       var self = this
         , $options = self.$options()
@@ -191,9 +196,13 @@
 
     _buildOption: function (item) {
       var $li = $('<li class="list-group-item"/>');
-      $li.data('value', this.options.valuer(true, item));
+      $li.data('value', item);
       $li.text(this.options.optioner(item));
       return $li;
+    },
+
+    isOptionsShown: function () {
+      return this.$options().is(':visible')
     },
 
     $options: function () {
@@ -204,32 +213,59 @@
       return this.$group().find('input')
     },
 
-    _update: function (initial) {
-      var self = this
-        , oldValue = self.options.valuer(false, self.element.val())
-        ;
-      return self._super.apply(self, arguments)
-        .always(function (failure, newValue) {
-          //self.$clear().toggle(!Beats.empty(newValue));
-          if (oldValue !== newValue) {
-            self.$display().val(self.options.displayer(newValue));
-            self.element.val(self.options.valuer(true, newValue)).trigger(jQuery.Event('change'), [newValue, !failure])
-          }
-          self.$options().hide();
-        })
+    reset: function () {
+      var self = this;
+      self.element.data('selected', self.options.preset);
+      self._update();
+      return self;
     },
 
-    _validate: function (oldValue, initial) {
-      var self = this
-        , newValue
-        ;
-      if (initial) {
-        newValue = self.element.val()
-      } else {
-        newValue = self.element.data('selected').data('value');
+    revert: function () {
+      var self = this;
+      self.element.data('selected', self.options.valuer(false, self.element.val()));
+      self._update();
+      return self;
+    },
+
+    _defaulter: function (value) {
+      return this.options.valuer(false, value)
+    },
+
+    _select: function ($li) {
+      if ($li) {
+        this.element.data('previous', this.options.valuer(false, this.element.val()));
+        this.element.val(this.options.valuer(true, $li.data('value')));
+        this._update()
       }
-      newValue = self.options.valuer(false, newValue);
-      return self._super.apply(self, [newValue]);
+    },
+
+    _update: function (initial) {
+      var self = this
+        , oldValue
+        ;
+
+      if (initial) {
+        oldValue = self.options.preset;
+      } else {
+        oldValue = self.element.data('previous');
+      }
+
+      return self._super.apply(self, arguments)
+        .always(function (failure, newValue) {
+          if (oldValue !== newValue) {
+            self.$display().val(self.options.displayer(newValue));
+            self.element.val(self.options.valuer(true, newValue));
+            if (!initial) {
+              self.element.trigger(jQuery.Event('change'), [newValue, !failure])
+            }
+          }
+          self.$options().hide();
+        });
+    },
+
+    _validate: function (value, initial) {
+      var self = this;
+      return self._super.apply(self, [self.options.valuer(false, value), initial]);
     }
 
   });

@@ -48,7 +48,7 @@
           $.isFunction(self.options.defaulter)
             ? self.options.defaulter
             : self._defaulter
-          )
+        )
           .apply(self, [self.element.val()]);
 
         if (Beats.empty(self.options.view)) {
@@ -121,19 +121,19 @@
       },
 
       _validate: function (value, initial) {
-        var self = this;
+        var self = this, dfd, error, regexp;
         if (Beats.empty(self.options.validator)) {
           return $.Deferred().resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator.promise)) {
           return self.options.validator
         } else if (typeof self.options.validator === 'string') {
-          var dfd = $.Deferred()
-            , regexp = new RegExp(self.options.validator)
-            , error = !regexp.test(value);
+          dfd = $.Deferred();
+          regexp = new RegExp(self.options.validator);
+          error = !regexp.test(value);
           return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
         } else if ($.isFunction(self.options.validator)) {
-          var dfd = $.Deferred()
-            , error = self.options.validator.apply(self, arguments);
+          dfd = $.Deferred();
+          error = self.options.validator.apply(self, arguments);
           return error ? dfd.rejectWith(self, [error, value]) : dfd.resolveWith(self, [false, value])
         } else {
           return $.when(self.options.validator)
@@ -179,7 +179,7 @@
         return !this.$group().hasClass('has-error')
       },
 
-      clear: function() {
+      clear: function () {
         var self = this;
 
         self.$group().removeClass('has-error has-success');
