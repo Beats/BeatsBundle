@@ -1,5 +1,6 @@
 beats.engine.can.field.image.success: 'The image was successfuly changed'
 beats.engine.can.field.image.failure: 'There was a problem uploading the image'
+
 beats.engine.can.field.datetime.incomplete: 'The date is incomplete'
 beats.engine.can.field.datetime.invalid: 'The date is invalid'
 beats.engine.can.field.datetime.clear.button: 'Clear'
@@ -23,3 +24,17 @@ beats.engine.can.field.datetime.month.M.09: 'Sep'
 beats.engine.can.field.datetime.month.M.10: 'Oct'
 beats.engine.can.field.datetime.month.M.11: 'Nov'
 beats.engine.can.field.datetime.month.M.12: 'Dec'
+
+beats.engine.can.field.file.success: "You've changed your image successfully"
+beats.engine.can.field.file.failure: "There was a problem with the file upload"
+beats.engine.can.field.file.failure.maxNumberOfFiles: 'Maximum number of files exceeded'
+beats.engine.can.field.file.failure.acceptFileTypes: 'File type not allowed'
+beats.engine.can.field.file.failure.maxFileSize: 'File is too large'
+beats.engine.can.field.file.failure.minFileSize: 'File is too small'
+beats.engine.can.field.file.failure.uploadedBytes: 'Uploaded bytes exceed file size'
+
+beats.validation.constraint.failure: 'The value is invalid'
+beats.validation.constraint.success: 'The value is valid'
+
+beats.validation.constraint.username.failure: 'The value is not a valid username'
+beats.validation.constraint.username.success: 'The value is a valid username'

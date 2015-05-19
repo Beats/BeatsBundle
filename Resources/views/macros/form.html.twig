@@ -18,7 +18,7 @@
   {% endif %}
 {% endmacro %}
 
-{% macro _form_element_attrs(opts) %}
+{% macro _form_element_id(opts) %}
   {% set name = opts.name| default('') %}
   {% if opts.type in ['radio'] and opts.id is empty %}
     {% set id = name ~ '-' ~ opts.value %}
@@ -31,6 +31,11 @@
   {% if name is not empty %}
     name="{{ opts.name }}{{ opts.collection ? '[]' : '' }}"
   {% endif %}
+{% endmacro %}
+
+{% macro _form_element_attrs(opts) %}
+  {% import _self as self %}
+  {{ self._form_element_id(opts) }}
   class="{{ opts.inputClass }}"
   {% if opts.autocomplete is defined %}autocomplete="{{ opts.autocomplete ? "on" : "off" }}"{% endif %}
   {% if opts.autofocus is defined and opts.autofocus %}autofocus="autofocus"{% endif %}
@@ -45,12 +50,15 @@
   type="{{ opts.type }}"
   placeholder="{{ opts.placeholder|default(opts.label) }}"
   {% if opts.required is defined and opts.required %}required="required"{% endif %}
+  {% if opts.readonly is defined and opts.readonly %}readonly="readonly"{% endif %}
   {% if opts.type in ['checkbox'] %}
     {{ value is empty ? '' : 'checked="checked"' }}
     value="1"
   {% elseif opts.type in ['radio'] %}
     {{ value != opts.value ? '' : 'checked="checked"' }}
     value="{{ opts.value }}"
+  {% elseif opts.type in ['file'] %}
+    {% if opts.accept is defined %}accept="{{ opts.accept }}"{% endif %}
   {% else %}
     value="{{ value }}"
   {% endif %}
@@ -103,7 +111,7 @@
       {% if opts.addon.l is defined %}
         {{ self._addon(opts.addon.l) }}
       {% endif %}
-      {{ self.input(opts|merge({addon: null})) }}
+      {{ self._input(opts|merge({addon: null}), value) }} {# TODO@ion: Verify this change #}
       {% if opts.addon.r is defined %}
         {{ self._addon(opts.addon.r) }}
       {% endif %}
@@ -151,6 +159,110 @@
   <textarea {{ self._form_element_attrs(opts) }} {{ self._form_textarea_attrs(opts) }}>{{ value|raw }}</textarea>
 {% endmacro %}
 
+{% macro _input_file(opts, value) %}
+  {% import _self as self %}
+  {% set opts = {
+  accept: '',
+  button: {},
+  caption: false,
+  preview: false,
+  progress: false,
+  crop: false,
+  rotate: false,
+  }|merge(opts|default({})) %}
+
+  {% set fOpts = {
+  label: '',
+  placeholder: '',
+  inputClass: '',
+  } %}
+
+  {% set button = {
+  label: '&hellip;',
+  class: 'btn-default',
+  }|merge(opts.button) %}
+
+  {% if opts.caption is iterable %}
+    {% set caption = {
+    class: '',
+    }|merge(opts.caption) %}
+    <div class="input-group {{ caption.class }}">
+      <span class="input-group-btn">
+        <span class="btn beats_field_file-button {{ button.class }}">
+          <span>{{ button.label|raw }}</span>
+          {{ self._input(opts|merge(fOpts), value) }}
+          {% if opts.crop %}
+            <input type="hidden" id="{{ opts.rootName }}[crop][pW]" name="{{ opts.rootName }}[crop][pW]"/>
+            <input type="hidden" id="{{ opts.rootName }}[crop][pH]" name="{{ opts.rootName }}[crop][pH]"/>
+            <input type="hidden" id="{{ opts.rootName }}[crop][x1]" name="{{ opts.rootName }}[crop][x1]"/>
+            <input type="hidden" id="{{ opts.rootName }}[crop][x2]" name="{{ opts.rootName }}[crop][x2]"/>
+            <input type="hidden" id="{{ opts.rootName }}[crop][y1]" name="{{ opts.rootName }}[crop][y1]"/>
+            <input type="hidden" id="{{ opts.rootName }}[crop][y2]" name="{{ opts.rootName }}[crop][y2]"/>
+          {% endif %}
+          {% if opts.rotate %}
+            <input type="hidden" id="{{ opts.rootName }}[rotate]" name="{{ opts.rootName }}[rotate]" value="0"/>
+          {% endif %}
+        </span>
+      </span>
+      {{ self._input(opts|merge({name: null, id: null, type: 'text', readonly: true})) }}
+    </div>
+  {% else %}
+    <div class="beats_field_file-button {{ button.class }} {{ opts.inputClass }}">
+      <span>{{ button.label|raw }}</span>
+      {{ self._input(opts|merge(fOpts), value) }}
+      {% if opts.crop %}
+        <input type="hidden" id="{{ opts.rootName }}[crop][pW]" name="{{ opts.rootName }}[crop][pW]"/>
+        <input type="hidden" id="{{ opts.rootName }}[crop][pH]" name="{{ opts.rootName }}[crop][pH]"/>
+        <input type="hidden" id="{{ opts.rootName }}[crop][x1]" name="{{ opts.rootName }}[crop][x1]"/>
+        <input type="hidden" id="{{ opts.rootName }}[crop][x2]" name="{{ opts.rootName }}[crop][x2]"/>
+        <input type="hidden" id="{{ opts.rootName }}[crop][y1]" name="{{ opts.rootName }}[crop][y1]"/>
+        <input type="hidden" id="{{ opts.rootName }}[crop][y2]" name="{{ opts.rootName }}[crop][y2]"/>
+      {% endif %}
+      {% if opts.rotate %}
+        <input type="hidden" id="{{ opts.rootName }}[rotate]" name="{{ opts.rootName }}[rotate]" value="0"/>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if opts.progress %}
+    {% set progress = {
+    class: '',
+    value: 40,
+    min: 0,
+    max: 100,
+    label: true,
+    }|merge(opts.progress is iterable ? opts.progress : {}) %}
+    <div class="beats_field_file-progress progress" style="display: none;">
+      <div class="progress-bar {{ progress.class }}" role="progressbar"
+           aria-valuenow="{{ progress.value }}"
+           aria-valuemin="{{ progress.min }}"
+           aria-valuemax="{{ progress.max }}"
+           style="width: {{ progress.value }}%"
+        >
+        <span class="{% if not progress.label %}sr-only{% endif %}">{{ progress.value }}%</span>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="beats_field_file-preview" >
+    {% set preview = {
+    src: '',
+    type: false,
+    }|merge(opts.preview is iterable ? opts.preview : {}) %}
+    {% if preview.type is not empty %}
+      {% if preview.type matches '#^image/.*$#' %}
+        <img class="img-thumbnail btn-block" src="{{ preview.src }}"/>
+      {% elseif preview.type matches '#^audio/.*$#' %}
+        <audio class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"/>
+      {% elseif preview.type matches '#^video/.*$#' %}
+        <video class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"/>
+      {% else %}
+      {% endif %}
+    {% endif %}
+  </div>
+
+{% endmacro %}
+
 {% macro input(opts) %}
   {% import _self as self %}
   {% set opts = {
@@ -170,6 +282,8 @@
     {{ self._select(opts, value) }}
   {% elseif opts.type in ['textarea'] %}
     {{ self._textarea(opts, value) }}
+  {% elseif opts.type in ['file'] %}
+    {{ self._input_file(opts, value) }}
   {% else %}
     {{ self._input(opts, value) }}
   {% endif %}
@@ -233,6 +347,25 @@
   </div>
 {% endmacro %}
 
+{% macro _group_file(opts) %}
+  {% import _self as self %}
+  {% set opts = {
+  crop: false,
+  rotate: false,
+  }|merge(opts|default({})) %}
+  {% if opts.crop or opts.rotate %}
+    {% set opts = opts|merge({
+    rootName: opts.name,
+    name:  opts.name ~ '[file]'
+    }) %}
+  {% endif %}
+  <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
+    {{ self.label(opts) }}
+    {{ self.input(opts) }}
+    {{ self.messages(opts.name) }}
+  </div>
+{% endmacro %}
+
 {% macro field(opts) %}
   {% import _self as self %}
   {% set opts = {
@@ -255,18 +388,18 @@
   data:{},
   }|merge(opts|default({})) %}
 
-  {% if opts.type in ['date'] %}
+  {% if opts.type in ['date', 'autocomplete'] %}
     {{ self.input(opts|merge({type: 'hidden', data: {view: null}|merge(opts.data)})) }}
     <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
-      {{ self._field_date(opts) }}
+      {% if opts.type == 'date' %}
+        {{ self._field_date(opts) }}
+      {% else %}
+        {{ self._field_autocomplete(opts) }}
+      {% endif %}
       {{ self.messages(opts.name) }}
     </div>
-  {% elseif opts.type in ['autocomplete'] %}
-    {{ self.input(opts|merge({type: 'hidden', data: {view: null}|merge(opts.data)})) }}
-    <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
-      {{ self._field_autocomplete(opts) }}
-      {{ self.messages(opts.name) }}
-    </div>
+  {% elseif opts.type in ['file'] %}
+    {{ self._group_file(opts) }}
   {% else %}
     {% if opts.type in ['hidden'] %}
       {{ self.input(opts) }}
@@ -307,7 +440,7 @@
               {{ self.input(opts) }}
             {% endif %}
           </div>
-        {% elseif opts.type in ['date'] %}
+        {% elseif opts.type in ['date'] %} {# TODO@ion: Review this #}
           {{ self.input(opts|merge({type: 'hidden'})) }}
           {{ self._field_date(opts) }}
         {% else %}
@@ -394,5 +527,12 @@
   {% import _self as self %}
   {{ self.field(opts|default({})|merge({
     type: 'select',
+  })) }}
+{% endmacro %}
+
+{% macro file(opts) %}
+  {% import _self as self %}
+  {{ self.field(opts|default({})|merge({
+    type: 'file',
   })) }}
 {% endmacro %}

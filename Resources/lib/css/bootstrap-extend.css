@@ -1,0 +1,6 @@
+.has-error .input-group-btn .btn {
+    border-color: #a94442;
+}
+.has-success .input-group-btn .btn {
+    border-color: #3c763d;
+}

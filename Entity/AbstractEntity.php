@@ -78,9 +78,11 @@ class AbstractEntity implements \IteratorAggregate {
   /********************************************************************************************************************/
 
   static public function walk(array $array, $format) {
-    return array_map(function ($value) use ($format) {
-      return sprintf($format, $value);
-    }, $array);
+    return array_map(
+      function ($value) use ($format) {
+        return sprintf($format, $value);
+      }, $array
+    );
   }
 
   static public function fields($format = null, $array = true) {
@@ -119,8 +121,8 @@ class AbstractEntity implements \IteratorAggregate {
    * If the $key argument is an enumeration value, the enumeration label is returned
    * In all other cases the NULL is returned
    *
-   * @param array $associative A reference to an enumeration (associative array)
-   * @param bool|null $enum An enumeration value or false
+   * @param array     $associative A reference to an enumeration (associative array)
+   * @param bool|null $enum        An enumeration value or false
    * @return array|null a label for a certain enumeration or a vector of enumeration values
    */
   static protected function _enumeration(array &$associative, $enum = null) {
@@ -192,7 +194,7 @@ class AbstractEntity implements \IteratorAggregate {
 
   /**
    * @param array $values
-   * @param $class
+   * @param       $class
    * @return AbstractEntity
    */
   static protected function _build(array $values, $class) {
@@ -221,7 +223,7 @@ class AbstractEntity implements \IteratorAggregate {
 
   /**
    * @param array|string|\stdClass $entity
-   * @param bool $map
+   * @param bool                   $map
    * @throws Exception
    */
   public function __construct($entity = null, $map = true) {
@@ -277,7 +279,7 @@ class AbstractEntity implements \IteratorAggregate {
 
   /**
    * @param array $entity
-   * @param bool $map
+   * @param bool  $map
    * @return AbstractEntity
    */
   private function _rehydrate(array $entity, $map = true) {
@@ -317,15 +319,17 @@ class AbstractEntity implements \IteratorAggregate {
         } elseif (is_object($value)) {
           $value = (array)$value;
         } elseif (is_array($value)) {
-          $value = array_map(function ($element) use ($deep) {
-            if ($element instanceof self) {
-              return $element->_dehydrate($deep);
-            } elseif (is_object($element)) {
-              return (array)$element;
-            } else {
-              return $element;
-            }
-          }, $value);
+          $value = array_map(
+            function ($element) use ($deep) {
+              if ($element instanceof self) {
+                return $element->_dehydrate($deep);
+              } elseif (is_object($element)) {
+                return (array)$element;
+              } else {
+                return $element;
+              }
+            }, $value
+          );
         }
       }
     } else {
@@ -351,9 +355,9 @@ class AbstractEntity implements \IteratorAggregate {
    * Depending on the $exists parameter either a boolean is returned determining whether the child was found
    * or the $child entity is returned (or null if not found).
    *
-   * @param $child
-   * @param $field
-   * @param $value
+   * @param      $child
+   * @param      $field
+   * @param      $value
    * @param bool $exists
    * @return AbstractEntity|bool|null
    */
@@ -369,11 +373,11 @@ class AbstractEntity implements \IteratorAggregate {
   }
 
   protected function _remove($child, $field, $value, $mark = true) {
-    $entity = & $this->_filter($child, $field, $value);
+    $entity = &$this->_filter($child, $field, $value);
     if (empty($entity)) {
       return null;
     }
-    $children = & $this->$child;
+    $children = &$this->$child;
     $childID  = $entity->getID();
     if ($mark) {
       $children[$childID] = $childID;
@@ -387,7 +391,7 @@ class AbstractEntity implements \IteratorAggregate {
     if (empty($this->$child)) {
       return $exists ? false : null;
     }
-    $children = & $this->$child;
+    $children = &$this->$child;
     if (empty($children[$childID])) {
       return $exists ? false : null;
     }
@@ -452,7 +456,7 @@ class AbstractEntity implements \IteratorAggregate {
     if (!$this->_isField($field)) {
       return $this;
     }
-    $childs = & $this->$field;
+    $childs = &$this->$field;
     $class  = self::_childs($field);
     /** @noinspection PhpUndefinedMethodInspection */
     $model = $class::getModel();
@@ -595,6 +599,18 @@ class AbstractEntity implements \IteratorAggregate {
     return !empty($this->_attachments->$name);
   }
 
+  /**
+   * @param string $name
+   * @return null|string
+   */
+  public function getAttachmentType($name) {
+    $attachment = $this->getAttachment($name);
+    if (empty($attachment)) {
+      return null;
+    }
+    return $attachment->content_type;
+  }
+
   /********************************************************************************************************************/
 
   /**
@@ -613,9 +629,11 @@ class AbstractEntity implements \IteratorAggregate {
 
     foreach (static::$_childs as $field => $class) {
       if (isset($this->$field)) {
-        $this->$field = array_map(function (AbstractEntity $entity) {
-          return $entity->tidy();
-        }, $this->$field);
+        $this->$field = array_map(
+          function (AbstractEntity $entity) {
+            return $entity->tidy();
+          }, $this->$field
+        );
 
       } else {
         $this->$field = array();
@@ -753,7 +771,7 @@ class AbstractEntity implements \IteratorAggregate {
 
   /**
    * @param AbstractEntity $entity
-   * @param \stdClass $others
+   * @param \stdClass      $others
    * @return $this
    */
   static public function resetOthers(AbstractEntity $entity, \stdClass $others) {

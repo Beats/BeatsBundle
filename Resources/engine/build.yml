@@ -6,11 +6,12 @@ beats-can:
     - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
     - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
     - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
+#    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
+    - '@BeatsBundle/Resources/lib/css/bootstrap-extend.css'
     - '//cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js'
     - '@BeatsBundle/Resources/lib/js/jquery.hammer.js'
     - '//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'
     - '@BeatsBundle/Resources/lib/js/canjs/can-2.0.3.js'
-#    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
   javascripts:
     - 'can/beats'
     - 'can/entity'
@@ -38,17 +39,37 @@ beats-can-form:
   version: 0.1
   dependencies:
     - '@BeatsBundle/Resources/lib/js/jquery-plugins/twitter/typeahead.js-0.11.1/dist/bloodhound.js'
+
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Canvas-to-Blob-2.1.1/js/canvas-to-blob.js'
+
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/vendor/jquery.Jcrop.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image-ios.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image-meta.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image-exif.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image-exif-map.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/JavaScript-Load-Image-1.13.0/js/load-image-orientation.js'
+
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/vendor/jquery.ui.widget.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.iframe-transport.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-process.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-validate.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-image.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-audio.js'
+    - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-video.js'
+
   javascripts:
     - 'can/field'
+    - 'can/field/file'
     - 'can/field/reditor'
     - 'can/field/widget'
     - 'can/field/datetime'
     - 'can/field/number'
-    - 'can/field/image'
     - 'can/field/autocomplete'
     - 'can/suggestioner'
   stylesheets:
-    - 'can/field/image'
+    - 'can/field/file'
     - 'can/field/autocomplete'
   templates:
     - 'can/field/datetime'
@@ -62,7 +83,7 @@ ecma-jquery-boostrap:
     - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
     - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
 #    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
-
+    - '@BeatsBundle/Resources/lib/css/bootstrap-extend.css'
 ecma-jquery:
   version: 0.1
   dependencies:
