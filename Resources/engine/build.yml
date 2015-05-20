@@ -67,13 +67,16 @@ beats-can-form:
     - 'can/field/datetime'
     - 'can/field/number'
     - 'can/field/autocomplete'
+    - 'can/field/tags'
     - 'can/suggestioner'
   stylesheets:
     - 'can/field/file'
     - 'can/field/autocomplete'
+    - 'can/field/tags'
   templates:
     - 'can/field/datetime'
     - 'can/field/autocomplete'
+    - 'can/field/tags'
 ecma-jquery-boostrap:
   version: 0.1
   dependencies:

@@ -1,0 +1,35 @@
+.beats_field_tags-tag {
+    display: inline-block;
+    font-size: 18px;
+    margin: 4px 4px 0 0;
+    border-radius: 0.25em;
+    color: #fff;
+    font-weight: bold;
+    line-height: 1.33333;
+    padding: 0.3em 0.4em;
+    height: 36px;
+    text-align: center;
+    vertical-align: baseline;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.beats_field_tags-selected,
+.beats_field_tags-rejected {
+    padding: 0 0 4px 4px;
+    margin-bottom: 0;
+}
+
+.beats_field_tags-selected .beats_field_tags-tag {
+    background-color: #337ab7;
+}
+
+.beats_field_tags-rejected .beats_field_tags-tag {
+    background-color: #777;
+}

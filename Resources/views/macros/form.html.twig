@@ -107,7 +107,7 @@
   addon: null,
   }|merge(opts|default({})) %}
   {% if opts.addon is not empty %}
-    <div class="input-group">
+    <div class="input-group {{ opts.addon.class|default('') }}">
       {% if opts.addon.l is defined %}
         {{ self._addon(opts.addon.l) }}
       {% endif %}
@@ -244,7 +244,7 @@
     </div>
   {% endif %}
 
-  <div class="beats_field_file-preview" >
+  <div class="beats_field_file-preview">
     {% set preview = {
     src: '',
     type: false,
@@ -535,4 +535,78 @@
   {{ self.field(opts|default({})|merge({
     type: 'file',
   })) }}
+{% endmacro %}
+
+{% macro tags(opts) %}
+  {% import _self as self %}
+  {% set opts = {
+  id: null,
+  name: '',
+  type: 'text',
+  value: null,
+  default: null,
+  style: null,
+  inline: false,
+  groupClass: 'form-group',
+  labelClass: 'control-label',
+  inputClass: 'form-control',
+  label: null,
+  placeholder: null,
+  autocomplete: false,
+  autofocus: false,
+  tabindex: 0,
+  collection: false,
+  data:{},
+  }|merge(opts|default({})) %}
+
+  {% set value = app._value(opts.name, opts.default|default(opts.value)) %}
+  {% set selected = [] %}
+  {% set rejected = [] %}
+  {% for key, lbl in opts.options %}
+    {% if key in value %}
+      {% set selected = selected|merge([key]) %}
+    {% else %}
+      {% set rejected = rejected|merge([key]) %}
+    {% endif %}
+  {% endfor %}
+
+  <div class="{{ opts.groupClass }} {{ self.classes(opts.name) }}">
+
+    {{ self.label(opts) }}
+
+    {{ self._select(opts|merge({style:'display: none;'}), value) }}
+
+    {% set fOpts = {
+    type: 'text',
+    id: opts.name ~ '-search',
+    name: null,
+    value: null,
+    addon: {
+    class: 'beats_field_tags-searcher',
+    r: '<i class="fa fa-fw fa-search"></i>',
+    }
+    } %}
+
+    {{ self.input(opts|merge(fOpts)) }}
+
+    {#<pre aria-hidden="true" style="position: absolute; visibility: visible; white-space: pre; font-family: Ubuntu; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: optimizelegibility; text-transform: none;"></pre>#}
+
+    <div id="{{ opts.name ~ '-selected' }}" class="beats_field_tags-selected panel panel-default">
+      {% for key in selected %}
+        <span class="beats_field_tags-tag label" data-value="{{ key }}">
+          {{ attribute(opts.options, key) }}
+        </span>
+      {% endfor %}
+    </div>
+
+    <div id="{{ opts.name ~ '-rejected' }}" class="beats_field_tags-rejected panel panel-default">
+      {% for key in rejected %}
+        <span class="beats_field_tags-tag label" data-value="{{ key }}">
+          {{ attribute(opts.options, key) }}
+        </span>
+      {% endfor %}
+    </div>
+
+    {{ self.messages(opts.name) }}
+  </div>
 {% endmacro %}
