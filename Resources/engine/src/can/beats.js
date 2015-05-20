@@ -33,7 +33,7 @@
       }
       return cookieValue;
     }
-  }
+  };
 
   window.Beats = {
     _version: '0.1',
@@ -41,13 +41,13 @@
     timezone: __.cookie('beats_tz'),
 
     Error: function (self, message, id) {
-      var error = new Error(message, id)
-      error.name = self.Class ? self.Class.fullName : self.fullName
+      var error = new Error(message, id);
+      error.name = self.Class ? self.Class.fullName : self.fullName;
       return error;
     },
 
     log: function (self, fn) {
-      self = self || this
+      self = self || this;
       console.log([self.Class.fullName, '->', fn].join(' '))
     },
 
@@ -89,7 +89,7 @@
       if (!text) {
         return ''
       }
-      text = text.trim()
+      text = text.trim();
       if (!text.length) {
         return ''
       }
@@ -113,7 +113,7 @@
 
     invoke: function (callback, scope, arguments) {
       if ($.isFunction(callback)) {
-        callback.apply(scope, arguments)
+        callback.apply(scope, arguments);
         return true
       }
       return false
@@ -123,14 +123,14 @@
       $: $,
       jQuery: $,
       options: function (opts, selected, classes) {
-        var parts = []
+        var parts = [];
         $.each(opts, function (idx, opt) {
           parts.push(Beats._helpers.option(opt.lbl, opt.val, selected, classes));
-        })
+        });
         return parts.join('');
       },
       option: function (label, value, selected, classes, disabled) {
-        var parts = ['<option value="', value, '"']
+        var parts = ['<option value="', value, '"'];
         if (!Beats.empty(classes)) {
           parts.push(' class="', classes, '"')
         }
@@ -138,10 +138,10 @@
           parts.push(' selected="selected"')
         }
         if (disabled) {
-          parts.push(' disabled="disabled"')
+          parts.push(' disabled="disabled"');
           parts.push(' style="display:none;"')
         }
-        parts.push('>', label, '</option>')
+        parts.push('>', label, '</option>');
         return parts.join('');
       },
       count: function (object) {
@@ -153,7 +153,7 @@
       return $.extend({}, Beats._helpers, helpers || {})
     }
 
-  }
+  };
 
 // Determine the current user TimeZone
   if (!Beats.timezone) {

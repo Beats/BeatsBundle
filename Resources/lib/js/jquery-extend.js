@@ -49,13 +49,25 @@
           case 'array':
             return value.join(separator);
           case 'object':
-            return $.map(value,function (value) {
+            return $.map(value, function (value) {
               return value
             }).join(separator)
         }
         return value
       }
       return ''
+    },
+
+    diff: function (arr1, arr2) {
+      return $.merge($(arr1).not(arr2), $(arr2).not(arr1));
+    },
+
+    keys: function (object) {
+      var key, keys = [];
+      for (key in object) {
+        keys.push(key);
+      }
+      return keys;
     }
   });
 
