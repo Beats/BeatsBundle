@@ -12,7 +12,7 @@ atlassian-ide-plugin.xml
 #####################################
 # Vendor
 #####################################
-vendor
+# vendor
 composer.phar
 composer.lock
 phpunit.xml
