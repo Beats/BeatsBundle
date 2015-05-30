@@ -1,25 +1,47 @@
-<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"  {% block data %}{% endblock %}>
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        {% block header %}
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          {% block title %}
-            <h4 class="modal-title">Modal title</h4>
+{% import _self as _ %}
+
+{% macro attr(name, id, component) %}{% if id is defined %}{{ name }}="{{ id }}{% if component is defined and component %}-{{ component }}{% endif %}"{% endif %}{% endmacro %}
+
+<div {{ _.attr('id',id) }} class="modal {{ transition is defined ? transition|default('') : 'fade' }}"
+                           tabindex="-1" role="dialog"
+  {{ _.attr('aria-labelledby',id, 'modal-title') }} aria-hidden="true" {% block data %}{% endblock %}
+  >
+  {% block dialog %}
+    <div class="modal-dialog {{ size|default('') }}">
+      {% block content %}
+        <div class="modal-content">
+          {% block header %}
+            <div class="modal-header">
+              {% if close is not defined or close %}
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                        value="{{ value|default('') }}">&times;</button>
+              {% endif %}
+              {% block title %}
+                <h4 class="modal-title" {{ _.attr('id',id, 'modal-title') }}>{{ title|default('Title') }}</h4>
+              {% endblock %}
+            </div>
           {% endblock %}
-        {% endblock %}
-      </div>
-      <div class="modal-body">
-        {% block body %}
-          <p>One fine body&hellip;</p>
-        {% endblock %}
-      </div>
-      <div class="modal-footer">
-        {% block footer %}
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save</button>
-        {% endblock %}
-      </div>
+
+          {% block body %}
+            <div class="modal-body">
+              {{ body|default('One fine body&hellip;')|raw }}
+            </div>
+          {% endblock %}
+
+          {% block footer %}
+            <div class="modal-footer" style="text-align: center;">
+              {% if buttons is defined %}
+                {% for button in buttons %}
+                  <button type="button" class="btn {{ button.classes }}" value="{{ button.value }}"
+                          {% if button.dismiss %}data-dismiss="modal"{% endif %}>
+                    {{ button.text }}
+                  </button>
+                {% endfor %}
+              {% endif %}
+            </div>
+          {% endblock %}
+        </div>
+      {% endblock %}
     </div>
-  </div>
+  {% endblock %}
 </div>

@@ -18,16 +18,16 @@
     button: function (button, value, dissmis, text, classes) {
       switch ($.type(button)) {
         case  'object':
-          button.dismiss = dissmis
-          button.value = value
-          break
+          button.dismiss = dissmis;
+          button.value = value;
+          break;
         default:
           button = {
             dismiss: dissmis,
             classes: classes || '',
             text: button || text,
             value: value
-          }
+          };
           break
       }
       return button
@@ -40,7 +40,7 @@
         keyboard: self.options.keyboard,
         remote: self.options.remote,
         show: false
-      })
+      });
 
       self.element.on({
         'show.bs.modal': __.proxy(self, 'show'),
@@ -53,25 +53,25 @@
           } else {
             self.options.deferred.resolveWith(self, [self.options.value, self.options.data])
           }
-          __.trigger(self, 'hidden', self)
+          __.trigger(self, 'hidden', self);
 
           if (self.options.destroy) {
             self.element.remove()
           }
         }
-      })
+      });
 
       self.element.trigger(jQuery.Event('beats.modal.dialog.built'), [
         self.element.find('.modal-body'),
         self.element.find('.modal-header'),
         self.element.find('.modal-footer')
-      ])
+      ]);
 
       if (self.options.show) {
         self.show(self.options.deferred)
       }
     }
-  }
+  };
 
   /******************************************************************************************************************/
 
@@ -86,7 +86,9 @@
       backdrop: true,
       keyboard: true,
       remote: false,
+      transition: 'fade',
 
+      size: null,
       header: true,
       close: true,
       value: 0,
@@ -98,6 +100,7 @@
 
       view: 'beats.can.modal.dialog.ejs',
       tplV: {
+        size: null,
         header: true,
         close: null,
         value: 0,
@@ -109,17 +112,17 @@
     },
 
     make: function (options) {
-      var $dialog = $("<div></div>")
-      $('body').append($dialog)
+      var $dialog = $("<div></div>");
+      $('body').append($dialog);
       return new this($dialog, options)
     },
 
     show: function (options) {
-      var dfd = $.Deferred()
+      var dfd = $.Deferred();
       this.make($.extend(options || {}, {
         deferred: dfd,
         destroy: true
-      }))
+      }));
       return dfd
     },
 
@@ -129,19 +132,19 @@
         title: title,
         buttons: [],
         value: 0
-      }
+      };
       if (!title) {
         if (title === false) {
-          options.title = ''
-          options.close = false
+          options.title = '';
+          options.close = false;
           options.header = false
         } else {
           options.title = 'Confirm'
         }
       }
 
-      options.buttons.push(__.button(ok, 1, true, 'Yes', 'btn-primary'))
-      options.buttons.push(__.button(no, 0, true, 'No', 'btn-default'))
+      options.buttons.push(__.button(ok, 1, true, 'Yes', 'btn-primary'));
+      options.buttons.push(__.button(no, 0, true, 'No', 'btn-default'));
       return this.show(options)
     },
 
@@ -151,31 +154,31 @@
         title: title,
         buttons: [],
         value: 1
-      }
+      };
       if (!title) {
         if (title === false) {
-          options.title = ''
-          options.close = false
+          options.title = '';
+          options.close = false;
           options.header = false
         } else {
-          options.title = '&nbsp;'
-          options.close = true
+          options.title = '&nbsp;';
+          options.close = true;
           options.header = true
         }
       }
       if (button === false) {
-        options.footer = false
+        options.footer = false;
         return this.show(options)
       }
-      options.buttons.push(__.button(button, 1, true, 'OK', 'btn-primary'))
+      options.buttons.push(__.button(button, 1, true, 'OK', 'btn-primary'));
       return this.show(options)
     }
 
   }, {
 
     init: function () {
-      this._super.apply(this, arguments)
-      var self = this
+      this._super.apply(this, arguments);
+      var self = this;
 
       if (Beats.empty(self.options.view)) {
 
@@ -187,23 +190,23 @@
           self.options.id = 'beats-dialog-' + (++__.id)
         }
 
-        $.each(['id',
+        $.each(['id', 'size',
           'header', 'close', 'value', 'title',
           'body',
           'footer', 'buttons'
         ], function (idx, field) {
           self.options.tplV[field] = self.options[field]
-        })
+        });
 
         self.element.html(self.options.view, self.options.tplV, function () {
-          self.element.addClass('modal fade')
+          self.element.addClass('modal').addClass(self.options.transition);
           self.element.attr({
             id: self.options.id,
             tabindex: '-1',
             role: 'dialog',
             'aria-hidden': 'true',
             'aria-labelledby': self.options.id + '-modal-title'
-          })
+          });
 
           __.bootstrap(self)
 
@@ -213,13 +216,13 @@
     },
 
     show: function (dfd) {
-      var self = this
-      self.options.value = null
-      self.options.data = null
-      self.options.deferred = dfd || $.Deferred()
-      self.options.deferred.$dialog = self.element
-      self.element.data('deferred', self.options.deferred)
-      self.element.modal('show')
+      var self = this;
+      self.options.value = null;
+      self.options.data = null;
+      self.options.deferred = dfd || $.Deferred();
+      self.options.deferred.$dialog = self.element;
+      self.element.data('deferred', self.options.deferred);
+      self.element.modal('show');
       return self.options.deferred
     },
 
@@ -238,16 +241,16 @@
     },
 
     'button click': function ($btn, evt) {
-      var self = this
+      var self = this;
       if ($btn.data('dismiss')) {
         self.options.value = $btn.val()
       }
     }
 
-  })
+  });
 
   /******************************************************************************************************************/
 
   return Beats.Modal.Dialog
 
-})(jQuery)
+})(jQuery);
