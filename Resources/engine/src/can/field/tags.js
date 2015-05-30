@@ -13,16 +13,7 @@
       size: 4,
       maxCount: undefined,
       minCount: undefined,
-      //validator: function (value, initial) {
-      //  value = value || [];
-      //  if (3 < value.length) {
-      //    return 'too big'
-      //  } else if (value.length < 1) {
-      //    return 'too wee'
-      //  }
-      //},
-      //view: 'beats.can.field.tags.ejs',
-      view: null,
+      view: 'beats.can.field.tags.ejs',
       tplV: {
         name: null,
         display: null,
@@ -74,21 +65,52 @@
         self.select($(this).data('value'));
       });
 
-      self.$searcherText().on('keyup', function () {
-        var term = $(this).val().toLowerCase()
-          , $tags = $rejected.children()
-          ;
-        $tags.each(function (idx, el) {
-          var $tag = $(el)
-            , text = $tag.text().trim().toLocaleLowerCase()
-            ;
-          if (text.startsWith(term)) {
-            $tag.show();
-          } else {
-            $tag.hide();
+      self.$searcherText()
+        .on('change', function () {
+          if (!$(this).val().length) {
+            $rejected.children().show();
           }
-        });
-      });
+        })
+        .on('keydown', function (evt) {
+          if (!evt.shiftKey) {
+            var handled = false;
+            switch (evt.keyCode) {
+              case 13: // Enter
+                var $tags = $rejected.children().filter(':visible');
+                if ($tags.length == 1) {
+                  $tags.click();
+                  $(this).val('');
+                }
+                handled = true;
+                break;
+
+              case 27: // Esc
+                $(this).val('');
+                handled = true;
+                break;
+            }
+          }
+          if (handled) {
+            evt.preventDefault();
+            evt.stopPropagation();
+          }
+        })
+        .on('keyup', function () {
+          var term = $(this).val().toLowerCase()
+            , $tags = $rejected.children()
+            ;
+          $tags.each(function (idx, el) {
+            var $tag = $(el)
+              , text = $tag.text().trim().toLocaleLowerCase()
+              ;
+            if (text.startsWith(term)) {
+              $tag.show();
+            } else {
+              $tag.hide();
+            }
+          });
+        })
+      ;
 
       self.element.on('change', function (evt) {
         self._update();
