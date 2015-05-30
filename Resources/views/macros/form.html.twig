@@ -224,7 +224,7 @@
     </div>
   {% endif %}
 
-  {% if opts.progress %}
+  {% if opts.progress is iterable %}
     {% set progress = {
     class: '',
     value: 40,
@@ -244,22 +244,26 @@
     </div>
   {% endif %}
 
-  <div class="beats_field_file-preview">
+  {% if opts.preview is iterable %}
     {% set preview = {
+    class: '',
+    style: '',
     src: '',
     type: false,
-    }|merge(opts.preview is iterable ? opts.preview : {}) %}
-    {% if preview.type is not empty %}
-      {% if preview.type matches '#^image/.*$#' %}
-        <img class="img-thumbnail btn-block" src="{{ preview.src }}"/>
-      {% elseif preview.type matches '#^audio/.*$#' %}
-        <audio class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"/>
-      {% elseif preview.type matches '#^video/.*$#' %}
-        <video class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"/>
-      {% else %}
+    }|merge(opts.preview) %}
+    <div class="beats_field_file-preview {{ preview.class }}" style="{{ preview.style }}">
+      {% if preview.type is not empty %}
+        {% if preview.type matches '#^image/.*$#' %}
+          <img class="img-thumbnail btn-block" src="{{ preview.src }}"/>
+        {% elseif preview.type matches '#^audio/.*$#' %}
+          <audio class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"></audio>
+        {% elseif preview.type matches '#^video/.*$#' %}
+          <video class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"></video>
+        {% else %}
+        {% endif %}
       {% endif %}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 
 {% endmacro %}
 

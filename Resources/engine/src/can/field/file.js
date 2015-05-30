@@ -3,6 +3,19 @@
  */
 (function () {
 
+  var __ = {
+    clearInputFile: function ($input) {
+      if (/MSIE/.test(navigator.userAgent)) {
+        $input.wrap('<form>').closest('form').on('reset', function (evt) {
+          evt.stopPropagation();
+        }).get(0).reset();
+        $input.unwrap();
+      } else { // normal reset behavior for other sane browsers
+        $input.val('');
+      }
+    }
+  };
+
   Beats.Field.File = Beats.Control.extend({
     pluginName: 'beats_field_file',
     defaults: {
@@ -241,6 +254,18 @@
 
     $caption: function () {
       return this.element.parents('.input-group').find(':text')
+    },
+
+    clear: function () {
+      var self = this;
+      if (Beats.empty(self.options.url)) {
+        self.$preview().empty().hide();
+        self.$alert().empty().hide();
+        self.$control().removeClass('has-error has-success');
+        __.clearInputFile(self.element);
+      } else {
+        throw Beats.Error(self, 'Not Implemented', self.element.prop('id'));
+      }
     }
 
   });
