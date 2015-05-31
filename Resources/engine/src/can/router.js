@@ -4,12 +4,12 @@
 (function ($) {
 
   // LATER: Load /routes.js
-  var _routes = routes
-  delete routes
+  var _routes = routes;
+  delete routes;
 
   var _cache = {
     fsal: {}
-  }
+  };
 
   Beats.Router = can.Construct.extend({
 
@@ -20,7 +20,7 @@
     fsal: function (model, id, name, preset, absolute, scope) {
       var args = [model, id, name]
         , cacheID = args.join('_')
-        , cache = _cache.fsal[cacheID]
+        , cache = _cache.fsal[cacheID];
       if (!cache) {
         _cache.fsal[cacheID] = cache = {
           id: cacheID,
@@ -31,7 +31,7 @@
           deferred: $.Deferred(),
           scope: scope || this,
           complete: function (success) {
-            this.args.unshift(success ? this.href : this.preset)
+            this.args.unshift(success ? this.href : this.preset);
             if (success) {
               this.deferred.resolveWith(this.scope, this.args)
             } else {
@@ -39,7 +39,7 @@
             }
             return this.args
           }
-        }
+        };
         cache.ajax = $.ajax({
           url: cache.href,
           type: 'HEAD',
@@ -57,9 +57,9 @@
     },
 
     href: function (model, id, name, absolute) {
-      var path = this._fileBase + '/' + model + '_' + id + '/' + name
+      var path = this._fileBase + '/' + model + 's_' + id + '/' + name;
       if (absolute) {
-        var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname
+        var origin = window.location.origin || window.location.protocol + '//' + window.location.hostname;
         return origin + path;
       }
       return path;
@@ -74,10 +74,10 @@
     },
 
     setup : function(base, fullName, staticProps, protoProps){
-      var self = this
+      var self = this;
       $.each(_routes, function (idx, route) {
         self._routes[idx] = null
-      })
+      });
       can.Construct.setup.apply(self, arguments)
     },
 
@@ -89,7 +89,7 @@
 //    },
 
     get: function (name) {
-      var self = this
+      var self = this;
       if (name in self._routes) {
         if (!self._routes[name]) {
           if (!_routes[name]) {
@@ -122,7 +122,7 @@
     init: function () {
       throw Beats.Error(this, "This is a singleton. Do NOT instantiate!")
     }
-  })
+  });
 
   var __ = {
     empty: function (value) {
@@ -135,27 +135,27 @@
       return encodeURIComponent(value).replace(/%2F/g, '/')
     },
     build: function (instance, path, url, data) {
-      var self = this, optional = false
+      var self = this, optional = false;
       $.each(path.tokens, function (idx, token) {
-        var type = token[0], fn = __.token[type]
+        var type = token[0], fn = __.token[type];
         if ($.isFunction(fn)) {
           fn.call(self, instance, url, data, optional, token)
         } else {
           throw Beats.Error(instance, 'Unsupported route token type: ' + type)
         }
-      })
+      });
       return optional
     },
     token: {
       text: function (instance, url, data, optional, tokens) {
-        url.unshift(tokens[1])
+        url.unshift(tokens[1]);
         optional = false
       },
       variable: function (instance, url, data, optional, tokens) {
         var delimiter = tokens[1], pattern = tokens[2], key = tokens[3]
           , val, def, rex = __.parseRegEx(pattern)
           , hasDefault = instance.hasDefault(key)
-          , hasParam = key in data
+          , hasParam = key in data;
 
         if (hasParam) {
           val = data[key]
@@ -177,13 +177,13 @@
             throw Beats.Error(instance, 'Missing parameter "' + key + '" for route: ' + instance.name)
           }
 
-          optional = false
+          optional = false;
 
           if (!__.empty(val)) {
             if (rex && !rex.test(val)) {
               throw Beats.Error(instance, 'Invalid parameter "' + key + '":"' + val + '" for route: ' + instance.name)
             }
-            url.unshift(__.encode(val))
+            url.unshift(__.encode(val));
             url.unshift(delimiter)
           }
         }
@@ -195,7 +195,7 @@
         var delimiter = pcre[0]
           , i = pcre.lastIndexOf(delimiter)
           , pattern = pcre.substring(1, i)
-          , modifiers = pcre.substr(i + 1)
+          , modifiers = pcre.substr(i + 1);
         try {
           return new RegExp(pattern, modifiers)
         } catch (ex) {
@@ -215,9 +215,9 @@
       return false
     },
     parseCompiled: function (opts) {
-      var vars = {}, tokens = []
+      var vars = {}, tokens = [];
       if (opts) {
-        vars = opts.vars || {}
+        vars = opts.vars || {};
         tokens = opts.tokens || []
       }
       return {
@@ -226,13 +226,13 @@
     },
 
     cleanPath: function (url, data) {
-      var path = url.length ? url.join('') : '/'
+      var path = url.length ? url.join('') : '/';
 
       // LATER: cleanup '.' and '..' paths
 
       return path
     }
-  }
+  };
 
   can.Construct.extend('Beats.Route', {
 
@@ -246,7 +246,7 @@
     },
 
     resolve: function (ajax, scope) {
-      var dfd = $.Deferred()
+      var dfd = $.Deferred();
       ajax.done(function (response, status, xhr) {
         try {
           dfd.resolveWith(scope, [Beats.Route.parse.apply(scope, arguments), true])
@@ -255,7 +255,7 @@
         }
       }).fail(function (xhr, status, error) {
           dfd.rejectWith(scope, [new Error(status), false]);
-        })
+        });
       return dfd
     }
 
@@ -276,21 +276,21 @@
     _host: null,
 
     init: function (name, options) {
-      var self = this
-      self.name = name
+      var self = this;
+      self.name = name;
 
-      self._methods = options.methods || self._methods
-      self._schemes = options.schemes || self._schemes
+      self._methods = options.methods || self._methods;
+      self._schemes = options.schemes || self._schemes;
 
-      self._defaults = options.defaults || {}
-      self._required = options.required || {}
+      self._defaults = options.defaults || {};
+      self._required = options.required || {};
 
-      self._controller = options.controller
-      self._hostname = options.hostname || self._hostname
-      self._format = options.format || self._format
+      self._controller = options.controller;
+      self._hostname = options.hostname || self._hostname;
+      self._format = options.format || self._format;
 
-      self._path = __.parseCompiled(options.path)
-      self._host = __.parseCompiled(options.host)
+      self._path = __.parseCompiled(options.path);
+      self._host = __.parseCompiled(options.host);
     },
 
     getName: function () {
@@ -330,7 +330,7 @@
     },
 
     args: function (params, absolute, sync) {
-      var self = this, path = [], host = [], data = {}
+      var self = this, path = [], host = [], data = {};
 
       if (!params) {
         params = {}
@@ -341,21 +341,21 @@
       if ($.type(params) != 'object') {
         throw Beats.Error(this, 'Parameters must be an object')
       }
-      $.extend(data, params)
+      $.extend(data, params);
 
-      __.build(self, self._path, path, data)
+      __.build(self, self._path, path, data);
 
-      path = __.cleanPath(path, data)
+      path = __.cleanPath(path, data);
 
-      var scheme, port
+      var scheme, port;
       if (self.hasRequired('_scheme')) {
-        scheme = self.getRequired('_scheme').toLowerCase()
+        scheme = self.getRequired('_scheme').toLowerCase();
         if (scheme != window.location.protocol) {
           absolute = true
         }
       }
       if (self.hasRequired('_port')) {
-        port = self.getRequired('_port').toLowerCase()
+        port = self.getRequired('_port').toLowerCase();
         if (port != window.location.port) {
           absolute = true
         }
@@ -374,11 +374,11 @@
           port = window.location.port
         }
 
-        host.unshift(scheme, '://')
+        host.unshift(scheme, '://');
         if (port && port.length) {
           host.push(':', port)
         }
-        host.push(path)
+        host.push(path);
         path = host.join('')
       }
 
@@ -388,29 +388,29 @@
     },
 
     ajax: function (params, absolute, sync) {
-      var self = this
+      var self = this;
       return $.ajax(self.args(params, absolute, sync))
     },
 
     call: function (params, scope, absolute, sync) {
-      var self = this
+      var self = this;
       return Beats.Route.resolve(self.ajax(params, absolute, sync), scope || self)
     },
 
     url: function (params, absolute, ignoreQueryString) {
-      var args = this.args(params, absolute)
+      var args = this.args(params, absolute);
       if (args.method != 'GET' && ignoreQueryString) {
         return args.url
       }
-      var query = $.param(args.data)
+      var query = $.param(args.data);
       if (query.length) {
         return [args.url, query].join('?')
       }
       return args.url
     }
 
-  })
+  });
 
   return Beats.Router
 
-})(jQuery)
+})(jQuery);
