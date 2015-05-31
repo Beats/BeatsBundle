@@ -275,6 +275,7 @@
         self.$preview().slideUp(null, function () {
           $(this).empty().hide()
         });
+        self.$caption().val('');
         self.$alert().empty().hide();
         self.$clear().hide();
         self.$control().removeClass('has-error has-success');
