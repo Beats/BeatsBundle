@@ -106,6 +106,7 @@ class AbstractEntity implements \IteratorAggregate {
     } else {
       $data = $fields;
     }
+
     return $array ? $data : implode(',', $data);
   }
 
@@ -131,8 +132,10 @@ class AbstractEntity implements \IteratorAggregate {
       if (empty($enumerations)) {
         $enumerations = array_keys($associative);
       }
+
       return is_null($enum) ? (array)$associative : $enumerations;
     }
+
     return isset($associative[$enum]) ? $associative[$enum] : null;
   }
 
@@ -274,6 +277,7 @@ class AbstractEntity implements \IteratorAggregate {
         $childs[] = static::_rehydrateEntity($value, $classChilds);
       }
     }
+
     return $childs;
   }
 
@@ -303,6 +307,7 @@ class AbstractEntity implements \IteratorAggregate {
         $this->$field = $value;
       }
     }
+
     return $this;
   }
 
@@ -347,6 +352,7 @@ class AbstractEntity implements \IteratorAggregate {
         $entity[$field] = $value;
       }
     }
+
     return $entity;
   }
 
@@ -369,6 +375,7 @@ class AbstractEntity implements \IteratorAggregate {
         }
       }
     }
+
     return $exists ? false : null;
   }
 
@@ -384,6 +391,7 @@ class AbstractEntity implements \IteratorAggregate {
     } else {
       unset($children[$childID]);
     }
+
     return $entity;
   }
 
@@ -396,6 +404,7 @@ class AbstractEntity implements \IteratorAggregate {
       return $exists ? false : null;
     }
     $entity = $children[$childID];
+
     return $exists ? true : $entity;
 
   }
@@ -449,6 +458,7 @@ class AbstractEntity implements \IteratorAggregate {
         $this->$field = $newValue;
       }
     }
+
     return $this;
   }
 
@@ -494,6 +504,7 @@ class AbstractEntity implements \IteratorAggregate {
     if (count($insert)) {
       $childs += $insert;
     }
+
     return $this;
   }
 
@@ -521,6 +532,7 @@ class AbstractEntity implements \IteratorAggregate {
    */
   public function getID() {
     $pk = static::getPK();
+
     return $this->$pk;
   }
 
@@ -531,6 +543,7 @@ class AbstractEntity implements \IteratorAggregate {
   public function setID($id) {
     $pk        = static::getPK();
     $this->$pk = $id;
+
     return $this;
   }
 
@@ -539,6 +552,7 @@ class AbstractEntity implements \IteratorAggregate {
    */
   public function hasID() {
     $pk = static::getPK();
+
     return !empty($this->$pk);
   }
 
@@ -563,6 +577,7 @@ class AbstractEntity implements \IteratorAggregate {
    */
   public function setRev($rev) {
     $this->_rev = $rev;
+
     return $this;
   }
 
@@ -582,6 +597,7 @@ class AbstractEntity implements \IteratorAggregate {
     if (empty($this->_attachments->$name)) {
       return null;
     }
+
     return $this->_attachments->$name;
   }
 
@@ -596,18 +612,36 @@ class AbstractEntity implements \IteratorAggregate {
     if (empty($name)) {
       return !empty($this->_attachments);
     }
+
     return !empty($this->_attachments->$name);
+  }
+
+  /**
+   * @param string      $name
+   * @param bool|false  $absolute
+   * @param string|null $default
+   * @return object
+   */
+  public function href($name, $absolute = false, $default = null) {
+    return (object)array(
+      'model'    => self::getModel(),
+      'id'       => $this->getID(),
+      'name'     => $name,
+      'default'  => $default,
+      'absolute' => $absolute,
+    );
   }
 
   /**
    * @param string $name
    * @return null|string
    */
-  public function getAttachmentType($name) {
+  public function mime($name) {
     $attachment = $this->getAttachment($name);
     if (empty($attachment)) {
       return null;
     }
+
     return $attachment->content_type;
   }
 
@@ -680,6 +714,7 @@ class AbstractEntity implements \IteratorAggregate {
    */
   public function secure() {
     unset($this->_rev);
+
     return $this;
   }
 
@@ -750,6 +785,7 @@ class AbstractEntity implements \IteratorAggregate {
         };
       }
     }
+
     return true;
   }
 
@@ -766,6 +802,7 @@ class AbstractEntity implements \IteratorAggregate {
       $others[$field] = $entity->$field;
       unset($entity->$field);
     }
+
     return (object)$others;
   }
 
@@ -782,6 +819,7 @@ class AbstractEntity implements \IteratorAggregate {
         }
       }
     }
+
     return $entity;
   }
 

@@ -18,6 +18,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   public function getFilters() {
     return array(
+      'fsal'     => new Twig_Filter_Method($this, 'toURL', array('is_safe' => array('html'))),
       'absolute' => new Twig_Filter_Method($this, 'toAbsolute', array('is_safe' => array('html'))),
       'ceil'     => new Twig_Filter_Method($this, 'toCeil', array('is_safe' => array('html'))),
       'options'  => new Twig_Filter_Method($this, 'toOptions', array('is_safe' => array('html'))),
@@ -41,7 +42,6 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'dateY'          => new Twig_Function_Method($this, 'dateY'),
       'dateM'          => new Twig_Function_Method($this, 'dateM'),
       'dateD'          => new Twig_Function_Method($this, 'dateD'),
-
     );
   }
 
@@ -64,6 +64,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
         $opts[$y] = $y;
       }
     }
+
     return $opts;
   }
 
@@ -77,6 +78,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
     foreach ($months as $m => $label) {
       $opts[sprintf('%02d', $m + 1)] = $label;
     }
+
     return $opts;
   }
 
@@ -90,6 +92,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
       $i        = '' . $i;
       $opts[$i] = $i;
     }
+
     return $opts;
   }
 
@@ -101,10 +104,23 @@ class TwigExtension extends ContainerAwareTwigExtension {
     return $this->_fsal()->exists($model, $id, $name);
   }
 
-  public function fsalURL($model, $id, $name, $default = null) {
+  public function toURL($params, $default = null, $absolute = false) {
+    $params = (object)$params;
+
+    return $this->fsalURL(
+      $params->model,
+      $params->id,
+      $params->name,
+      empty($params->default) ? $default : $params->default,
+      empty($params->absolute) ? $absolute : $params->absolute
+    );
+  }
+
+  public function fsalURL($model, $id, $name, $default = null, $absolute = false) {
     if (empty($default) || $this->_fsal()->exists($model, $id, $name)) {
-      return $this->_fsal()->link($model, $id, $name);
+      return $this->_fsal()->link($model, $id, $name, $absolute);
     }
+
     return $default;
   }
 
@@ -137,6 +153,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
       /** @noinspection PhpUndefinedMethodInspection */
       $zone = $this->_twig()->getExtension('core')->getTimezone();
     }
+
     return UTC::toTZFormat($format, $zone, $time);
   }
 
@@ -153,6 +170,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
     if (!empty($suffix)) {
       $length -= $size;
     }
+
     return mb_substr($value, 0, $length) . $suffix;
   }
 
@@ -183,6 +201,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   public function currentRoute($suffix = '') {
     $route = $this->_request()->attributes->get('_route');
+
     return empty($suffix) ? $route : implode('.', array($route, $suffix));
   }
 
@@ -197,10 +216,12 @@ class TwigExtension extends ContainerAwareTwigExtension {
   public function renderFlash() {
     $flashes = array();
     foreach ($this->_flasher()->get() as $flash) {
-      $flashes[] = sprintf('<span data-type="%s" data-heading="%s" data-message="%s"></span>',
+      $flashes[] = sprintf(
+        '<span data-type="%s" data-heading="%s" data-message="%s"></span>',
         $flash->type, htmlentities($flash->heading), htmlentities($flash->message)
       );
     }
+
     return implode('', $flashes);
   }
 
