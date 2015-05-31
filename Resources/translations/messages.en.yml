@@ -1,3 +1,6 @@
+beats.bs.close: 'Close'
+beats.bs.clear: 'Clear'
+
 beats.engine.can.field.image.success: 'The image was successfuly changed'
 beats.engine.can.field.image.failure: 'There was a problem uploading the image'
 

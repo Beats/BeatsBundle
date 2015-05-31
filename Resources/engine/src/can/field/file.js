@@ -36,7 +36,6 @@
       var self = this;
       self._super.apply(self, arguments);
 
-
       var $control = self.$control()
         , $button = self.$button()
         , $progress = self.$progress()
@@ -46,7 +45,9 @@
         , $caption = self.$caption()
         , $inputs = self.$inputs()
         , $alert = self.$alert()
+        , $clear = self.$clear()
         ;
+      $clear.hide();
 
       if (Beats.empty(self.options.url)) {
         var FUP = $.blueimp.fileupload.prototype;
@@ -54,6 +55,7 @@
         self.element.on('change', function (evt) {
           $preview.empty().hide();
           $alert.empty().hide();
+          $clear.hide();
           $control.removeClass('has-error has-success');
           delete evt.target.files.error;
           delete evt.target.files[0].error;
@@ -78,6 +80,7 @@
               var file = data.files[data.index];
               var text = file.name.replace(/\\/g, '/').replace(/.*\//, '');
               $caption.val(text);
+              $clear.show();
               switch (true) {
                 case FUP.options.loadImageFileTypes.test(file.type):
                   data.preview = self._loadPreview(file, 'img', 'image');
@@ -96,8 +99,14 @@
               $caption.val('');
               $control.addClass('has-error');
               $alert.html(file.error).show();
+              $clear.hide();
             })
         });
+
+        $clear.click(function () {
+          self.clear()
+        })
+
       } else {
         if (!$.isFunction(self.options.onDone)) {
           throw new Error('Beats.Field.File requires the onDone callback function. Will be removed in future versions');
@@ -256,11 +265,18 @@
       return this.element.parents('.input-group').find(':text')
     },
 
+    $clear: function () {
+      return this.$control().find('.beats_field_file-clear')
+    },
+
     clear: function () {
       var self = this;
       if (Beats.empty(self.options.url)) {
-        self.$preview().empty().hide();
+        self.$preview().slideUp(null, function () {
+          $(this).empty().hide()
+        });
         self.$alert().empty().hide();
+        self.$clear().hide();
         self.$control().removeClass('has-error has-success');
         __.clearInputFile(self.element);
       } else {

@@ -167,6 +167,7 @@
   caption: false,
   preview: false,
   progress: false,
+  clear: false,
   crop: false,
   rotate: false,
   }|merge(opts|default({})) %}
@@ -182,10 +183,24 @@
   class: 'btn-default',
   }|merge(opts.button) %}
 
-  {% if opts.caption is iterable %}
+  {% if opts.clear %}
+    {% set clear = {
+    class: 'close',
+    value: '',
+    style: '',
+    label: 'beats.bs.clear'|trans,
+    button:  '&times;',
+    }|merge(opts.clear is iterable ? opts.clear : {}) %}
+    <button type="button" class="{{ clear.class }} beats_field_file-clear" aria-label="{{ clear.label }}"
+            style="{{ clear.style }}">
+      <span aria-hidden="true">{{ clear.button|raw }}</span>
+    </button>
+  {% endif %}
+
+  {% if opts.caption %}
     {% set caption = {
     class: '',
-    }|merge(opts.caption) %}
+    }|merge(opts.caption is iterable ? opts.caption : {}) %}
     <div class="input-group {{ caption.class }}">
       <span class="input-group-btn">
         <span class="btn beats_field_file-button {{ button.class }}">
@@ -224,7 +239,7 @@
     </div>
   {% endif %}
 
-  {% if opts.progress is iterable %}
+  {% if opts.progress %}
     {% set progress = {
     class: '',
     value: 40,
@@ -244,13 +259,13 @@
     </div>
   {% endif %}
 
-  {% if opts.preview is iterable %}
+  {% if opts.preview %}
     {% set preview = {
     class: '',
     style: '',
     src: '',
     type: false,
-    }|merge(opts.preview) %}
+    }|merge(opts.preview is iterable ? opts.preview : {}) %}
     <div class="beats_field_file-preview {{ preview.class }}" style="{{ preview.style }}">
       {% if preview.type is not empty %}
         {% if preview.type matches '#^image/.*$#' %}
