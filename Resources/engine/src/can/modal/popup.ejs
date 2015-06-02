@@ -1,0 +1,13 @@
+<div class="arrow"></div>
+<% if (title) { %>
+<h3 class="popover-title"><%== title %></h3>
+<% } %>
+<div class="popover-content">
+  <div class="btn-group-vertical <%= clsGroup %>" role="group" aria-label="<%= label %>">
+    <% $.each(items, function(name, item) { %>
+    <a class="btn btn-block <%= item.class || 'btn-default' %>" role="button" tabindex="-1" href="#<%= name %>">
+      <%== item.text %>
+    </a>
+    <% }); %>
+  </div>
+</div>

@@ -23,7 +23,8 @@ class RDB extends AbstractDB {
 
   public function __construct($config) {
     // LATER: Read the configuration the correct way;
-    $connection_string = sprintf("%s:host=%s;port=%d;dbname=%s;user=%s;password=%s",
+    $connection_string = sprintf(
+      "%s:host=%s;port=%d;dbname=%s;user=%s;password=%s",
       $config['drvr'],
       $config['host'],
       $config['port'],
@@ -82,8 +83,8 @@ class RDB extends AbstractDB {
   }
 
   /**
-   * @param $data
-   * @param $model
+   * @param      $data
+   * @param      $model
    * @param bool $avoidPK
    * @throws DBALException
    * @return array
@@ -119,6 +120,7 @@ class RDB extends AbstractDB {
         $fields[$field] = $value;
       }
     }
+
     return $fields;
   }
 
@@ -128,6 +130,7 @@ class RDB extends AbstractDB {
     if ($this->_execute === false) {
       throw new DBALException(implode(" ", $statement->errorInfo()));
     }
+
     return $this->_execute;
   }
 
@@ -143,13 +146,17 @@ class RDB extends AbstractDB {
     }
     $fields = array_keys($data);
     if ($equal) {
-      return array_map(function ($field) {
-        return "$field = :$field";
-      }, $fields);
+      return array_map(
+        function ($field) {
+          return "$field = :$field";
+        }, $fields
+      );
     } else {
-      return array_map(function ($field) {
-        return "$field <> :$field";
-      }, $fields);
+      return array_map(
+        function ($field) {
+          return "$field <> :$field";
+        }, $fields
+      );
     }
   }
 
@@ -162,6 +169,7 @@ class RDB extends AbstractDB {
         $limit_offset .= " offset $offset";
       }
     }
+
     return $limit_offset;
   }
 
@@ -174,6 +182,7 @@ class RDB extends AbstractDB {
     foreach ($order as $field => $direction) {
       $fields[] = $field . ' ' . $direction;
     }
+
     return implode(',', $fields);
   }
 
@@ -182,16 +191,17 @@ class RDB extends AbstractDB {
     foreach ($data as $field => $value) {
       $list[] = "$field $value";
     }
+
     return $list;
   }
 
   /**
-   * @param $model
+   * @param       $model
    * @param array $where
    * @param array $order
-   * @param int $limit
-   * @param int $offset
-   * @param bool $equal
+   * @param int   $limit
+   * @param int   $offset
+   * @param bool  $equal
    * @return int
    */
   public function buildSelect($model, array $where, array $order, $limit, $offset, $equal = true) {
@@ -242,6 +252,7 @@ class RDB extends AbstractDB {
         $data[$pk] = self::uuid();
       }
     }
+
     return parent::_setup($data, $model, $pk, $insert, $sequence);
   }
 
@@ -251,6 +262,7 @@ class RDB extends AbstractDB {
    */
   public function version() {
     $result = $this->_db->query("SELECT VERSION()")->fetch(PDO::FETCH_OBJ);
+
     return $result->version;
   }
 
@@ -278,6 +290,7 @@ class RDB extends AbstractDB {
       $args[0] = $this;
       $result  = call_user_func_array($callback, $args);
       $this->commit();
+
       return $result;
     } catch (\Exception $ex) {
       $this->revert();
@@ -292,7 +305,7 @@ class RDB extends AbstractDB {
 
   /**
    * @param string $model
-   * @param mixed $id
+   * @param mixed  $id
    * @return object|mixed
    */
   public function locate($model, $id) {
@@ -300,14 +313,15 @@ class RDB extends AbstractDB {
     $statement = $this->_db->prepare($query);
     $statement->bindParam(1, $id, PDO::PARAM_INT);
     $this->execute($statement);
+
     return $statement->fetch(PDO::FETCH_OBJ);
   }
 
   /**
    * @param string $model
-   * @param array $parent
-   * @param array $childs
-   * @param array $joints
+   * @param array  $parent
+   * @param array  $childs
+   * @param array  $joints
    * @param string $id
    * @return mixed|object
    */
@@ -345,6 +359,7 @@ class RDB extends AbstractDB {
       self::pdoBind($statement, $model, $where);
     }
     $this->execute($statement);
+
     return $statement->fetchAll(PDO::FETCH_OBJ);
   }
 
@@ -355,13 +370,15 @@ class RDB extends AbstractDB {
     $data = $this->_setup($data, $model, $pk, true, $sequence);
 
     $fields = array_keys($data);
-    $query  = sprintf("INSERT INTO %s(%s) VALUES (:%s)",
+    $query  = sprintf(
+      "INSERT INTO %s(%s) VALUES (:%s)",
       self::table($model), implode(', ', $fields), implode(', :', $fields)
     );
 
     $statement = $this->_db->prepare($query);
     self::pdoBind($statement, $model, $data, $sequence);
     $this->execute($statement);
+
     return $sequence ? $this->lastInsertId($model) : $data[$pk];
   }
 
@@ -378,7 +395,8 @@ class RDB extends AbstractDB {
     $data = $this->_setup($data, $model, $pk, false);
 
     $sets  = $this->sqlSets($data, $model, true);
-    $query = sprintf("UPDATE %s SET %s WHERE %s = :%s",
+    $query = sprintf(
+      "UPDATE %s SET %s WHERE %s = :%s",
       self::table($model), implode(', ', $sets),
       $pk, $pk
     );
@@ -386,19 +404,21 @@ class RDB extends AbstractDB {
     $statement = $this->_db->prepare($query);
     self::pdoBind($statement, $model, $data, false);
     $this->execute($statement);
+
     return $data[$pk];
   }
 
   /**
    * Deletes a record
    *
-   * @param string $model
-   * @param mixed $id
+   * @param string     $model
+   * @param mixed      $id
    * @param null|mixed $rev
    * @return bool|mixed
    */
   public function devour($model, $id, $rev = null) {
-    $query = sprintf("DELETE FROM %s WHERE %s = ?",
+    $query = sprintf(
+      "DELETE FROM %s WHERE %s = ?",
       self::table($model), self::pk($model)
     );
 
@@ -407,6 +427,7 @@ class RDB extends AbstractDB {
     if ($this->execute($statement)) {
       return $id;
     }
+
     return false;
   }
 
@@ -418,6 +439,7 @@ class RDB extends AbstractDB {
 //    $query    = sprintf("TRUNCATE %s RESTART IDENTITY CASCADE", implode(', ', self::tables(array($models))));
     $query    = sprintf("DELETE FROM %s", self::table($model));
     $affected = $this->execute($this->_db->prepare($query));
+
     //      throw new \Exception("Truncate test run");
     return $affected;
   }
@@ -434,7 +456,7 @@ class RDB extends AbstractDB {
 
   /**
    * @param string $model
-   * @param array $data
+   * @param array  $data
    * @return mixed
    */
   public function kill($model, array $data) {
@@ -443,10 +465,12 @@ class RDB extends AbstractDB {
       return $this->devour($model, $data[$pk]);
     }
     $sets      = $this->sqlSets($data);
-    $query     = sprintf("DELETE FROM %s WHERE (%s)",
+    $query     = sprintf(
+      "DELETE FROM %s WHERE (%s)",
       self::table($model), implode(') AND (', $sets)
     );
     $statement = $this->_db->prepare($query);
+
     return $this->execute($statement);
   }
 
@@ -461,7 +485,8 @@ class RDB extends AbstractDB {
   }
 
   public function detachChilds($model, $parentPK, $parentID) {
-    $query = sprintf("DELETE FROM %s WHERE %s = ?",
+    $query = sprintf(
+      "DELETE FROM %s WHERE %s = ?",
       self::table($model), $parentPK
     );
 
@@ -470,6 +495,7 @@ class RDB extends AbstractDB {
     if ($this->execute($statement)) {
       return $parentID;
     }
+
     return false;
 
   }
@@ -479,6 +505,7 @@ class RDB extends AbstractDB {
     if (empty($rows)) {
       return null;
     }
+
     return reset($rows);
   }
 
@@ -490,12 +517,15 @@ class RDB extends AbstractDB {
 
   /********************************************************************************************************************/
 
-  public function linkAll($modelL, $modelR, $idL, $ids) {
+  public function linkAll($modelL, $modelR, $idL, $ids, $pkR = null) {
     if (empty($ids)) {
       return $ids;
     }
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
 
-    $this->unlinkAll($modelL, $modelR, $idL);
+    $this->unlinkAll($modelL, $modelR, $idL, $pkR);
 
     $pdo = $this->pdo();
 
@@ -504,8 +534,9 @@ class RDB extends AbstractDB {
       $links[] = sprintf('%s, %s', $pdo->quote($idL), $pdo->quote($id));
       $id      = array($idL, $id);
     }
-    $query     = sprintf("INSERT INTO %s (%s, %s) VALUES (%s)",
-      self::link($modelL, $modelR), self::pk($modelL), self::pk($modelR), implode('),(', $links)
+    $query     = sprintf(
+      "INSERT INTO %s (%s, %s) VALUES (%s)",
+      self::link($modelL, $modelR), self::pk($modelL), $pkR, implode('),(', $links)
     );
     $statement = $this->_db->prepare($query);
     $this->execute($statement);
@@ -513,42 +544,60 @@ class RDB extends AbstractDB {
     return $ids;
   }
 
-  public function linkOne($modelL, $modelR, $idL, $idR) {
-    $this->unlinkOne($modelL, $modelR, $idL, $idR);
-    $query     = sprintf("INSERT INTO %s (%s, %s) VALUES (?, ?)",
-      self::link($modelL, $modelR), self::pk($modelL), self::pk($modelR)
+  public function linkOne($modelL, $modelR, $idL, $idR, $pkR = null) {
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
+
+    $this->unlinkOne($modelL, $modelR, $idL, $idR, $pkR);
+    $query     = sprintf(
+      "INSERT INTO %s (%s, %s) VALUES (?, ?)",
+      self::link($modelL, $modelR), self::pk($modelL), $pkR
     );
     $statement = $this->_db->prepare($query);
     $statement->bindValue(1, $idL);
     $statement->bindValue(2, $idR);
     $this->execute($statement);
+
     return array($idL, $idR);
   }
 
   public function unlinkAll($modelL, $modelR, $idL) {
-    $query     = sprintf("DELETE FROM %s WHERE %s = ?",
+    $query     = sprintf(
+      "DELETE FROM %s WHERE %s = ?",
       self::link($modelL, $modelR), self::pk($modelL)
     );
     $statement = $this->_db->prepare($query);
     $statement->bindValue(1, $idL);
+
     return $this->execute($statement);
   }
 
-  public function unlinkOne($modelL, $modelR, $idL, $idR) {
-    $query     = sprintf("DELETE FROM %s WHERE %s = ? AND %s = ?",
-      self::link($modelL, $modelR), self::pk($modelL), self::pk($modelR)
+  public function unlinkOne($modelL, $modelR, $idL, $idR, $pkR = null) {
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
+
+    $query     = sprintf(
+      "DELETE FROM %s WHERE %s = ? AND %s = ?",
+      self::link($modelL, $modelR), self::pk($modelL), $pkR
     );
     $statement = $this->_db->prepare($query);
     $statement->bindValue(1, $idL);
     $statement->bindValue(2, $idR);
+
     return $this->execute($statement);
   }
 
-  public function joints($modelL, $modelR, $idL) {
+  public function joints($modelL, $modelR, $idL, $pkR = null) {
     $pkL = self::pk($modelL);
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
 
-    $query = sprintf("SELECT %s FROM %s WHERE (%s = :%s)",
-      self::pk($modelR), self::link($modelL, $modelR), $pkL, $pkL
+    $query = sprintf(
+      "SELECT %s FROM %s WHERE (%s = :%s)",
+      $pkR, self::link($modelL, $modelR), $pkL, $pkL
     );
 
     $statement = $this->_db->prepare($query);
@@ -567,7 +616,38 @@ class RDB extends AbstractDB {
       $statement = $this->pdo()->prepare($sql);
       $statement->bindValue(1, $id);
     }
+
     return $this->execute($statement);
+  }
+
+  public function count($model, $id = null, $pk = null) {
+    if (empty($pk)) {
+      $pk = self::pk($model);
+    }
+    if (is_array($model)) {
+      $table = self::link($model[0], $model[1]);
+    } else {
+      $table = self::table($model);
+    }
+    if (empty($id)) {
+      $query = sprintf(
+        "SELECT COUNT(*) FROM %s",
+        $table
+      );
+    } else {
+      $query = sprintf(
+        "SELECT COUNT(*) FROM %s WHERE (%s = :%s)",
+        $table, $pk, $pk
+      );
+    }
+
+    $statement = $this->_db->prepare($query);
+    if (!empty($id)) {
+      RDB::pdoBind($statement, null, array($pk => $id));
+    }
+    $this->execute($statement);
+
+    return current($statement->fetchAll(PDO::FETCH_COLUMN));
   }
 
 }

@@ -297,11 +297,15 @@ class AbstractEntity implements \IteratorAggregate {
         $this->$field = static::_rehydrateEntity($value, $classParent);
       } elseif ($classChilds && $value != null) {
         $this->$field = static::_rehydrateChilds($value, $classChilds, $map);
-      } elseif ($classOthers && $value != null) {
+      } elseif ($classOthers && $value != null && !is_bool($classOthers)) {
         if (is_array($classOthers)) {
           $this->$field = static::_rehydrateChilds($value, $classOthers, $map);
         } else {
+//          if (strpos($classOthers, '\\') !== false) {
           $this->$field = static::_rehydrateEntity($value, $classOthers);
+//          } else {
+//            $this->$field = $value;
+//          }
         }
       } else {
         $this->$field = $value;
@@ -814,7 +818,7 @@ class AbstractEntity implements \IteratorAggregate {
   static public function resetOthers(AbstractEntity $entity, \stdClass $others) {
     if (!empty($others)) {
       foreach (static::$_others as $field => $type) {
-        if (isset($others->$field)) {
+        if (isset($others->$field) && $type) {
           $entity->$field = $others->$field;
         }
       }

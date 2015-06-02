@@ -22,11 +22,13 @@ beats-can:
     - 'can/flasher'
     - 'can/modal'
     - 'can/modal/dialog'
+    - 'can/modal/popup'
   stylesheets:
     - 'can/blocker'
   templates:
     - 'can/flasher/message'
     - 'can/modal/dialog'
+    - 'can/modal/popup'
 
 #beats-can-modal:
 #  version: 0.1
