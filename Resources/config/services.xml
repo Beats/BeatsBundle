@@ -137,6 +137,7 @@
 
     <service id="beats.dbal.rdb" class="%beats.dbal.rdb.class%" public="true">
       <argument>%beats.dbal.rdb%</argument>
+      <argument type="service" id="templating"/>
     </service>
 
     <service id="beats.dbal.dom" class="%beats.dbal.dom.class%" public="true">

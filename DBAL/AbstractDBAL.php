@@ -59,6 +59,7 @@ class AbstractDBAL extends ContainerAware {
     }
     $this->_model  = strtolower($matches['model']);
     $this->_entity = sprintf("%sBundle\\Entity\\%s", $matches['prefix'], $matches['model']);
+
     return $this;
   }
 
@@ -210,7 +211,7 @@ class AbstractDBAL extends ContainerAware {
    * @return AbstractDBAL
    */
   final protected function _dbal($model) {
-    return $this->container->get('beats.dbal.' . $model);
+    return $this->container->get('beats.dbal.' . DOM::collection($model));
   }
 
   /**
@@ -237,11 +238,13 @@ class AbstractDBAL extends ContainerAware {
         if ($this->isMIX()) {
           return $this->mix()->dom();
         }
+
         return $this->dom();
       case self::P_RDB:
         if ($this->isMIX()) {
           return $this->mix()->rdb();
         }
+
         return $this->rdb();
       case self::P_MIX:
         return $this->mix();
@@ -279,6 +282,7 @@ class AbstractDBAL extends ContainerAware {
     if (empty($class)) {
       $class = $this->_classFactory($row);
     }
+
     return new $class((array)$row);
   }
 
@@ -315,6 +319,7 @@ class AbstractDBAL extends ContainerAware {
         $entities[] = $this->_buildEntity($row, $class);
       }
     }
+
     return $entities;
   }
 
@@ -362,6 +367,7 @@ class AbstractDBAL extends ContainerAware {
           throw new Exception("Could not insert data in RDB");
         }
         $this->commit();
+
         return $result;
       } catch (Exception $ex) {
         $this->revert();
@@ -393,6 +399,7 @@ class AbstractDBAL extends ContainerAware {
     $row = $this->rdb()->locateDeep(
       $class::getModel(), $class::getParent(), $class::getChilds(), $class::getJoints(), $id
     );
+
     return $this->_buildEntity($row, $class);
   }
 
@@ -424,6 +431,7 @@ class AbstractDBAL extends ContainerAware {
     if (empty($entity)) {
       throw new Exception(ucfirst($this->_model) . ' not found: ' . $id);
     }
+
     return $entity;
   }
 
@@ -465,9 +473,11 @@ class AbstractDBAL extends ContainerAware {
             function (DOM $dom, $model, AbstractEntity $entity, $id) {
               if ($entity->hasID()) {
                 $entity->setID($id);
+
                 return $dom->update($model, $entity->_toDB(AbstractDBAL::P_DOM));
               } else {
                 $entity->setID($id);
+
                 return $dom->insert($model, $entity->_toDB(AbstractDBAL::P_DOM));
               }
             }, $model, $entity, $id
@@ -486,6 +496,7 @@ class AbstractDBAL extends ContainerAware {
     if (empty($result)) {
       throw new Exception("Entity not saved: " . $entity::getModel());
     }
+
     return $result;
   }
 
@@ -505,6 +516,7 @@ class AbstractDBAL extends ContainerAware {
     if (empty($result)) {
       throw new Exception("Entity not saved: " . $entity::getModel());
     }
+
     return $result;
   }
 
@@ -537,6 +549,7 @@ class AbstractDBAL extends ContainerAware {
       // Insert any reset logic here
 
       $dstID = $this->rdb()->insert($model, $newEntity->_toDB(AbstractDBAL::P_RDB));
+
       return $this->save($newEntity, $type);
     } catch (\Exception $ex) {
       if (!empty($dstID)) {
@@ -549,14 +562,18 @@ class AbstractDBAL extends ContainerAware {
   /********************************************************************************************************************/
 
   protected function _rdbSave(AbstractEntity $entity, $callback = null) {
-    if (true)
+    if (true) {
       throw new Exception(__METHOD__ . ' not implemented');
+    }
+
     return null;
   }
 
   protected function _domSave(AbstractEntity $entity) {
-    if (true)
+    if (true) {
       throw new Exception(__METHOD__ . ' not implemented');
+    }
+
     return null;
   }
 
@@ -574,6 +591,7 @@ class AbstractDBAL extends ContainerAware {
     if (empty($result)) {
       throw new Exception("Entity not saved: " . $entity::getModel());
     }
+
     return $result;
   }
 
@@ -582,12 +600,14 @@ class AbstractDBAL extends ContainerAware {
   protected function _rdbKill(AbstractEntity $entity, $callback = null) {
     if (true)
       throw new Exception(__METHOD__ . ' not implemented');
+
     return null;
   }
 
   protected function _domKill(AbstractEntity $entity) {
     if (true)
       throw new Exception(__METHOD__ . ' not implemented');
+
     return null;
   }
 
@@ -601,12 +621,13 @@ class AbstractDBAL extends ContainerAware {
     } else {
       throw new Exception("Invalid DB type [$type]");
     }
+
     return $out;
   }
 
   /********************************************************************************************************************/
 
-  protected function _filterIDs($sql, $params) {
+  protected function _fetchIDs($sql, $params) {
     $statement = $this->rdb()->pdo()->prepare($sql);
     foreach ($params as $key => $val) {
       $statement->bindValue($key, $val);
@@ -618,24 +639,207 @@ class AbstractDBAL extends ContainerAware {
     }
 
     $ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
     return empty($ids) ? array() : $ids;
   }
 
-  protected function _domHerd(array $ids) {
+  protected function _fillAggregation(AbstractEntity $entity, $aggregation = array()) {
+    if (empty($aggregation)) {
+      return $entity;
+    }
+    foreach ($aggregation as $field => $value) {
+      if ($field[0] !== '_') {
+        $entity->$field = json_decode($value);
+      }
+    };
+
+    return $entity;
+  }
+
+  protected function __identity(AbstractEntity $entity) {
+    return $entity;
+  }
+
+  protected function _domHerdRDB(array $ids, $aggregations = array(), $callback = null) {
+    array_walk(
+      $ids,
+      function (&$id) {
+        $id = DOM::domID($this->_model, $id);
+      }
+    );
+
+    return $this->_domHerd($ids, $aggregations, $callback);
+  }
+
+  protected function _domHerd(array $ids, $aggregations = array(), $walker = null, $map = true) {
     $rows = array();
     if (empty($ids)) {
       return $rows;
     }
     $data = $this->dom()->rug()->db()->herd($ids, true, true);
 
+    if (empty($walker)) {
+      if (empty($aggregations)) {
+        $walker = array($this, '__identity');
+      } else {
+        $walker = array($this, '_fillAggregation');
+      }
+    }
+
+    $push = empty($map)
+      ? function ($walker, AbstractEntity $entity, $aggregation, $filler) use (&$rows) {
+        $rows[] = call_user_func($walker, $entity, $aggregation, $filler);
+      }
+      : function ($walker, AbstractEntity $entity, $aggregation, $filler) use (&$rows) {
+        $rows[$entity->getID()] = call_user_func($walker, $entity, $aggregation, $filler);
+      };
+
+    if (empty($aggregations)) {
+      $aggregations = array();
+    }
+
     foreach ($data->rows as $row) {
       if ($row->value->deleted || !empty($row->error)) {
         continue;
       }
-      $rows[] = self::_buildEntity($row->doc);
+      $entity = $this->_buildEntity($row->doc);
+      call_user_func($push, $walker, $entity, $aggregations[$row->id], array($this, '_fillAggregation'));
     }
+
     return $rows;
   }
 
+  protected function _filterCleanup($model, &$filters, &$sorters) {
+    if (empty($sorters)) {
+      $sorters = array();
+    } elseif (!is_array($sorters)) {
+      $sorters = array($sorters);
+    }
+    $table = RDB::table($model);
+
+    $_sorters = array();
+    foreach ($sorters as $field => $sorter) {
+      if (is_array($sorter) || is_object($sorter)) {
+        $sorter = (array)$sorter;
+      } else {
+        if (is_string($sorter) and is_numeric($field)) {
+          $field  = $sorter;
+          $sorter = 'ASC';
+        }
+        list($subModel, $subField) = explode('.', $field);
+        if (empty($subField)) {
+          $subField = $subModel;
+          $subModel = $model;
+        }
+        $sorter = array(
+          'table'     => RDB::table($subModel),
+          'field'     => $subField,
+          'direction' => is_bool($sorter) ? ($sorter ? 'ASC' : 'DESC') : $sorter,
+        );
+      }
+      if (empty($sorter['table'])) {
+        $sorter['table'] = $table;
+      }
+      $_sorters[] = (object)$sorter;
+    }
+
+    if (empty($filters)) {
+      $filters = array();
+    }
+    $filters = (object)$filters;
+    $sorters = $_sorters;
+  }
+
+  /**
+   * @param string $model
+   * @return string[]
+   * @throws DBALException
+   */
+  protected function _filterIDs($model, $sorters = array(),
+                                $params = array(),
+                                $fields = array(),
+                                $links = array(),
+                                $where = array(),
+                                $having = array(),
+                                $group = array(),
+                                $limit = 0, $offset = 0,
+                                $distinct = true,
+                                $aggregations = false,
+                                $callback = null
+  ) {
+
+    $order = array();
+
+    foreach ($sorters as $sorter) {
+      $table = empty($sorter->table) ? RDB::table($model) : $sorter->table;
+      if ($distinct) {
+        $this->_filterField($fields, '_' . $sorter->field, sprintf('%s.%s', $table, $sorter->field));
+      }
+      $this->_filterOrder($order, $table, $sorter->field, $sorter->direction);
+    }
+    if ($aggregations) {
+      $aggregations = array();
+    }
+
+    $ids = $this->rdb()->filterIDs(
+      $model, $params, $fields, $links, $where, $having, $group, $order, $limit, $offset, $distinct, $aggregations
+    );
+
+    return $this->_domHerd($ids, $aggregations, $callback);
+  }
+
+  protected function _filterOrder(&$order = array(), $table, $field, $direction = 'ASC') {
+    $order[sprintf('%s.%s', $table, $field)] = sprintf('%s.%s %s', $table, $field, $direction);
+  }
+
+  protected function _filterField(&$fields = array(), $name, $expression) {
+    $fields[$name] = $expression;
+  }
+
+  protected function _filterFieldJSON(&$fields = array(), $name, $table, $field) {
+    $this->_filterField(
+      $fields, $name, sprintf(
+        'CASE WHEN COUNT(%1$s.%2$s) = 0 THEN \'[]\' ELSE json_agg(%1$s.%2$s)::text END', $table, $field, $table, $field
+      )
+    );
+  }
+
+  protected function _filterFieldFN(&$fields = array(), $name, $table, $field, $fn = 'COUNT', $cast = null) {
+    $this->_filterField($fields, $name, sprintf('%s(%s.%s)%s', $fn, $table, $field, $cast));
+  }
+
+  protected function _filterLink(&$links = array(), $table, $pk, $type = 'LEFT') {
+    $links[$table] = array(
+      'type'  => $type,
+      'table' => $table,
+      'pk'    => $pk
+    );
+
+    return $links;
+  }
+
+  protected function _filterGroup(&$group = array(), $table, $field) {
+    $group[$g] = $g = sprintf('%s.%s', $table, $field);
+
+    return $group;
+  }
+
+  protected function _filterWhere(&$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null) {
+    $param = empty($param) ? $field : $param;
+
+    if (in_array($op, array('IN'))) {
+      $where[] = sprintf(
+        "%s.%s %s ('%s')", $table, $field, $op, implode("','", is_array($value) ? $value : array($value))
+      );
+    } else {
+      $where[] = sprintf("%s.%s %s :%s", $table, $field, $op, $param);
+
+      $params[$param] = $value;
+    }
+
+    return $where;
+  }
+
   /********************************************************************************************************************/
+
 }

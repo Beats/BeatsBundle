@@ -9,6 +9,8 @@ use Twig_Function_Method;
 
 class TwigExtension extends ContainerAwareTwigExtension {
 
+  const CLASS_RDB = 'BeatsBundle\\DBAL\\RDB';
+
   public function getTests() {
     return array(
       'traversable' => new \Twig_Test_Method($this, 'isTraversable'),
@@ -26,6 +28,13 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'gmdate'   => new Twig_Filter_Method($this, 'toDate', array('is_safe' => array('html'))),
 
       'ellipsis' => new Twig_Filter_Method($this, 'ellipsis', array('is_safe' => array('html'))),
+
+      'rdbTable' => new \Twig_SimpleFilter(
+        'rdbTable', array(self::CLASS_RDB, 'table'), array('is_safe' => array('sql'))
+      ),
+      'rdbPK'    => new \Twig_SimpleFilter(
+        'rdbPK', array(self::CLASS_RDB, 'pk'), array('is_safe' => array('sql'))
+      ),
     );
   }
 

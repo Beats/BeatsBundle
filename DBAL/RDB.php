@@ -5,6 +5,7 @@ use BeatsBundle\Entity\AbstractEntity;
 use BeatsBundle\Exception\DBALException;
 use PDO;
 use PDOStatement;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templater;
 
 /**
  * Implement PDO or what ever to access PgSQL
@@ -21,7 +22,21 @@ class RDB extends AbstractDB {
    */
   protected $_execute;
 
-  public function __construct($config) {
+  /**
+   * @var Templater
+   */
+  private $_templater;
+
+  /**
+   * @return Templater
+   */
+  final protected function _templater() {
+    return $this->_templater;
+  }
+
+  /********************************************************************************************************************/
+
+  public function __construct($config, Templater $templater) {
     // LATER: Read the configuration the correct way;
     $connection_string = sprintf(
       "%s:host=%s;port=%d;dbname=%s;user=%s;password=%s",
@@ -34,6 +49,8 @@ class RDB extends AbstractDB {
     );
 
     $this->_db = new PDO($connection_string);
+
+    $this->_templater = $templater;
   }
 
   static public function link($modelL, $modelR) {
@@ -173,7 +190,6 @@ class RDB extends AbstractDB {
     return $limit_offset;
   }
 
-
   public function order($order) {
     if (empty($order)) {
       return '';
@@ -242,7 +258,7 @@ class RDB extends AbstractDB {
     return $this->_execute;
   }
 
-  /******************************************************/
+  /********************************************************************************************************************/
 
   protected function _setup(array &$data, $model, $pk, $insert = true, $sequence = false) {
     if ($insert) {
@@ -607,6 +623,8 @@ class RDB extends AbstractDB {
     return $statement->fetchAll(PDO::FETCH_COLUMN);
   }
 
+  /********************************************************************************************************************/
+
   public function nullify($model, $field, $id = null) {
     if (empty($id)) {
       $sql       = sprintf("UPDATE %s SET %s = NULL", self::table($model), $field);
@@ -649,5 +667,98 @@ class RDB extends AbstractDB {
 
     return current($statement->fetchAll(PDO::FETCH_COLUMN));
   }
+
+  /********************************************************************************************************************/
+
+  protected function _template($name) {
+    return "$name.sql.twig";
+  }
+
+  /**
+   * @param string $template
+   * @param array  $params
+   * @return string
+   */
+  public function sql($template, array $params = array()) {
+    return $this->_templater()->render($this->_template($template), $params);
+  }
+
+  public function sqlFetch($template, $tplParams, $sqlParams = array(), $one = false, $style = PDO::FETCH_OBJ) {
+    $sql = $this->sql($template, $tplParams);
+
+    $statement = $this->_db->prepare($sql);
+    self::pdoBind($statement, null, $sqlParams);
+    $this->execute($statement);
+
+    return $one
+      ? $statement->fetch($style)
+      : $statement->fetchAll($style);
+  }
+
+  public function fetchIDs($sql, $params, array $fields = array(), &$aggregations = false) {
+    $statement = $this->_db->prepare($sql);
+    self::pdoBind($statement, null, $params);
+    $this->execute($statement);
+
+    if ($aggregations === false) {
+      $ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
+    } else {
+      $ids = $statement->fetchAll(
+        PDO::FETCH_FUNC,
+        function ($id) use ($fields, &$aggregations) {
+          $aggregations[$id] = array_combine($fields, func_get_args());
+          array_shift($aggregations[$id]);
+          return $id;
+        }
+      );
+    }
+    return empty($ids) ? array() : $ids;
+  }
+
+  public function filterIDs($model,
+                            $params = array(),
+                            $fields = array(),
+                            $links = array(),
+                            $where = array(),
+                            $having = array(),
+                            $group = array(),
+                            $order = array(),
+                            $limit = 0, $offset = 0,
+                            $distinct = true,
+                            &$aggregations
+
+  ) {
+
+    $entity = (object)array(
+      'table' => RDB::table($model),
+      'pk'    => RDB::pk($model),
+    );
+    $fields = array('_id' => sprintf(
+        "'%s_' || %s.%s", self::collection($model), $entity->table, $entity->pk
+      )) + $fields;
+
+    $page = empty($limit) ? null : (object)array('limit' => abs($limit), 'offset' => empty($offset) ? 0 : abs($offset));
+
+    $sql = $this->sql(
+      "BeatsBundle:sql:filter", array(
+        'distinct' => $distinct,
+        'model'    => $model,
+        'fields'   => $fields,
+        'entity'   => $entity,
+        'links'    => $links,
+        'where'    => $where,
+        'having'   => $having,
+        'group'    => $group,
+        'order'    => $order,
+        'page'     => $page,
+      )
+    );
+//    ini_set('xdebug.var_display_max_data', -1);
+//    var_dump($sql, $params);
+
+    return $this->fetchIDs($sql, $params, array_keys($fields), $aggregations);
+  }
+
+  /********************************************************************************************************************/
 
 }
