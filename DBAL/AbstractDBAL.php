@@ -799,7 +799,8 @@ class AbstractDBAL extends ContainerAware {
   protected function _filterFieldJSON(&$fields = array(), $name, $table, $field) {
     $this->_filterField(
       $fields, $name, sprintf(
-        'CASE WHEN COUNT(%1$s.%2$s) = 0 THEN \'[]\' ELSE json_agg(%1$s.%2$s)::text END', $table, $field, $table, $field
+        'CASE WHEN COUNT(%1$s.%2$s) = 0 THEN \'[]\' ELSE json_agg(DISTINCT %1$s.%2$s)::text END',
+        $table, $field, $table, $field
       )
     );
   }
@@ -808,11 +809,13 @@ class AbstractDBAL extends ContainerAware {
     $this->_filterField($fields, $name, sprintf('%s(%s.%s)%s', $fn, $table, $field, $cast));
   }
 
-  protected function _filterLink(&$links = array(), $table, $pk, $type = 'LEFT') {
-    $links[$table] = array(
-      'type'  => $type,
-      'table' => $table,
-      'pk'    => $pk
+  protected function _filterLink(&$links = array(), $tableL, $fieldL, $tableR = null, $fieldR = null, $type = 'LEFT') {
+    $links[$tableL] = array(
+      'type'   => $type,
+      'tableL' => $tableL,
+      'fieldL' => $fieldL,
+      'tableR' => empty($tableR) ? RDB::table($this->_model) : $tableR,
+      'fieldR' => empty($fieldR) ? $fieldL : $fieldR,
     );
 
     return $links;
@@ -826,6 +829,10 @@ class AbstractDBAL extends ContainerAware {
 
   protected function _filterWhere(&$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null) {
     $param = empty($param) ? $field : $param;
+
+    if (is_array($value) and $op === '=') {
+      $op = 'IN';
+    }
 
     if (in_array($op, array('IN'))) {
       $where[] = sprintf(

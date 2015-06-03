@@ -1,24 +1,24 @@
 
-  SELECT {{ distinct?'DISTINCT':'' }}
+SELECT {{ distinct?'DISTINCT':'' }}
 {% for as, field in fields %}
   {{ loop.first ? '' : ',' }} {{ field|raw }} AS {{ as }}
 {% endfor %}
-  FROM {{ entity.table }}
+FROM {{ entity.table }}
 {% for link in links %}
-  {{ link.type }} JOIN {{ link.table }} ON {{ entity.table }}.{{ entity.pk }} = {{ link.table }}.{{ link.pk }}
+{{ link.type }} JOIN {{ link.tableL }} ON {{ link.tableL }}.{{ link.fieldL }} = {{ link.tableR }}.{{ link.fieldR }}
 {% endfor %}
 {% if where is not empty %}
-  WHERE ({{ where|join(')\n  AND (')|raw }})
+WHERE ({{ where|join(')\n  AND (')|raw }})
 {% endif %}
 {% if group is not empty %}
-  GROUP BY {{ group|join(', ')|raw }}
+GROUP BY {{ group|join(', ')|raw }}
 {% endif %}
 {% if having is not empty %}
-  HAVING ({{ having|join(')\n  AND (')|raw }})
+HAVING ({{ having|join(')\n  AND (')|raw }})
 {% endif %}
 {% if order is not empty %}
-  ORDER BY {{ order|join(', ')|raw }}
+ORDER BY {{ order|join(', ')|raw }}
 {% endif %}
 {% if page is not empty %}
-  LIMIT {{ page.limit|default('ALL') }} OFFSET {{ page.offset|default(0) }}
+LIMIT {{ page.limit|default('ALL') }} OFFSET {{ page.offset|default(0) }}
 {% endif %}
