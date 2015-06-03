@@ -1,0 +1,7 @@
+.beats-modal-popup {
+    position: absolute;
+}
+
+.beats-modal-popup > .popover-content {
+    padding: 4px;
+}

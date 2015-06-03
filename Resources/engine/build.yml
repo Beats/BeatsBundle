@@ -24,7 +24,7 @@ beats-can:
     - 'can/modal/dialog'
     - 'can/modal/popup'
   stylesheets:
-    - 'can/blocker'
+    - 'can/modal/popup'
   templates:
     - 'can/flasher/message'
     - 'can/modal/dialog'

@@ -58,12 +58,10 @@
 
       self.backdrop(true);
       self.element.html(self.options.view, self.options.tplV, function () {
-        self.element.css('position', 'absolute');
+        self.element.addClass('beats-modal-popup popover');
         var position = self._onPosition(self.options.$trigger.offset(), self.options.$trigger);
-        self.element.addClass('skwibb-post-menu popover').addClass(position);
+        self.element.addClass(position);
         self._onAfterRender.call(self);
-        self.element.data('id_post', self.options.id_post);
-
         self.$button().click(function (evt) {
           evt.stopPropagation();
           evt.preventDefault();
@@ -80,8 +78,6 @@
               })
           }
         });
-
-
         self.element.show();
       });
 
@@ -115,11 +111,17 @@
       this.element.remove();
     },
 
+    _buildBackdrop: function () {
+      return $('<div class="modal-backdrop fade in"></div>').click(function () {
+        this.kill();
+      }.bind(this));
+    },
+
     backdrop: function (show) {
       var $body = $(document.body);
       if (show) {
         $body.addClass('modal-open');
-        $body.append('<div class="modal-backdrop fade in"></div>')
+        $body.append(this._buildBackdrop())
       } else {
         $body.removeClass('modal-open');
         $body.find('.modal-backdrop').remove();
