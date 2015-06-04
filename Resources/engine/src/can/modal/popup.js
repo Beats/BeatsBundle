@@ -36,10 +36,11 @@
         evt.stopPropagation();
         evt.preventDefault();
         var $trigger = $(this);
-
-        options = options || {};
-        options.$trigger = $trigger;
-        self.make(options)
+        if ($trigger.is(':enabled')) {
+          options = options || {};
+          options.$trigger = $trigger;
+          self.make(options);
+        }
       })
     }
 
