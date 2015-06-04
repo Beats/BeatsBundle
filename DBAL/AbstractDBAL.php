@@ -827,6 +827,12 @@ class AbstractDBAL extends ContainerAware {
     return $group;
   }
 
+  protected function _filterWhereRAW(&$where = array(), $expression) {
+    $where[] = $expression;
+
+    return $where;
+  }
+
   protected function _filterWhere(&$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null) {
     $param = empty($param) ? $field : $param;
 
