@@ -625,6 +625,118 @@ class RDB extends AbstractDB {
 
   /********************************************************************************************************************/
 
+  public function associateAll($modelL, $modelR, $idL, $ids, $pkR = null, $column = 'value') {
+    if (empty($ids)) {
+      return $ids;
+    }
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
+
+    $this->unassociateAll($modelL, $modelR, $idL);
+
+    $pdo = $this->pdo();
+
+    $links = array();
+    foreach ($ids as $id => &$value) {
+      $links[] = sprintf('%s, %s, %s', $pdo->quote($idL), $pdo->quote($id), $pdo->quote($value));
+      $value   = array($idL, $id);
+    }
+    $query     = sprintf(
+      "INSERT INTO %s (%s, %s, %s) VALUES (%s)",
+      self::link($modelL, $modelR), self::pk($modelL), $pkR, $column, implode('),(', $links)
+    );
+    $statement = $this->_db->prepare($query);
+    $this->execute($statement);
+
+    return $ids;
+  }
+
+  public function associateOne($modelL, $modelR, $idL, $idR, $value, $pkR = null, $column = 'value') {
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
+
+    $this->unassociateOne($modelL, $modelR, $idL, $idR, $pkR, $column);
+    $query     = sprintf(
+      "INSERT INTO %s (%s, %s, %s) VALUES (?, ?, ?)",
+      self::link($modelL, $modelR), self::pk($modelL), $pkR, $column
+    );
+    $statement = $this->_db->prepare($query);
+    $statement->bindValue(1, $idL);
+    $statement->bindValue(2, $idR);
+    $statement->bindValue(3, $value);
+    $this->execute($statement);
+
+    return array($idL, $idR, $value);
+  }
+
+  public function unassociateAll($modelL, $modelR, $idL) {
+    return $this->unlinkAll($modelL, $modelR, $idL);
+  }
+
+  public function unassociateOne($modelL, $modelR, $idL, $idR, $pkR = null) {
+    return $this->unlinkOne($modelL, $modelR, $idL, $idR, $pkR);
+  }
+
+  public function associates($modelL, $modelR, $idL, $pkR = null, $column = 'value') {
+    $pkL = self::pk($modelL);
+    if (empty($pkR)) {
+      $pkR = self::pk($modelR);
+    }
+
+    $query = sprintf(
+      "SELECT %s, %s FROM %s WHERE (%s = :%s)",
+      $pkR, $column, self::link($modelL, $modelR), $pkL, $pkL
+    );
+
+    $statement = $this->_db->prepare($query);
+    self::pdoBind($statement, null, array($pkL => $idL));
+    $this->execute($statement);
+
+    return $statement->fetchAll(PDO::FETCH_KEY_PAIR);
+  }
+
+  public function associatesCount($model, $id = null, $pk = null, array $fields = array(), $column = 'value') {
+    if (empty($pk)) {
+      $pk = self::pk($model);
+    }
+    if (is_array($model)) {
+      $table = self::link($model[0], $model[1]);
+    } else {
+      $table = self::table($model);
+    }
+
+    $query = sprintf(
+      "SELECT %s, COUNT(*) FROM %s",
+      $column, $table
+    );
+    if (!empty($id)) {
+      $query = sprintf(
+        "%s WHERE (%s = :%s)",
+        $query, $pk, $pk
+      );
+    }
+    $query = sprintf("%s GROUP BY %s, %s", $query, $pk, $column);
+
+    $statement = $this->_db->prepare($query);
+    if (!empty($id)) {
+      RDB::pdoBind($statement, null, array($pk => $id));
+    }
+    $this->execute($statement);
+
+    $rows = $statement->fetchAll(PDO::FETCH_KEY_PAIR);
+    foreach ($fields as $value) {
+      if (empty($rows[$value])) {
+        $rows[$value] = 0;
+      }
+    }
+
+    return $rows;
+  }
+
+  /********************************************************************************************************************/
+
   public function nullify($model, $field, $id = null) {
     if (empty($id)) {
       $sql       = sprintf("UPDATE %s SET %s = NULL", self::table($model), $field);
@@ -647,15 +759,15 @@ class RDB extends AbstractDB {
     } else {
       $table = self::table($model);
     }
-    if (empty($id)) {
+
+    $query = sprintf(
+      "SELECT COUNT(*) FROM %s",
+      $table
+    );
+    if (!empty($id)) {
       $query = sprintf(
-        "SELECT COUNT(*) FROM %s",
-        $table
-      );
-    } else {
-      $query = sprintf(
-        "SELECT COUNT(*) FROM %s WHERE (%s = :%s)",
-        $table, $pk, $pk
+        "%s WHERE (%s = :%s)",
+        $query, $pk, $pk
       );
     }
 
@@ -708,10 +820,12 @@ class RDB extends AbstractDB {
         function ($id) use ($fields, &$aggregations) {
           $aggregations[$id] = array_combine($fields, func_get_args());
           array_shift($aggregations[$id]);
+
           return $id;
         }
       );
     }
+
     return empty($ids) ? array() : $ids;
   }
 

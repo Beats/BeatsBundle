@@ -49,6 +49,7 @@
       var self = this;
       self._super.apply(self, arguments);
 
+      self._onBeforeRender.call(self);
 
       $.each([
         'title', 'label', 'items', 'clsGroup'
@@ -83,6 +84,14 @@
 
     },
 
+    _onBeforeRender: function () {
+
+    },
+
+    _onAfterRender: function () {
+
+    },
+
     _onPosition: function (offset, $trigger) {
       var self = this
         , pH = self.element.height()
@@ -93,10 +102,6 @@
       self.element.css('top', offset.top - (pH - tH) / 2);
       self.element.css('left', offset.left - pW);
       return 'left'
-    },
-
-    _onAfterRender: function () {
-
     },
 
     $button: function (type) {
