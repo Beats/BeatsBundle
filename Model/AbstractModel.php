@@ -4,6 +4,7 @@ namespace BeatsBundle\Model;
 
 use BeatsBundle\Exception\Exception;
 use BeatsBundle\Service\Aware\BrowserAware;
+use BeatsBundle\Service\Aware\ClientDeviceAware;
 use BeatsBundle\Service\Aware\DBALAware;
 use BeatsBundle\Service\Aware\FlasherAware;
 use BeatsBundle\Service\Aware\FSALAware;
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * ALL THE BUSINESS LOGIC GOES HERE
  */
 abstract class AbstractModel extends ContainerAware {
-  use FSALAware, DBALAware, FlasherAware, ValidatorAware, BrowserAware;
+  use FSALAware, DBALAware, FlasherAware, ValidatorAware, BrowserAware, ClientDeviceAware;
 
   /*********************************************************************************************************************/
 
