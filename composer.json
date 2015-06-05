@@ -30,8 +30,8 @@
     "symfony/twig-bundle": "~2.1",
     "sensio/distribution-bundle": "~2.3",
     "symfony/class-loader": "*",
-
-    "kriswallsmith/buzz": ">=v0.10",
+    "kriswallsmith/buzz": "~0.10",
+    "suncat/mobile-detect-bundle": "0.10.*",
     "o100ja/rug": "dev-master"
   },
   "require-dev": {
