@@ -20,23 +20,43 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "symfony/console": "*",
-    "symfony/finder": "*",
-    "symfony/framework-bundle": "~2.3",
-    "symfony/security-bundle": "*",
+    "symfony/symfony": "2.3.*",
+    "doctrine/orm": "~2.2,>=2.2.3,<2.5",
+    "doctrine/dbal": "<2.5",
+    "doctrine/doctrine-bundle": "~1.2",
+    "twig/extensions": "1.0.*",
     "symfony/assetic-bundle": "~2.3",
     "symfony/swiftmailer-bundle": "~2.3",
-    "symfony/monolog-bundle": "~2.3",
-    "symfony/twig-bundle": "~2.1",
+    "symfony/monolog-bundle": "~2.4",
     "sensio/distribution-bundle": "~2.3",
-    "symfony/class-loader": "*",
+    "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
+    "sensio/generator-bundle": "~2.3",
+    "incenteev/composer-parameter-handler": "~2.0",
+
     "kriswallsmith/buzz": "~0.10",
     "suncat/mobile-detect-bundle": "0.10.*",
     "o100ja/rug": "dev-master"
   },
+  "scripts": {
+    "post-install-cmd": [
+      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+    ],
+    "post-update-cmd": [
+      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+    ]
+  },
   "require-dev": {
-    "phpunit/phpunit": "3.7.*",
-    "symfony/browser-kit": "*"
+    "phpunit/phpunit": "3.7.*"
   },
   "suggest": {
   },
@@ -45,6 +65,19 @@
       "BeatsBundle": ""
     }
   },
+  "config": {
+    "bin-dir": "bin"
+  },
   "target-dir": "BeatsBundle",
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "extra": {
+    "symfony-app-dir": "app",
+    "symfony-web-dir": "web",
+    "symfony-assets-install": "symlink",
+    "incenteev-parameters": {
+      "file": "app/config/parameters.yml"
+    }
+  }
+
+
 }
