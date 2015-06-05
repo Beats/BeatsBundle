@@ -32,7 +32,8 @@
     "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
     "sensio/generator-bundle": "~2.3",
     "incenteev/composer-parameter-handler": "~2.0",
-
+    "jms/security-extra-bundle": "1.5.1",
+    "jms/cg": "1.0.0",
     "kriswallsmith/buzz": "~0.10",
     "suncat/mobile-detect-bundle": "0.10.*",
     "o100ja/rug": "dev-master@dev"
