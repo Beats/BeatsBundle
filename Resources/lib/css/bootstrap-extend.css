@@ -28,3 +28,8 @@
     overflow-y: visible;
     overflow-x: hidden;
 }
+
+.btn-inline-block {
+    width: 100%;
+    display: inline-block;
+}
