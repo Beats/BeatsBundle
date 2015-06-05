@@ -35,7 +35,7 @@
 
     "kriswallsmith/buzz": "~0.10",
     "suncat/mobile-detect-bundle": "0.10.*",
-    "o100ja/rug": "dev-master"
+    "o100ja/rug": "dev-master@dev"
   },
   "scripts": {
     "post-install-cmd": [
