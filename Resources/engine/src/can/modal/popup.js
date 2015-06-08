@@ -118,7 +118,7 @@
     },
 
     _buildBackdrop: function () {
-      return $('<div class="modal-backdrop fade in"></div>').click(function () {
+      return $('<div class="beats-modal-popup-backdrop modal-backdrop fade in"></div>').click(function () {
         this.kill();
       }.bind(this));
     },
@@ -130,7 +130,7 @@
         $body.append(this._buildBackdrop())
       } else {
         $body.removeClass('modal-open');
-        $body.find('.modal-backdrop').remove();
+        $body.find('.beats-modal-popup-backdrop.modal-backdrop').remove();
       }
     }
 

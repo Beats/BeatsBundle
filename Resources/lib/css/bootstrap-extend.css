@@ -57,3 +57,7 @@
     -webkit-transform: translate3d(0, 25%, 0);
     transform: translate3d(0, 25%, 0);
 }
+
+.beats-modal-popup-backdrop.modal-backdrop {
+    z-index: 1050;
+}
