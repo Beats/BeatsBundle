@@ -2,7 +2,7 @@
 
 {% macro attr(name, id, component) %}{% if id is defined %}{{ name }}="{{ id }}{% if component is defined and component %}-{{ component }}{% endif %}"{% endif %}{% endmacro %}
 
-<div {{ _.attr('id',id) }} class="modal {{ transition is defined ? transition|default('') : 'fade' }}"
+<div {{ _.attr('id',id) }} class="{{ class|default('') }} modal {{ transition is defined ? transition|default('') : 'fade' }}"
                            tabindex="-1" role="dialog"
   {{ _.attr('aria-labelledby',id, 'modal-title') }} aria-hidden="true" {% block data %}{% endblock %}
   >
