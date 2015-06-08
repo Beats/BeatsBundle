@@ -124,6 +124,9 @@
           evt.stopPropagation();
           self._activate($(evt.currentTarget));
         })
+        .on('mousedown', function (evt) {
+          evt.preventDefault();
+        })
         .on('click', 'li', function (evt) {
           evt.stopPropagation();
           self._select($(evt.currentTarget));
