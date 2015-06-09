@@ -73,7 +73,7 @@
 
     },
 
-    setup : function(base, fullName, staticProps, protoProps){
+    setup: function (base, fullName, staticProps, protoProps) {
       var self = this;
       $.each(_routes, function (idx, route) {
         self._routes[idx] = null
@@ -116,6 +116,10 @@
 
     call: function (name, params, scope, absolute, sync) {
       return this.get(name).call(params, scope, absolute, sync)
+    },
+
+    html: function (name, params, scope, absolute, sync) {
+      return this.get(name).html(params, scope, absolute, sync)
     }
 
   }, {
@@ -254,8 +258,8 @@
           dfd.rejectWith(scope, [ex, false]);
         }
       }).fail(function (xhr, status, error) {
-          dfd.rejectWith(scope, [new Error(status), false]);
-        });
+        dfd.rejectWith(scope, [new Error(status), false]);
+      });
       return dfd
     }
 
@@ -329,7 +333,7 @@
       }
     },
 
-    args: function (params, absolute, sync) {
+    args: function (params, absolute, sync, dataType) {
       var self = this, path = [], host = [], data = {};
 
       if (!params) {
@@ -383,7 +387,7 @@
       }
 
       return {
-        url: path, type: self.getMethod(), data: data, dataType: self._format, async: !sync
+        url: path, type: self.getMethod(), data: data, dataType: dataType || self._format, async: !sync
       }
     },
 
@@ -395,6 +399,11 @@
     call: function (params, scope, absolute, sync) {
       var self = this;
       return Beats.Route.resolve(self.ajax(params, absolute, sync), scope || self)
+    },
+
+    html: function (params, absolute, sync) {
+      var self = this;
+      return $.ajax(self.args(params, absolute, sync, 'html'))
     },
 
     url: function (params, absolute, ignoreQueryString) {
