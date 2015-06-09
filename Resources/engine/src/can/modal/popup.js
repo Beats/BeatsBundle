@@ -32,7 +32,7 @@
 
     register: function (trigger, options) {
       var self = this;
-      $(document).on('click', trigger, function (evt) {
+      return $(document).on('click', trigger, function (evt) {
         evt.stopPropagation();
         evt.preventDefault();
         var $trigger = $(this);
