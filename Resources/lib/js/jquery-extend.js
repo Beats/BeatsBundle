@@ -8,14 +8,18 @@
     serializeObject: function () {
       var object = {};
       $.each(this.serializeArray(), function (idx, item) {
+        //var matches
+        //if (matches = item.name.match(/^(.*)\[\]$/)) {
+        //  item.name = matches[1];
+        //}
         if (object[item.name] === undefined) {
           object[item.name] = item.value;
         } else {
           var array = object[item.name];
           if (!array.push) {
-            array = [array];
+            object[item.name] = [array];
           }
-          array.push(item.value);
+          object[item.name].push(item.value);
         }
       });
       return object

@@ -59,10 +59,10 @@
       self._super.apply(self, arguments);
 
       $selected.on('click', '.beats_field_tags-tag', function (evt) {
-        self.reject($(this).data('value'));
+        self.rejectTag($(this).data('value'));
       });
       $rejected.on('click', '.beats_field_tags-tag', function (evt) {
-        self.select($(this).data('value'));
+        self.selectTag($(this).data('value'));
       });
 
       self.$searcherText()
@@ -147,7 +147,7 @@
 
     },
 
-    select: function (value) {
+    selectTag: function (value) {
       var values = this.element.val() || [];
       if (~$.inArray(value, values)) {
         return;
@@ -157,7 +157,7 @@
       this._update();
 
     },
-    reject: function (value) {
+    rejectTag: function (value) {
       var values = this.element.val() || [];
       if (!~$.inArray(value, values)) {
         return;
