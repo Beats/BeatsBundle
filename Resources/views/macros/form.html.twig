@@ -201,7 +201,7 @@
     {% set caption = {
     class: '',
     }|merge(opts.caption is iterable ? opts.caption : {}) %}
-    <div class="input-group {{ caption.class }}">
+    <div class="beats_field_file-caption input-group {{ caption.class }}">
       <span class="input-group-btn">
         <span class="btn beats_field_file-button {{ button.class }}">
           <span>{{ button.label|raw }}</span>

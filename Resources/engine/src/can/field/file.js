@@ -49,6 +49,10 @@
         ;
       $clear.hide();
 
+      $caption.click(function () {
+        self.element.click()
+      });
+
       if (Beats.empty(self.options.url)) {
         var FUP = $.blueimp.fileupload.prototype;
 

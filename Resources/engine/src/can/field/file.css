@@ -25,6 +25,10 @@
     padding: 0;
 }
 
+.beats_field_file-caption input {
+    cursor: pointer;
+}
+
 .beats_field_file-progress {
     margin-top: 10px;
     margin-bottom: 10px;
