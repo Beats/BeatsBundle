@@ -5,7 +5,7 @@
 <div class="popover-content">
   <div class="btn-group-vertical <%= clsGroup %>" role="group" aria-label="<%= label %>">
     <% $.each(items, function(name, item) { %>
-    <a class="btn btn-block <%= item.class || 'btn-default' %>" role="button" tabindex="-1" href="#<%= name %>">
+    <a class="btn btn-block <%= item.classes || 'btn-default' %>" role="button" tabindex="-1" href="#<%= name %>">
       <%== item.text %>
     </a>
     <% }); %>
