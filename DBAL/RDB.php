@@ -867,7 +867,6 @@ class RDB extends AbstractDB {
         'page'     => $page,
       )
     );
-//    ini_set('xdebug.var_display_max_data', -1);
 //    var_dump($sql, $params);
 
     return $this->fetchIDs($sql, $params, array_keys($fields), $aggregations);

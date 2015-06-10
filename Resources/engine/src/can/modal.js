@@ -7,7 +7,7 @@
   }, {
     init: function () {
     }
-  })
+  });
 
   return Beats.Modal
 

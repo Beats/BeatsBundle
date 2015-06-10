@@ -102,8 +102,12 @@
       throw Beats.Error(self, 'Route not found: ' + name)
     },
 
-    url: function (name, params, absolute) {
-      return this.get(name).url(params, absolute)
+    url: function (name, params, absolute, ignoreQueryString) {
+      return this.get(name).url(params, absolute, ignoreQueryString)
+    },
+
+    redirect: function (name, params, ignoreQueryString) {
+      return this.get(name).redirect(params, ignoreQueryString);
     },
 
     args: function (name, params, absolute, sync) {
@@ -391,6 +395,22 @@
       }
     },
 
+    url: function (params, absolute, ignoreQueryString) {
+      var args = this.args(params, absolute);
+      if (args.method != 'GET' && ignoreQueryString) {
+        return args.url
+      }
+      var query = $.param(args.data);
+      if (query.length) {
+        return [args.url, query].join('?')
+      }
+      return args.url
+    },
+
+    redirect: function (params, ignoreQueryString) {
+      window.location.assign(this.url(params, true, ignoreQueryString))
+    },
+
     ajax: function (params, absolute, sync) {
       var self = this;
       return $.ajax(self.args(params, absolute, sync))
@@ -404,18 +424,6 @@
     html: function (params, absolute, sync) {
       var self = this;
       return $.ajax(self.args(params, absolute, sync, 'html'))
-    },
-
-    url: function (params, absolute, ignoreQueryString) {
-      var args = this.args(params, absolute);
-      if (args.method != 'GET' && ignoreQueryString) {
-        return args.url
-      }
-      var query = $.param(args.data);
-      if (query.length) {
-        return [args.url, query].join('?')
-      }
-      return args.url
     }
 
   });
