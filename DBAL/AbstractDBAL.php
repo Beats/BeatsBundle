@@ -762,13 +762,12 @@ class AbstractDBAL extends ContainerAware {
                                 $where = array(),
                                 $having = array(),
                                 $group = array(),
+                                $order = array(),
                                 $limit = 0, $offset = 0,
                                 $distinct = true,
                                 $aggregations = false,
                                 $callback = null
   ) {
-
-    $order = array();
 
     foreach ($sorters as $sorter) {
       $table = empty($sorter->table) ? RDB::table($model) : $sorter->table;
@@ -789,7 +788,11 @@ class AbstractDBAL extends ContainerAware {
   }
 
   protected function _filterOrder(&$order = array(), $table, $field, $direction = 'ASC') {
-    $order[sprintf('%s.%s', $table, $field)] = sprintf('%s.%s %s', $table, $field, $direction);
+    $this->_filterOrderRAW($order, sprintf('%s.%s', $table, $field), $direction);
+  }
+
+  protected function _filterOrderRAW(&$order = array(), $expression, $direction = 'ASC') {
+    $order[$expression] = sprintf('%s %s', $expression, $direction);
   }
 
   protected function _filterField(&$fields = array(), $name, $expression) {
