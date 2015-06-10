@@ -99,6 +99,7 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     if (is_string($user)) {
       return null;
     }
+
     return $user;
   }
 
@@ -107,6 +108,7 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     if (empty($identity)) {
       return null;
     }
+
     return $this->container->get('beats.security.user.provider')->loadUserByUsername($identity);
   }
 
@@ -126,17 +128,24 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     if (empty($member)) {
       return null;
     }
+
     return $member->getUser();
   }
 
   public function isCurrent($memberID) {
     $member = $this->getMember();
+
     return !(empty($member) || strcasecmp($member->getID(), $memberID));
   }
 
   public function isAnonymous() {
     $member = $this->getMember();
+
     return empty($member);
+  }
+
+  public function isAuthenticated() {
+    return !$this->isAnonymous();
   }
 
   public function getUTC($format = 'Y-m-d H:i:s', $time = null) {
@@ -154,6 +163,7 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     if (empty($field)) {
       return $this->_request()->get($path, $default, true);
     }
+
     return $field->getValue();
   }
 
@@ -162,10 +172,12 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
   public function getLocale() {
     return $this->container->get('translator')->getLocale();
   }
+
   public function getLang() {
     $locale = $this->getLocale();
 //    language[_territory][.codeset][@modifier]
     preg_match('#(?<lang>\w{2})(_(?<_territory>\w+))?(.(?<codeset>\w+))?(.(?<modifier>\w+))?#', $locale, $matches);
+
     return $matches['lang'];
   }
 
