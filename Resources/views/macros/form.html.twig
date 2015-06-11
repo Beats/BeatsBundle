@@ -70,6 +70,7 @@
 {% endmacro %}
 
 {% macro _form_textarea_attrs(opts) %}
+  placeholder="{{ opts.placeholder|default(opts.label) }}"
   {% if opts.rows %}rows="{{ opts.rows }}"{% endif %}
   {% if opts.cols %}cols="{{ opts.cols }}"{% endif %}
 {% endmacro %}
