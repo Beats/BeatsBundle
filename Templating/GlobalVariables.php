@@ -152,6 +152,10 @@ abstract class GlobalVariables extends \Symfony\Bundle\FrameworkBundle\Templatin
     return UTC::toFormat($format, $time);
   }
 
+  public function getUTCTimestamp($time = null) {
+    return $this->getUTC('Y-m-d H:i:s', $time);
+  }
+
   /********************************************************************************************************************/
 
   public function get_field($path) {
