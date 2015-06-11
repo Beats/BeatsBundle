@@ -49,8 +49,17 @@
         ;
       $clear.hide();
 
-      $caption.click(function () {
-        self.element.click()
+      $caption.click(function (evt) {
+        evt.stopPropagation();
+        self.element.get(0).click()
+      });
+      $button.click(function (evt) {
+        evt.stopPropagation();
+        self.element.get(0).click()
+      });
+      self.$control().on('click', '.beats_field_file-preview', function (evt) {
+        evt.stopPropagation();
+        self.element.get(0).click();
       });
 
       if (Beats.empty(self.options.url)) {
