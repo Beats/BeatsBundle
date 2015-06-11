@@ -1,6 +1,7 @@
 <?php
 namespace BeatsBundle\Extension;
 
+use BeatsBundle\Exception\Exception;
 use BeatsBundle\Helper\SEO;
 use BeatsBundle\Helper\UTC;
 use BeatsBundle\OAuth\ResourceProviderMap;
@@ -25,7 +26,9 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'ceil'     => new Twig_Filter_Method($this, 'toCeil', array('is_safe' => array('html'))),
       'options'  => new Twig_Filter_Method($this, 'toOptions', array('is_safe' => array('html'))),
       'slugify'  => new Twig_Filter_Method($this, 'toSlug', array('is_safe' => array('html'))),
+
       'gmdate'   => new Twig_Filter_Method($this, 'toDate', array('is_safe' => array('html'))),
+      'gmmonth'  => new Twig_Filter_Method($this, 'toMonth', array('is_safe' => array('html'))),
 
       'ellipsis' => new Twig_Filter_Method($this, 'ellipsis', array('is_safe' => array('html'))),
 
@@ -154,6 +157,8 @@ class TwigExtension extends ContainerAwareTwigExtension {
     return SEO::slugify($text);
   }
 
+  /********************************************************************************************************************/
+
   public function toDate($time, $format, $zone = false) {
     if (empty($zone)) {
       $zone = $this->_chronos()->getTimezone();
@@ -161,6 +166,24 @@ class TwigExtension extends ContainerAwareTwigExtension {
     if (empty($zone)) {
       /** @noinspection PhpUndefinedMethodInspection */
       $zone = $this->_twig()->getExtension('core')->getTimezone();
+    }
+
+    return UTC::toTZFormat($format, $zone, $time);
+  }
+
+  public function toMonth($month, $format, $zone = false) {
+    if (empty($zone)) {
+      $zone = $this->_chronos()->getTimezone();
+    }
+    if (empty($zone)) {
+      /** @noinspection PhpUndefinedMethodInspection */
+      $zone = $this->_twig()->getExtension('core')->getTimezone();
+    }
+
+    if (preg_match('#^((?<y>\d{4})-)?(?<m>\d{1,2})#', $month, $matches)) {
+      $time = implode('-', array(empty($matches['y']) ? '2000' : $matches['y'], $matches['m'], '01'));
+    } else {
+      throw new Exception("Invalid month format: $month");
     }
 
     return UTC::toTZFormat($format, $zone, $time);
