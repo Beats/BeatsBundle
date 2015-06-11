@@ -640,10 +640,10 @@ class AbstractEntity implements \IteratorAggregate {
    * @param string $name
    * @return null|string
    */
-  public function mime($name) {
+  public function mime($name, $default = null) {
     $attachment = $this->getAttachment($name);
     if (empty($attachment)) {
-      return null;
+      return $default;
     }
 
     return $attachment->content_type;
