@@ -5,7 +5,7 @@
   <% for (var row = 0; row < fields.length; row++) { var cols = fields[row]; %>
   <div class="row">
     <% for (var col = 0; col < cols.length; col++) { var field = cols[col]; %>
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-4 col-xs-4">
       <select class="<%= inputClass %>" data-fld="<%= field %>" autocomlete="off">
         <% if (clear) { %>
         <option data-hidden="true" value=""><%= clear[field] %></option>
