@@ -5,6 +5,7 @@ use BeatsBundle\Exception\Exception;
 use BeatsBundle\Helper\SEO;
 use BeatsBundle\Helper\UTC;
 use BeatsBundle\OAuth\ResourceProviderMap;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig_Filter_Method;
 use Twig_Function_Method;
 
@@ -46,6 +47,8 @@ class TwigExtension extends ContainerAwareTwigExtension {
       'hasImage'       => new Twig_Function_Method($this, 'hasImage'),
       'fsalURL'        => new Twig_Function_Method($this, 'fsalURL', array('is_save' => array('html'))),
       'routeCurrent'   => new Twig_Function_Method($this, 'routeCurrent', array('is_safe' => array('html'))),
+      'currentPath'    => new Twig_Function_Method($this, 'currentPath', array('is_safe' => array('html'))),
+      'authPath'       => new Twig_Function_Method($this, 'authPath', array('is_safe' => array('html'))),
       'currentRoute'   => new Twig_Function_Method($this, 'currentRoute', array('is_safe' => array('html'))),
       'flash'          => new Twig_Function_Method($this, 'renderFlash', array('is_safe' => array('html'))),
       'oauthConnect'   => new Twig_Function_Method($this, 'oauthConnect', array('is_safe' => array('html'))),
@@ -255,6 +258,20 @@ class TwigExtension extends ContainerAwareTwigExtension {
     }
 
     return implode('', $flashes);
+  }
+
+  public function currentPath($relative = false) {
+    return $this->_router()->generate(
+      $this->_request()->attributes->get('_route'), $this->_request()->attributes->get('_route_params'),
+      $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH
+    );
+  }
+
+  public function authPath($loginRoute, array $params = array(), $relative = false) {
+    $targetPath = $this->currentPath($relative);
+    $this->_session()->set('_target_path', $targetPath);
+
+    return $this->_router()->generate($loginRoute, $params, $relative);
   }
 
   /********************************************************************************************************************/
