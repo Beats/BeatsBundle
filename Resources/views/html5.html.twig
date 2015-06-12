@@ -23,7 +23,7 @@
 </head>
 
 {% block body %}
-  <body class="{{ _bodyClass|default(is_full_view() ? 'beats-html-body-full' : 'beats-html-body-mobile') }}">
+  <body class="{{ is_full_view() ? 'beats-html-body-full' : 'beats-html-body-mobile' }} {{ _bodyClass|default('') }}">
 
   {% block guts %}
   {% endblock %}
