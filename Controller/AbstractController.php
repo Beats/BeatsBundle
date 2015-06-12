@@ -10,6 +10,7 @@ use BeatsBundle\Session\Message;
 use BeatsBundle\Session\Page;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AbstractController extends Controller {
   use Service, FlasherAware, ValidatorAware, ClientDeviceAware;
@@ -51,6 +52,13 @@ class AbstractController extends Controller {
         ':', '', ':', '.' . $type . '.twig'
       ),
       $request->attributes->get('_controller')
+    );
+  }
+
+  protected function _currentPath($relative = false) {
+    return $this->_router()->generate(
+      $this->_request()->attributes->get('_route'), $this->_request()->attributes->get('_route_params'),
+      $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH
     );
   }
 
