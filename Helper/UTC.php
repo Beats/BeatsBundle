@@ -8,7 +8,7 @@ class UTC {
    * @return \DateTimeZone
    * @throws UTCException
    */
-  static public function createTimeZone($zone = null) {
+  static public function createTimeZone($zone = 'UTC') {
     if ($zone instanceof \DateTimeZone) {
       return $zone;
     } elseif (is_numeric($zone)) { // GMT offset in hours, with DST in affect
@@ -37,7 +37,7 @@ class UTC {
   static public function createDateTime($time = null, $zone = null) {
     static $utc;
     if (empty($utc)) {
-      $utc = self::createTimeZone('UTC');
+      $utc = self::createTimeZone();
     }
     if (empty($zone)) {
       $zone = $utc;
