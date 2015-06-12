@@ -162,7 +162,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   /********************************************************************************************************************/
 
-  public function toDate($time, $format, $zone = false) {
+  public function toDate($time, $format = 'Y-m-d H:i:s', $zone = false) {
     if (empty($zone)) {
       $zone = $this->_chronos()->getTimezone();
     }
