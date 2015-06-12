@@ -67,7 +67,7 @@ class OAuthFactory extends AbstractFactory {
     /** @noinspection PhpUndefinedMethodInspection */
     $definition = $container->setDefinition($handlerID, new DefinitionDecorator($config['success_handler']));
     /** @noinspection PhpUndefinedMethodInspection */
-    $definition->replaceArgument(1, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
+    $definition->replaceArgument(2, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
     /** @noinspection PhpUndefinedMethodInspection */
     $definition->addMethodCall('setProviderKey', array($id));
 

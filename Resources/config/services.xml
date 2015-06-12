@@ -62,6 +62,7 @@
              public="false"
              abstract="true">
       <argument type="service" id="service_container"/>
+      <argument type="string">%beats.security.service.id%</argument>
       <argument type="collection"/>
     </service>
 

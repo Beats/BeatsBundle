@@ -2,6 +2,7 @@
 
 namespace BeatsBundle\Security\Http\Authentication;
 
+use BeatsBundle\Security\PersisterInterface;
 use BeatsBundle\Service\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,13 @@ class AuthenticationHandler extends ContainerAware implements AuthenticationSucc
     return $this->container->get('security.http_utils');
   }
 
+  /**
+   * @return PersisterInterface
+   */
+  final protected function _persister() {
+    return $this->container->get($this->_persisterServiceID);
+  }
+
   /********************************************************************************************************************/
 
   /**
@@ -28,14 +36,23 @@ class AuthenticationHandler extends ContainerAware implements AuthenticationSucc
    */
   protected $_providerKey;
 
-  public function __construct(ContainerInterface $container, array $options) {
-    parent::__construct($container, array_merge(array(
-      'always_use_default_target_path' => false,
-      'default_target_path'            => '/',
-      'login_path'                     => '/login',
-      'target_path_parameter'          => '_target_path',
-      'use_referer'                    => false,
-    ), $options));
+  /** @var string */
+  private $_persisterServiceID;
+
+  public function __construct(ContainerInterface $container, $serviceID, array $options) {
+    $this->_persisterServiceID = $serviceID;
+    parent::__construct(
+      $container,
+      array_merge(
+        array(
+          'always_use_default_target_path' => false,
+          'default_target_path'            => '/',
+          'login_path'                     => '/login',
+          'target_path_parameter'          => '_target_path',
+          'use_referer'                    => false,
+        ), $options
+      )
+    );
   }
 
   /********************************************************************************************************************/
@@ -45,13 +62,15 @@ class AuthenticationHandler extends ContainerAware implements AuthenticationSucc
    * is called by authentication listeners inheriting from
    * AbstractAuthenticationListener.
    *
-   * @param Request $request
+   * @param Request        $request
    * @param TokenInterface $token
    *
    * @return Response never null
    */
   public function onAuthenticationSuccess(Request $request, TokenInterface $token) {
-    return $this->_httpUtils()->createRedirectResponse($request, $this->_determineTargetUrl($request));
+    $response = $this->_httpUtils()->createRedirectResponse($request, $this->_determineTargetUrl($request));
+
+    return $this->_persister()->onAuthenticationSuccess($request, $token, $response);
   }
 
   /********************************************************************************************************************/
@@ -125,6 +144,7 @@ class AuthenticationHandler extends ContainerAware implements AuthenticationSucc
     if ($targetUrl = $session->get($sessionKey, false)) {
       $session->remove($sessionKey);
     }
+
     return $targetUrl;
   }
 
@@ -136,6 +156,7 @@ class AuthenticationHandler extends ContainerAware implements AuthenticationSucc
         return $targetUrl;
       }
     }
+
     return false;
   }
 
