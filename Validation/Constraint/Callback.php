@@ -1,9 +1,9 @@
 <?php
 namespace BeatsBundle\Validation\Constraint;
 
+use BeatsBundle\Exception\Exception;
 use BeatsBundle\Validation\Constraint;
 use BeatsBundle\Validation\Context;
-use BeatsBundle\Exception\Exception;
 
 class Callback extends Constraint {
 
@@ -11,6 +11,7 @@ class Callback extends Constraint {
 
   public function __construct(\Closure $callback, $failure = 'The value is invalid', $success = 'The value is valid') {
     parent::__construct($failure, $success);
+    $this->_optional = false;
     if (!is_callable($callback)) {
       throw new Exception("Invalid Callback constraint");
     }
