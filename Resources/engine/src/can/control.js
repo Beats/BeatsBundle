@@ -24,7 +24,16 @@
     factory: function (opts, tplV) {
       tplV = $.extend(true, {}, this.defaults.tplV, tplV || opts.tplV);
       var df = can.view(this.defaults.view, tplV);
-      return new this($(df.children), opts)
+      var html = df.children;
+      if (html === undefined) {
+        html = [];
+        $.each(df.childNodes, function (idx, node) {
+          if (node.nodeType === 1) {
+            html.push(node);
+          }
+        });
+      }
+      return new this($(html), opts)
     }
   }, {
     init: function () {
