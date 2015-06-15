@@ -22,21 +22,22 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   public function getFilters() {
     return array(
-      'fsal'     => new Twig_Filter_Method($this, 'toURL', array('is_safe' => array('html'))),
-      'absolute' => new Twig_Filter_Method($this, 'toAbsolute', array('is_safe' => array('html'))),
-      'ceil'     => new Twig_Filter_Method($this, 'toCeil', array('is_safe' => array('html'))),
-      'options'  => new Twig_Filter_Method($this, 'toOptions', array('is_safe' => array('html'))),
-      'slugify'  => new Twig_Filter_Method($this, 'toSlug', array('is_safe' => array('html'))),
+      'fsal'       => new Twig_Filter_Method($this, 'toURL', array('is_safe' => array('html'))),
+      'absolute'   => new Twig_Filter_Method($this, 'toAbsolute', array('is_safe' => array('html'))),
+      'ceil'       => new Twig_Filter_Method($this, 'toCeil', array('is_safe' => array('html'))),
+      'options'    => new Twig_Filter_Method($this, 'toOptions', array('is_safe' => array('html'))),
+      'slugify'    => new Twig_Filter_Method($this, 'toSlug', array('is_safe' => array('html'))),
 
-      'gmdate'   => new Twig_Filter_Method($this, 'toDate', array('is_safe' => array('html'))),
-      'gmmonth'  => new Twig_Filter_Method($this, 'toMonth', array('is_safe' => array('html'))),
+      'gmdate'     => new Twig_Filter_Method($this, 'toDate', array('is_safe' => array('html'))),
+      'gmmonth'    => new Twig_Filter_Method($this, 'toMonth', array('is_safe' => array('html'))),
+      'gmrelative' => new Twig_Filter_Method($this, 'toRelative', array('is_safe' => array('html'))),
 
-      'ellipsis' => new Twig_Filter_Method($this, 'ellipsis', array('is_safe' => array('html'))),
+      'ellipsis'   => new Twig_Filter_Method($this, 'ellipsis', array('is_safe' => array('html'))),
 
-      'rdbTable' => new \Twig_SimpleFilter(
+      'rdbTable'   => new \Twig_SimpleFilter(
         'rdbTable', array(self::CLASS_RDB, 'table'), array('is_safe' => array('sql'))
       ),
-      'rdbPK'    => new \Twig_SimpleFilter(
+      'rdbPK'      => new \Twig_SimpleFilter(
         'rdbPK', array(self::CLASS_RDB, 'pk'), array('is_safe' => array('sql'))
       ),
     );
@@ -192,6 +193,50 @@ class TwigExtension extends ContainerAwareTwigExtension {
     return UTC::toTZFormat($format, $zone, $time);
   }
 
+  public function toRelative($time) {
+    $ts     = UTC::toUNIX($time);
+    $diff_s = time() - $ts;
+
+    // TODO@ion: refactor and translate this
+    if (0 < $diff_s) {
+      $diff_d = floor($diff_s / 86400);
+      if ($diff_d == 0) {
+        if ($diff_s < 60) return 'just now';
+        if ($diff_s < 120) return '1 minute ago';
+        if ($diff_s < 3600) return floor($diff_s / 60) . ' minutes ago';
+        if ($diff_s < 7200) return '1 hour ago';
+        if ($diff_s < 86400) return floor($diff_s / 3600) . ' hours ago';
+      }
+      if ($diff_d == 1) return 'Yesterday';
+      if ($diff_d < 7) return $diff_d . ' days ago';
+      if ($diff_d < 31) return ceil($diff_d / 7) . ' weeks ago';
+      if ($diff_d < 60) return 'last month';
+
+      return date('F Y', $ts);
+
+    } elseif ($diff_s < 0) {
+
+      $diff_s = abs($diff_s);
+      $diff_d = floor($diff_s / 86400);
+      if ($diff_d == 0) {
+        if ($diff_s < 120) return 'in a minute';
+        if ($diff_s < 3600) return 'in ' . floor($diff_s / 60) . ' minutes';
+        if ($diff_s < 7200) return 'in an hour';
+        if ($diff_s < 86400) return 'in ' . floor($diff_s / 3600) . ' hours';
+      }
+      if ($diff_d == 1) return 'Tomorrow';
+      if ($diff_d < 4) return date('l', $ts);
+      if ($diff_d < 7 + (7 - date('w'))) return 'next week';
+      if (ceil($diff_d / 7) < 4) return 'in ' . ceil($diff_d / 7) . ' weeks';
+      if (date('n', $ts) == date('n') + 1) return 'next month';
+
+      return date('F Y', $ts);
+    } else {
+      return 'now';
+    }
+  }
+
+  /********************************************************************************************************************/
 
   public function ellipsis($value, $length = 160, $suffix = ' ...') {
     $value = trim($value);

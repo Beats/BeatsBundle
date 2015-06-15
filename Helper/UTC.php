@@ -64,7 +64,7 @@ class UTC {
    * Created a string representation of the given time according to the specified format
    *
    * @param \DateTime $time
-   * @param string $format
+   * @param string    $format
    * @return string
    * @throws UTCException
    */
@@ -73,6 +73,7 @@ class UTC {
     if (empty($text)) {
       throw new UTCException("Invalid format given: $format");
     }
+
     return $text;
   }
 
@@ -103,7 +104,7 @@ class UTC {
 
   /**
    * Returns the given time formatted according to the parameters
-   * @param $format
+   * @param      $format
    * @param null $time
    * @return string
    * @throws UTCException
@@ -201,8 +202,8 @@ class UTC {
   /**
    * Returns a string representation of the given time, adjusted to the given timezone, by the specified format
    *
-   * @param string $format
-   * @param mixed $zone
+   * @param string     $format
+   * @param mixed      $zone
    * @param mixed|null $time
    * @return string
    * @throws UTCException
@@ -211,6 +212,7 @@ class UTC {
     if (empty($zone)) {
       throw new UTCException("Timezone not specified");
     }
+
     return self::_format(self::createDateTime($time)->setTimezone(self::createTimeZone($zone)), $format);
   }
 
