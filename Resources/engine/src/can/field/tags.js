@@ -13,6 +13,14 @@
       size: 4,
       maxCount: undefined,
       minCount: undefined,
+      hideOnEmpty: true,
+      searcher: false,
+      selected: {
+        icon: '<i class="fa fa-fw fa-times"></i>'
+      },
+      rejected: {
+        icon: ''
+      },
       view: 'beats.can.field.tags.ejs',
       tplV: {
         name: null,
@@ -45,9 +53,12 @@
         , $selected = self.$selected()
         , $rejected = self.$rejected()
         ;
-      $searcher.toggle(!!$rejected.children().length);
-      $rejected.toggle(!!$rejected.children().length);
-      $selected.toggle(!!$selected.children().length);
+
+      if (self.options.hideOnEmpty) {
+        $searcher.toggle(!!$rejected.children().length);
+        $rejected.toggle(!!$rejected.children().length);
+        $selected.toggle(!!$selected.children().length);
+      }
 
       var options = {};
       $options.each(function (idx, el) {
@@ -65,52 +76,54 @@
         self.selectTag($(this).data('value'));
       });
 
-      self.$searcherText()
-        .on('change', function () {
-          if (!$(this).val().length) {
-            $rejected.children().show();
-          }
-        })
-        .on('keydown', function (evt) {
-          if (!evt.shiftKey) {
-            var handled = false;
-            switch (evt.keyCode) {
-              case 13: // Enter
-                var $tags = $rejected.children().filter(':visible');
-                if ($tags.length == 1) {
-                  $tags.click();
-                  $(this).val('');
-                }
-                handled = true;
-                break;
+      if (self.options.searcher) {
+        self.$searcherText()
+          .on('change', function () {
+            if (!$(this).val().length) {
+              $rejected.children().show();
+            }
+          })
+          .on('keydown', function (evt) {
+            if (!evt.shiftKey) {
+              var handled = false;
+              switch (evt.keyCode) {
+                case 13: // Enter
+                  var $tags = $rejected.children().filter(':visible');
+                  if ($tags.length == 1) {
+                    $tags.click();
+                    $(this).val('');
+                  }
+                  handled = true;
+                  break;
 
-              case 27: // Esc
-                $(this).val('');
-                handled = true;
-                break;
+                case 27: // Esc
+                  $(this).val('');
+                  handled = true;
+                  break;
+              }
             }
-          }
-          if (handled) {
-            evt.preventDefault();
-            evt.stopPropagation();
-          }
-        })
-        .on('keyup', function () {
-          var term = $(this).val().toLowerCase()
-            , $tags = $rejected.children()
-            ;
-          $tags.each(function (idx, el) {
-            var $tag = $(el)
-              , text = $tag.text().trim().toLocaleLowerCase()
+            if (handled) {
+              evt.preventDefault();
+              evt.stopPropagation();
+            }
+          })
+          .on('keyup', function () {
+            var term = $(this).val().toLowerCase()
+              , $tags = $rejected.children()
               ;
-            if (text.startsWith(term)) {
-              $tag.show();
-            } else {
-              $tag.hide();
-            }
-          });
-        })
-      ;
+            $tags.each(function (idx, el) {
+              var $tag = $(el)
+                , text = $tag.text().trim().toLocaleLowerCase()
+                ;
+              if (text.startsWith(term)) {
+                $tag.show();
+              } else {
+                $tag.hide();
+              }
+            });
+          })
+        ;
+      }
 
       self.element.on('change', function (evt) {
         self._update();
@@ -124,17 +137,27 @@
         $.each(diff, function (idx, value) {
           var $el = _isSelected(value);
           if ($el.length) {
+            $el.find('i').remove();
+            if (self.options.rejected.icon) {
+              $el.prepend($(self.options.rejected.icon));
+            }
             $el.prependTo($rejected);
           }
         });
         $.each(values, function (idx, value) {
           var $el = _isRejected(value);
           if ($el.length) {
+            $el.find('i').remove();
+            if (self.options.selected.icon) {
+              $el.prepend($(self.options.selected.icon));
+            }
             $el.prependTo($selected);
           }
         });
-        $rejected.toggle(!!$rejected.children().length);
-        $selected.toggle(!!$selected.children().length);
+        if (self.options.hideOnEmpty) {
+          $rejected.toggle(!!$rejected.children().length);
+          $selected.toggle(!!$selected.children().length);
+        }
       });
 
       function _isSelected(value) {
@@ -214,8 +237,10 @@
               self.element.trigger(jQuery.Event('update'));
             }
             if (!isNaN(this.options.maxCount)) {
-              self.$rejected().toggle(newValue.length != self.options.maxCount);
-              self.$searcher().toggle(newValue.length != self.options.maxCount);
+              if (self.options.hideOnEmpty) {
+                self.$searcher().toggle(newValue.length != self.options.maxCount);
+                self.$rejected().toggle(newValue.length != self.options.maxCount);
+              }
             }
           }
         });

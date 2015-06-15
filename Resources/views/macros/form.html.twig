@@ -576,6 +576,13 @@
   autofocus: false,
   tabindex: 0,
   collection: false,
+  searcher: false,
+  selected: {
+  icon: '<i class="fa fa-fw fa-times"></i>',
+  },
+  rejected: {
+  icon: '',
+  },
   data:{},
   }|merge(opts|default({})) %}
 
@@ -596,24 +603,27 @@
 
     {{ self._select(opts|merge({style:'display: none;'}), value) }}
 
-    {% set fOpts = {
-    type: 'text',
-    id: opts.name ~ '-search',
-    name: null,
-    value: null,
-    addon: {
-    class: 'beats_field_tags-searcher',
-    r: '<i class="fa fa-fw fa-search"></i>',
-    }
-    } %}
+    {% if opts.searcher %}
+      {% set searcher = {
+      type: 'text',
+      id: opts.name ~ '-search',
+      name: null,
+      value: null,
+      addon: {
+      class: 'beats_field_tags-searcher',
+      r: '<i class="fa fa-fw fa-search"></i>',
+      }
+      }|merge(opts.searcher is iterable ? opts.searcher : {}) %}
 
-    {{ self.input(opts|merge(fOpts)) }}
+      {{ self.input(opts|merge(searcher)) }}
 
-    {#<pre aria-hidden="true" style="position: absolute; visibility: visible; white-space: pre; font-family: Ubuntu; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: optimizelegibility; text-transform: none;"></pre>#}
+      {#<pre aria-hidden="true" style="position: absolute; visibility: visible; white-space: pre; font-family: Ubuntu; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: optimizelegibility; text-transform: none;"></pre>#}
+    {% endif %}
 
     <div id="{{ opts.name ~ '-selected' }}" class="beats_field_tags-selected panel panel-default">
       {% for key in selected %}
         <span class="beats_field_tags-tag label" data-value="{{ key }}">
+          {{ opts.selected.icon|raw }}
           {{ attribute(opts.options, key) }}
         </span>
       {% endfor %}
@@ -622,6 +632,7 @@
     <div id="{{ opts.name ~ '-rejected' }}" class="beats_field_tags-rejected panel panel-default">
       {% for key in rejected %}
         <span class="beats_field_tags-tag label" data-value="{{ key }}">
+          {{ opts.rejected.icon|raw }}
           {{ attribute(opts.options, key) }}
         </span>
       {% endfor %}
