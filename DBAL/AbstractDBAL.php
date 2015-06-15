@@ -836,6 +836,18 @@ class AbstractDBAL extends ContainerAware {
     return $where;
   }
 
+  protected function _filterWhereORs(&$where = array(), array $ors) {
+    if (!empty($ors)) {
+      if (count($ors) == 1) {
+        array_push($where, array_pop($ors));
+
+        return $where;
+      }
+
+      return $this->_filterWhereRAW($where, sprintf('(%s)', implode(') OR (', $ors)));
+    }
+  }
+
   protected function _filterWhere(&$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null) {
     $param = empty($param) ? $field : $param;
 
@@ -844,8 +856,13 @@ class AbstractDBAL extends ContainerAware {
     }
 
     if (in_array($op, array('IN'))) {
+      $values = array();
+      $pdo = $this->rdb()->pdo();
+      foreach (is_array($value) ? $value : array($value) as $value) {
+        $values[] = $pdo->quote($value);
+      };
       $where[] = sprintf(
-        "%s.%s %s ('%s')", $table, $field, $op, implode("','", is_array($value) ? $value : array($value))
+        "%s.%s %s (%s)", $table, $field, $op, implode(",", $values)
       );
     } else {
       $where[] = sprintf("%s.%s %s :%s", $table, $field, $op, $param);
