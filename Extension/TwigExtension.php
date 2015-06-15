@@ -306,15 +306,23 @@ class TwigExtension extends ContainerAwareTwigExtension {
   }
 
   public function currentPath($relative = false) {
-    return $this->_router()->generate(
-      $this->_request()->attributes->get('_route'), $this->_request()->attributes->get('_route_params'),
-      $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH
-    );
+    try {
+      return $this->_router()->generate(
+        $this->_request()->attributes->get('_route'), $this->_request()->attributes->get('_route_params'),
+        $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH
+      );
+    } catch (\Exception $ex) {
+      $this->_logger()->error($ex->getMessage());
+
+      return null;
+    }
   }
 
   public function authPath($loginRoute, array $params = array(), $relative = false) {
     $targetPath = $this->currentPath($relative);
-    $this->_session()->set('_target_path', $targetPath);
+    if (!empty($targetPath)) {
+      $this->_session()->set('_target_path', $targetPath);
+    }
 
     return $this->_router()->generate($loginRoute, $params, $relative);
   }
