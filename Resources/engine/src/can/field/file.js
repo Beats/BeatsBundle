@@ -238,7 +238,7 @@
     },
 
     _displayPreview: function ($preview, type) {
-      $preview.addClass('img-thumbnail btn-block');
+      $preview.addClass('col-xs-12');
       this.$preview().append($preview).slideDown();
     },
 

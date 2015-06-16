@@ -267,14 +267,14 @@
     src: '',
     type: false,
     }|merge(opts.preview is iterable ? opts.preview : {}) %}
-    <div class="beats_field_file-preview {{ preview.class }}" style="{{ preview.style }}">
+    <div class="row beats_field_file-preview {{ preview.class }}" style="{{ preview.style }}">
       {% if preview.type is not empty %}
         {% if preview.type matches '#^image/.*$#' %}
-          <img class="img-thumbnail btn-block" src="{{ preview.src }}"/>
+          <img class="col-xs-12" src="{{ preview.src }}"/>
         {% elseif preview.type matches '#^audio/.*$#' %}
-          <audio class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"></audio>
+          <audio class="col-xs-12" src="{{ preview.src }}" controls="controls"></audio>
         {% elseif preview.type matches '#^video/.*$#' %}
-          <video class="img-thumbnail btn-block" src="{{ preview.src }}" controls="controls"></video>
+          <video class="col-xs-12" src="{{ preview.src }}" controls="controls"></video>
         {% else %}
         {% endif %}
       {% endif %}
