@@ -556,6 +556,7 @@ EOT
   private $_isTplExport = false;
   private $_isDependencies = false;
   private $_isReformat = false;
+  private $_isWatch = false;
 
   protected $_bundles;
 
@@ -572,6 +573,7 @@ EOT
     $this->_isDependencies = !$input->getOption('no-dependencies');
     $this->_isTplExport    = $input->getOption('exported');
     $this->_isReformat     = $input->getOption('reformat');
+    $this->_isWatch        = $input->getOption('watch');
 
     if ($name = $input->getArgument('bundle')) {
       $this->_bundles = array($name => $this->_kernel()->getBundle($name));
@@ -579,7 +581,7 @@ EOT
       $this->_bundles = $this->_kernel()->getBundles();
     }
 
-    if ($input->getOption('watch')) {
+    if ($this->_isWatch) {
       $this->_isMinify       = false;
       $this->_isReformat     = false;
       $this->_isRemote       = false;

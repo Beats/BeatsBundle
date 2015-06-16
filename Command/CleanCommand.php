@@ -13,7 +13,7 @@ class CleanCommand extends ServiceCommand {
     $this
       ->setName($name)
       ->addOption('no-cache', 'C', InputOption::VALUE_NONE, 'Skip cache:clear')
-      ->addOption('no-build', 'B', InputOption::VALUE_NONE, 'Skip beats:fe:build')
+      ->addOption('no-build', 'B', InputOption::VALUE_NONE, 'Skip beats:fe:can')
       ->addOption('no-minify', 'M', InputOption::VALUE_NONE, 'Whether to minify the build')
       ->setDescription('Performs all Symfony2 and Beats cleanup and build processes ')
       ->setHelp(<<<EOT
