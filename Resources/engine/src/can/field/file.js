@@ -49,17 +49,9 @@
         ;
       $clear.hide();
 
-      $caption.click(function (evt) {
+      self.$control().on('click', '.beats_field_file-preview, .beats_field_file-caption > :text', function (evt) {
         evt.stopPropagation();
         self.element.get(0).click()
-      });
-      $button.click(function (evt) {
-        evt.stopPropagation();
-        self.element.get(0).click()
-      });
-      self.$control().on('click', '.beats_field_file-preview', function (evt) {
-        evt.stopPropagation();
-        self.element.get(0).click();
       });
 
       if (Beats.empty(self.options.url)) {
@@ -70,6 +62,9 @@
           $alert.empty().hide();
           $clear.hide();
           $control.removeClass('has-error has-success');
+          if (!evt.target.files.length) {
+            return;
+          }
           delete evt.target.files.error;
           delete evt.target.files[0].error;
 
