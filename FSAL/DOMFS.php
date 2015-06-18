@@ -136,23 +136,26 @@ class DOMFS extends AbstractFSAL {
       return $this->_cacheLoad($cacheID, __FUNCTION__);
     } catch (CacheException $ex) {
     }
-    $href = $this->link($model, $id, $name, true);
 
-//    $code    = false;
-//    $context = stream_context_create(array(
-//      'http' => array(
-//        'method'          => "HEAD",
-//        'follow_location' => 0
-//      )
-//    ));
-//    if (file_get_contents($href, null, $context) && !empty($http_response_header)) {
-//      sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $code);
-//    }
+    $doc = $this->_dom()->locate($model, $id);
+    $exists = !empty($doc) && isset($doc->_attachments->$name);
+    return $this->_cacheSave($cacheID, __FUNCTION__, $exists);
 
-    list($status) = get_headers($href);
-    /** @noinspection PhpUnusedLocalVariableInspection */
-    list($protocol, $code, $message) = explode(' ', $status);
-    return $this->_cacheSave($cacheID, __FUNCTION__, $code == 200);
+//    $href = $this->link($model, $id, $name, true);
+////    $code    = false;
+////    $context = stream_context_create(array(
+////      'http' => array(
+////        'method'          => "HEAD",
+////        'follow_location' => 0
+////      )
+////    ));
+////    if (file_get_contents($href, null, $context) && !empty($http_response_header)) {
+////      sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $code);
+////    }
+//    list($status) = get_headers($href);
+//    /** @noinspection PhpUnusedLocalVariableInspection */
+//    list($protocol, $code, $message) = explode(' ', $status);
+//    return $this->_cacheSave($cacheID, __FUNCTION__, $code == 200);
   }
 
   /********************************************************************************************************************/
