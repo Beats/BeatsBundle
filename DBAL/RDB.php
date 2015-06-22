@@ -533,7 +533,7 @@ class RDB extends AbstractDB {
 
   /********************************************************************************************************************/
 
-  public function linkAll($modelL, $modelR, $idL, $ids, $pkR = null) {
+  public function relinkAll($modelL, $modelR, $idL, $ids, $pkR = null) {
     if (empty($ids)) {
       return $ids;
     }
@@ -560,7 +560,7 @@ class RDB extends AbstractDB {
     return $ids;
   }
 
-  public function linkOne($modelL, $modelR, $idL, $idR, $pkR = null) {
+  public function relinkOne($modelL, $modelR, $idL, $idR, $pkR = null) {
     if (empty($pkR)) {
       $pkR = self::pk($modelR);
     }
@@ -867,6 +867,7 @@ class RDB extends AbstractDB {
         'page'     => $page,
       )
     );
+
 //    var_dump($sql, $params);
 
     return $this->fetchIDs($sql, $params, array_keys($fields), $aggregations);
