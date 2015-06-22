@@ -874,4 +874,22 @@ class RDB extends AbstractDB {
 
   /********************************************************************************************************************/
 
+  static public function vector_locate(array $haystack, $needle, &$idx = false, $strict = null) {
+    return ($idx = array_search($needle, $haystack, $strict)) !== false;
+  }
+
+  static public function vector_remove(array &$haystack, $needle, $strict = null) {
+    while (self::vector_locate($haystack, $needle, $idx, $strict)) {
+      array_splice($haystack, $idx, 1);
+    }
+  }
+
+  static public function vector_attach(array &$haystack, $value) {
+    if (!in_array($value, $haystack)) {
+      array_push($haystack, $value);
+    }
+  }
+
+  /********************************************************************************************************************/
+
 }
