@@ -17,7 +17,7 @@
       if (Beats.empty(message)) {
         return
       }
-      var $message = Beats.Flasher.Message.factory({
+      return Beats.Flasher.Message.factory({
         fade: fade || this.instance.options.fade,
         delay: delay || this.instance.options.delay,
         method: method || this.instance.options.method,
@@ -26,13 +26,19 @@
           heading: heading,
           message: message
         }
-      })
-      Beats.Flasher.attach($message);
+      });
+    },
+
+    attach: function (message, heading, type, delay, fade, method) {
+      var $message = __.message(message, heading, type, delay, fade, method);
+      if (!Beats.empty($message)) {
+        Beats.Flasher.attach($message);
+      }
       return $message;
     },
 
     redirect: function (redirect, message, type, heading) {
-      return window.location.href = Router.url('beats.basic.html.flash', {
+      return window.location.href = Beats.Router.url('beats.basic.html.flash', {
         data: {
           redirect: redirect,
           message: message,
@@ -43,7 +49,7 @@
     },
 
     page: function (message, type, heading, title, href) {
-      return window.location.href = Router.url('beats.basic.html.flash', {
+      return window.location.href = Beats.Router.url('beats.basic.html.flash', {
         data: {
           message: message,
           type: type,
@@ -53,7 +59,7 @@
         }
       })
     }
-  }
+  };
 
   /******************************************************************************************************************/
 
@@ -74,21 +80,21 @@
     },
 
     success: function (message, heading, delay) {
-      __.message(message, heading, __.types.success, delay)
+      __.attach(message, heading, __.types.success, delay)
     },
     failure: function (message, heading, delay) {
-      __.message(message, heading, __.types.failure, delay)
+      __.attach(message, heading, __.types.failure, delay)
     },
     warning: function (message, heading, delay) {
-      __.message(message, heading, __.types.warning, delay)
+      __.attach(message, heading, __.types.warning, delay)
     },
     counsel: function (message, heading, delay) {
-      __.message(message, heading, __.types.counsel, delay)
+      __.attach(message, heading, __.types.counsel, delay)
     },
 
     exception: function (exception, heading, delay) {
-      var message = exception ? exception.message : null
-      __.message(message || 'An error occurred. Please try again!', heading, __.types.failure, delay)
+      var message = exception ? exception.message : null;
+      __.attach(message || 'An error occurred. Please try again!', heading, __.types.failure, delay)
     },
 
     attach: function ($message) {
@@ -127,17 +133,17 @@
   }, {
     init: function () {
       var self = this
-        , messages = []
-      self._super.apply(self, arguments)
+        , messages = [];
+      self._super.apply(self, arguments);
       if (__.instance) {
         throw new Beats.Error(self, 'Already exists')
       }
-      __.instance = self
+      __.instance = self;
 
       self.element.children().each(function (idx, span) {
         messages.push($(span).data())
-      })
-      self.element.empty()
+      });
+      self.element.empty();
 
       $.each(messages, function (idx, data) {
         if (!Beats.empty(data.type)) {
@@ -147,21 +153,21 @@
     },
 
     clear: function (immediately) {
-      var self = this
+      var self = this;
       self.element.children().each(function () {
         $(this).beats_flasher_message('kill', immediately)
       })
     },
     attach: function ($message) {
-      var self = this
+      var self = this;
       if (this.options.single) {
         this.clear(self.options.immediately)
       }
-      self.element.append($message.element)
+      self.element.append($message.element);
       $message.show()
     }
 
-  })
+  });
 
   /******************************************************************************************************************/
 
@@ -178,18 +184,27 @@
         message: null,
         heading: null
       }
+    },
+
+    success: function (message, heading, delay, fade, method) {
+      return __.message(message, heading, __.types.success, delay, fade, method)
+    },
+    failure: function (message, heading, delay, fade, method) {
+      return __.message(message, heading, __.types.failure, delay, fade, method)
+    },
+    warning: function (message, heading, delay, fade, method) {
+      return __.message(message, heading, __.types.warning, delay, fade, method)
+    },
+    counsel: function (message, heading, delay, fade, method) {
+      return __.message(message, heading, __.types.counsel, delay, fade, method)
     }
-    /*
-     , factory: function (opts, tplV) {
-     return can.view(this.defaults.view, $.extend(true, {}, this.defaults.tplV, tplV))
-     }
-     */
+
   }, {
     _timerID: null,
 
     init: function () {
-      var self = this
-      self._super.apply(self, arguments)
+      var self = this;
+      self._super.apply(self, arguments);
       if (!$.isPlainObject(self.options.fade)) {
         self.options.fade = {
           show: self.options.fade,
@@ -206,7 +221,7 @@
     },
 
     show: function () {
-      var self = this
+      var self = this;
       self.element[self.options.method.show]({
         easing: self.options.easing,
         duration: self.options.fade.show,
@@ -217,29 +232,29 @@
             }, self.options.delay)
           }
         }
-      })
+      });
       return self;
     },
 
     hide: function () {
-      var self = this
+      var self = this;
       self.element[self.options.method.hide]({
         easing: self.options.easing,
         duration: self.options.fade.hide,
         complete: function () {
           self.kill(true)
         }
-      })
+      });
       return self;
     },
 
     kill: function (immediately) {
-      var self = this
+      var self = this;
       if (self.options.fade && !immediately) {
         self.hide()
       } else {
         if (self._timerID) {
-          clearTimeout(self._timerID)
+          clearTimeout(self._timerID);
           self._timerID = null
         }
         if (self.element) { // TODO@ion: WTF?
@@ -252,10 +267,10 @@
       this.hide()
     }
 
-  })
+  });
 
   /******************************************************************************************************************/
 
   return Beats.Flasher
 
-})(jQuery)
+})(jQuery);
