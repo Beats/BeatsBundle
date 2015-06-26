@@ -2,6 +2,7 @@
 namespace BeatsBundle\Controller;
 
 use BeatsBundle\Model\ModelException;
+use BeatsBundle\Security\Core\User\Member;
 use BeatsBundle\Service\Aware\ClientDeviceAware;
 use BeatsBundle\Service\Aware\FlasherAware;
 use BeatsBundle\Service\Aware\ValidatorAware;
@@ -10,6 +11,8 @@ use BeatsBundle\Session\Message;
 use BeatsBundle\Session\Page;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AbstractController extends Controller {
@@ -187,6 +190,81 @@ class AbstractController extends Controller {
 
     return $this->redirectFlashTo($message, $route, $parameters, $absolute, $status);
   }
+
+  /********************************************************************************************************************/
+
+  /**
+   * @return Member
+   */
+  public function getMember() {
+    return parent::getUser();
+  }
+
+  /**
+   * @return \BeatsBundle\Security\User\UserInterface|null
+   */
+  public function getMemberUser() {
+    $member = $this->getMember();
+    if (empty($member)) {
+      return null;
+    }
+
+    return $member->getUser();
+  }
+
+  public function isAnonymous() {
+    $member = $this->getMember();
+
+    return empty($member);
+  }
+
+  public function isAuthenticated() {
+    return !$this->isAnonymous();
+  }
+
+  /********************************************************************************************************************/
+
+
+  /**
+   * Returns an AccessDenied Exception with the given message
+   * If the message is a boolean it will render the default message for Anonymous users (TRUE) or Forbidden (FALSE)
+   *
+   * @param string|bool $message The exception message
+   * @param \Exception  $previous
+   * @param bool        $logout  Whether to forcibly logout the user
+   * @return AccessDeniedHttpException
+   */
+  protected function _createAccessDeniedException($message = false, \Exception $previous = null, $logout = false) {
+    if (is_bool($message)) {
+      if ($message) {
+        $message = $this->_trans("beats.exception.access_denied.anonymous.ok"); // Anonymous
+      } else {
+        $message = $this->_trans("beats.exception.access_denied.anonymous.no"); // Forbidden
+      }
+    }
+    if ($logout) {
+      $this->_security()->setToken(null);
+    }
+
+    return new AccessDeniedHttpException($message, $previous);
+  }
+
+  /**
+   * Returns a NotFound Exception with the provided message
+   * If the message is empty a default message is used
+   *
+   * @param string|null $message
+   * @param \Exception  $previous
+   * @return NotFoundHttpException
+   */
+  protected function _createNotFoundException($message = null, \Exception $previous = null) {
+    if (empty($message)) {
+      $message = $this->_trans('beats.exception.not_found');
+    }
+
+    return new NotFoundHttpException($message, $previous);
+  }
+
 
   /********************************************************************************************************************/
 
