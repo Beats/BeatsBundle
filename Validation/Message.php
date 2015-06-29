@@ -3,11 +3,11 @@ namespace BeatsBundle\Validation;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class Message {
+class Message implements \JsonSerializable {
 
   const TYPE_OPTIONAL = 'optional';
-  const TYPE_INFO     = 'info';
-  const TYPE_FAILURE  = 'error';
+  const TYPE_COUNSEL  = 'info';
+  const TYPE_FAILURE  = 'failure';
   const TYPE_WARNING  = 'warning';
   const TYPE_SUCCESS  = 'success';
 
@@ -35,7 +35,8 @@ class Message {
   }
 
   public function setText($text) {
-    $this->_text  = is_array($text) ? $text : array($text);
+    $this->_text = is_array($text) ? $text : array($text);
+
     return $this;
   }
 
@@ -57,12 +58,23 @@ class Message {
       return $text;
     }
     $texts = array();
-    array_walk_recursive($text, function ($text) use (&$texts) {
-      array_push($texts, $text);
-    });
-    return implode(";", $texts);
+    array_walk_recursive(
+      $text,
+      function ($text) use (&$texts) {
+        array_push($texts, $text);
+      }
+    );
 
+    return implode(";", $texts);
   }
 
+  public function jsonSerialize() {
+    return array(
+      'type'  => $this->getType(),
+      'name'  => $this->getName(),
+      'text'  => $this->getText(),
+      'value' => $this->getValue(),
+    );
+  }
 
 }

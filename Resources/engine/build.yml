@@ -62,6 +62,7 @@ beats-can-form:
     - '@BeatsBundle/Resources/lib/js/jquery-plugins/blueimp/jQuery-File-Upload-9.9.3/js/jquery.fileupload-video.js'
 
   javascripts:
+    - 'can/form'
     - 'can/field'
     - 'can/field/file'
     - 'can/field/reditor'

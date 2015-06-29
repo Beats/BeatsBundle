@@ -42,6 +42,21 @@ class ValidationException extends Exception {
   }
 
   /**
+   * @return Message[]
+   */
+  public function getResponse() {
+    $response = array();
+    array_walk_recursive(
+      $this->getMessages()->all(),
+      function ($message) use (&$response) {
+        $response[] = $message;
+      }
+    );
+
+    return $response;
+  }
+
+  /**
    * @return Context
    */
   public function getContext() {
@@ -50,6 +65,7 @@ class ValidationException extends Exception {
 
   public function setStep($step) {
     $this->_step = $step;
+
     return $this;
   }
 
