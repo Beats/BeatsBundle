@@ -105,14 +105,15 @@
 {% macro _input(opts, value) %}
   {% import _self as self %}
   {% set opts = {
+  style: null,
   addon: null,
   }|merge(opts|default({})) %}
   {% if opts.addon is not empty %}
-    <div class="input-group {{ opts.addon.class|default('') }}">
+    <div class="input-group {{ opts.addon.class|default('') }}"  style="{{ opts.style }}">
       {% if opts.addon.l is defined %}
         {{ self._addon(opts.addon.l) }}
       {% endif %}
-      {{ self._input(opts|merge({addon: null}), value) }} {# TODO@ion: Verify this change #}
+      {{ self._input(opts|merge({addon: null, style: null}), value) }} {# TODO@ion: Verify this change #}
       {% if opts.addon.r is defined %}
         {{ self._addon(opts.addon.r) }}
       {% endif %}
@@ -291,6 +292,7 @@
   data: {},
   value: null,
   default: null,
+  style: null,
   placeholder: null,
   autocomplete: false,
   disabled: false,
