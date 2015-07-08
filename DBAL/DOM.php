@@ -64,13 +64,14 @@ class DOM extends AbstractDB {
    * Returns revision for a specific document
    * @param string $model
    * @param string $id
-   * @param mixed $_id
+   * @param mixed  $_id
    * @return mixed
    * @throws DBALException
    */
   public function revision($model, $id, &$_id = null) {
     try {
       $_id = self::domID($model, $id);
+
       return $this->_rug->db()->doc($_id)->rev();
     } catch (RugException $ex) {
       throw new DBALException("Document not found [$id]");
@@ -97,6 +98,7 @@ class DOM extends AbstractDB {
       unset($data[self::DOM_ATT]);
     }
     $data[$pk] = self::rdbID($model, $data[self::DOM_ID]);
+
     return parent::_setup($data, $model, $pk, $insert, $sequence);
   }
 
@@ -153,13 +155,14 @@ class DOM extends AbstractDB {
     if (!empty($order)) {
       throw new DBALException("DOM doesn't support ORDER BY clauses");
     }
+
     return $this->_table($model);
   }
 
   /**
    * @param string $model
-   * @param array $data
-   * @param bool $sequence
+   * @param array  $data
+   * @param bool   $sequence
    * @return mixed
    */
   public function insert($model, array $data, $sequence = false) {
@@ -169,13 +172,14 @@ class DOM extends AbstractDB {
     $pk = self::pk($model);
     $this->_setup($data, $model, $pk, true, $sequence);
     $_id = $this->_rug->db()->save($data)->id;
+
 //    $_id = $this->_db->put($data[self::DOM_ID], $data)->body->id;
     return self::rdbID($model, $_id);
   }
 
   /**
    * @param string $model
-   * @param array $data
+   * @param array  $data
    * @internal param mixed $id
    * @return mixed
    */
@@ -200,8 +204,8 @@ class DOM extends AbstractDB {
   }
 
   /**
-   * @param string $model
-   * @param mixed $id
+   * @param string     $model
+   * @param mixed      $id
    * @param null|mixed $rev
    * @return mixed
    */
@@ -227,12 +231,13 @@ class DOM extends AbstractDB {
    */
   public function truncate($model) {
     $documents = $this->_table($model);
+
     return $this->killAll($model, $documents);
   }
 
   /**
    * @param string $model
-   * @param array $data
+   * @param array  $data
    * @return mixed
    * @throws DBALException
    */
@@ -245,6 +250,7 @@ class DOM extends AbstractDB {
       } else {
         $rev = $this->revision($model, $id);
       }
+
       return $this->devour($model, $id, $rev);
     }
     throw new DBALException("DOM doesn't support multiple document delete without a view");
@@ -261,6 +267,7 @@ class DOM extends AbstractDB {
     $data[self::CREATED]    = UTC::toTimestamp();
 
     $this->_rug->db()->save($data);
+
 //    $this->_db->put($data[self::DOM_ID], $data);
     return $dstID;
   }
@@ -276,9 +283,10 @@ class DOM extends AbstractDB {
       $pk            = self::pk($model);
       $document->$pk = self::rdbID($model, $document->_id);
       /** @noinspection PhpUnusedLocalVariableInspection */
-      $id            = $this->kill($model, (array)$document);
+      $id = $this->kill($model, (array)$document);
       $killed++;
     }
+
     return $killed;
   }
 
@@ -350,6 +358,7 @@ class DOM extends AbstractDB {
     if (empty($name)) {
       $name = $file->getBasename();
     }
+
     return $this->_rug->db()->doc(self::domID($model, $id))->attach($name, $file, $rev);
 //    if (empty($rev)) {
 //      $rev = $this->revision($model, $id, $domID);
@@ -367,4 +376,17 @@ class DOM extends AbstractDB {
   }
 
   /********************************************************************************************************************/
+
+  public function killDependencies($key, $type, $name = 'dependencies') {
+    // Don't forget to emit(doc.id_xxx, doc.$model), where doc.id_xxx is the field that holds the $key param
+    $rows = $this->view($type, $name)->fetchKey($key)->all(true);
+    $affected = array();
+    foreach ($rows as $row) {
+      $affected[] = $this->devour($row->value, DOM::rdbID($row->value, $row->id));
+    }
+    return $affected;
+  }
+
+  /********************************************************************************************************************/
+
 }
