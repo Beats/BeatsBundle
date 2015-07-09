@@ -21,7 +21,9 @@
 
     <parameter key="beats.translation.exporter.class">BeatsBundle\Translation\Exporter</parameter>
 
-    <parameter key="beats.security.authentication.handler.class">BeatsBundle\Security\Http\Authentication\AuthenticationHandler</parameter>
+    <parameter key="beats.security.authentication.handler.class">
+      BeatsBundle\Security\Http\Authentication\AuthenticationHandler
+    </parameter>
 
     <parameter key="beats.listener.engine.class">BeatsBundle\EventListener\EngineListener</parameter>
 
@@ -149,6 +151,10 @@
       <argument type="service" id="beats.dbal.dom"/>
       <argument type="service" id="beats.dbal.rdb"/>
     </service>
+
+    <service id="beats.fsal" alias="beats.fsal.domfs"/>
+
+    <service id="beats.imager" alias="beats.fsal.imager"/>
 
   </services>
 </container>

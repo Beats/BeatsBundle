@@ -11,7 +11,7 @@ trait FSALAware {
    */
   final protected function _fsal() {
     /** @noinspection PhpUndefinedFieldInspection */
-    return $this->container->get('beats.fsal.domfs');
+    return $this->container->get('beats.fsal');
   }
 
   /**
@@ -19,7 +19,7 @@ trait FSALAware {
    */
   final protected function _imager() {
     /** @noinspection PhpUndefinedFieldInspection */
-    return $this->container->get('beats.fsal.imager');
+    return $this->container->get('beats.imager');
   }
 
 }
