@@ -1,6 +1,7 @@
 <?php
 namespace BeatsBundle\FSAL;
 
+use BeatsBundle\Exception\Exception;
 use BeatsBundle\Exception\FSALException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -72,9 +73,9 @@ abstract class AbstractFSAL extends ContainerAware {
    */
   abstract public function file($model, $id, $name, $path = null);
 
-  abstract public function link($model, $id, $name, $absolute = false);
+  abstract protected function _link($model, $id, $name, $absolute = false);
 
-  abstract public function exists($model, $id, $name);
+  abstract protected function _exists($model, $id, $name);
 
   public function temporary($extension = null, $prefix = null, $home = null) {
     $suffix = empty($extension) ? '' : '.' . $extension;
@@ -154,4 +155,55 @@ abstract class AbstractFSAL extends ContainerAware {
     return $response;
   }
 
+  public function link($model, $id, $name, $absolute = false) {
+    $cacheID = $this->_id(func_get_args());
+    try {
+      return $this->_cacheLoad($cacheID, __FUNCTION__);
+    } catch (CacheException $ex) {
+    }
+    $href = $this->_link($model, $id, $name, $absolute);
+
+    return $this->_cacheSave($cacheID, __FUNCTION__, $href);
+  }
+
+  public function exists($model, $id, $name) {
+    $cacheID = $this->_id(func_get_args());
+    try {
+      return $this->_cacheLoad($cacheID, __FUNCTION__);
+    } catch (CacheException $ex) {
+    }
+
+    $exists = $this->_exists($model, $id, $name);
+
+    return $this->_cacheSave($cacheID, __FUNCTION__, $exists);
+  }
+
+  /********************************************************************************************************************/
+
+  private $_cache = array();
+
+  private function _id(array $args) {
+    return implode('-', $args);
+  }
+
+  private function _cacheSave($id, $method, $value) {
+    if (!isset($this->_cache[$method])) {
+      $this->_cache[$method] = array();
+    }
+
+    return $this->_cache[$method][$id] = $value;
+  }
+
+  private function _cacheLoad($id, $method) {
+    if (isset($this->_cache[$method]) && isset($this->_cache[$method][$id])) {
+      return $this->_cache[$method][$id];
+    }
+    throw new CacheException();
+  }
+
+  /********************************************************************************************************************/
+
+}
+
+class CacheException extends Exception {
 }

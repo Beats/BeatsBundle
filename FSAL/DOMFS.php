@@ -2,7 +2,6 @@
 namespace BeatsBundle\FSAL;
 
 use BeatsBundle\DBAL\DOM;
-use BeatsBundle\Exception\Exception;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
@@ -131,18 +130,6 @@ class DOMFS extends AbstractFSAL {
     );
   }
 
-  public function link($model, $id, $name, $absolute = false) {
-    $cacheID = $this->_id(func_get_args());
-    try {
-      return $this->_cacheLoad($cacheID, __FUNCTION__);
-    } catch (CacheException $ex) {
-    }
-    $href = $this->_link($model, $id, $name, $absolute);
-
-    return $this->_cacheSave($cacheID, __FUNCTION__, $href);
-  }
-
-
   protected function _exists($model, $id, $name) {
     $doc = $this->_dom()->locate($model, $id);
 
@@ -164,42 +151,6 @@ class DOMFS extends AbstractFSAL {
     //    return $code == 200
   }
 
-  public function exists($model, $id, $name) {
-    $cacheID = $this->_id(func_get_args());
-    try {
-      return $this->_cacheLoad($cacheID, __FUNCTION__);
-    } catch (CacheException $ex) {
-    }
-
-    $exists = $this->_exists($model, $id, $name);
-
-    return $this->_cacheSave($cacheID, __FUNCTION__, $exists);
-  }
-
   /********************************************************************************************************************/
 
-  private $_cache = array();
-
-  private function _id(array $args) {
-    return implode('-', $args);
-  }
-
-  private function _cacheSave($id, $method, $value) {
-    if (!isset($this->_cache[$method])) {
-      $this->_cache[$method] = array();
-    }
-
-    return $this->_cache[$method][$id] = $value;
-  }
-
-  private function _cacheLoad($id, $method) {
-    if (isset($this->_cache[$method]) && isset($this->_cache[$method][$id])) {
-      return $this->_cache[$method][$id];
-    }
-    throw new CacheException();
-  }
-
-}
-
-class CacheException extends Exception {
 }
