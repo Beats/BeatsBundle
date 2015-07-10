@@ -589,7 +589,7 @@ class AbstractEntity implements \IteratorAggregate {
 
   /**
    * @param string|null $name
-   * @return \stdClass
+   * @return null|\stdClass
    */
   public function getAttachment($name = null) {
     if (empty($this->_attachments)) {
@@ -618,6 +618,29 @@ class AbstractEntity implements \IteratorAggregate {
     }
 
     return !empty($this->_attachments->$name);
+  }
+
+  /**
+   * @param string|null $name
+   * @return null|\stdClass
+   */
+  public function remAttachment($name = null) {
+    if (empty($this->_attachments)) {
+      return null;
+    }
+    if (empty($name)) {
+      $attachments = $this->_attachments;
+      unset($this->_attachments);
+
+      return $attachments;
+    }
+    if (empty($this->_attachments->$name)) {
+      return null;
+    }
+    $attachment = $this->_attachments->$name;
+    unset($this->_attachments->$name);
+
+    return $attachment;
   }
 
   /**
