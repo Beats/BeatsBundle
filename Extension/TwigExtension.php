@@ -133,7 +133,10 @@ class TwigExtension extends ContainerAwareTwigExtension {
   }
 
   public function fsalURL($model, $id, $name, $default = null, $absolute = false) {
-    if (empty($default) || $this->_fsal()->exists($model, $id, $name)) {
+    if (empty($id)) {
+      return $default;
+    }
+    if (empty($default)  || $this->_fsal()->exists($model, $id, $name)) {
       return $this->_fsal()->link($model, $id, $name, $absolute);
     }
 
