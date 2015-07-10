@@ -35,6 +35,7 @@ class DOMFS extends AbstractFSAL {
     } elseif (!is_writable($directory)) {
       throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
     }
+
     return $directory;
   }
 
@@ -43,6 +44,7 @@ class DOMFS extends AbstractFSAL {
     if ($response->ok && $erase) {
       $this->erase($file);
     }
+
     return $response->ok;
   }
 
@@ -74,6 +76,7 @@ class DOMFS extends AbstractFSAL {
       unset($doc->_attachments->$name);
       $this->_dom()->update($model, (array)$doc);
     }
+
     return true;
   }
 
@@ -88,6 +91,7 @@ class DOMFS extends AbstractFSAL {
       }
     }
     $this->_dom()->update($model, (array)$doc);
+
     return true;
   }
 
@@ -114,7 +118,17 @@ class DOMFS extends AbstractFSAL {
     copy($src, $path);
 
     $file = new File($path);
+
     return $file;
+  }
+
+  protected function _link($model, $id, $name, $absolute = false) {
+    return $this->_router()->generate(
+      'beats.fsal.link', array(
+      'id'   => DOM::domID($model, $id),
+      'name' => $name,
+    ), $absolute
+    );
   }
 
   public function link($model, $id, $name, $absolute = false) {
@@ -123,11 +137,31 @@ class DOMFS extends AbstractFSAL {
       return $this->_cacheLoad($cacheID, __FUNCTION__);
     } catch (CacheException $ex) {
     }
-    $href = $this->_router()->generate('beats.fsal.link', array(
-      'id'   => DOM::domID($model, $id),
-      'name' => $name,
-    ), $absolute);
+    $href = $this->_link($model, $id, $name, $absolute);
+
     return $this->_cacheSave($cacheID, __FUNCTION__, $href);
+  }
+
+
+  protected function _exists($model, $id, $name) {
+    $doc = $this->_dom()->locate($model, $id);
+
+    return !empty($doc) && isset($doc->_attachments->$name);
+    //    $href = $this->link($model, $id, $name, true);
+    ////    $code    = false;
+    ////    $context = stream_context_create(array(
+    ////      'http' => array(
+    ////        'method'          => "HEAD",
+    ////        'follow_location' => 0
+    ////      )
+    ////    ));
+    ////    if (file_get_contents($href, null, $context) && !empty($http_response_header)) {
+    ////      sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $code);
+    ////    }
+    //    list($status) = get_headers($href);
+    //    /** @noinspection PhpUnusedLocalVariableInspection */
+    //    list($protocol, $code, $message) = explode(' ', $status);
+    //    return $code == 200
   }
 
   public function exists($model, $id, $name) {
@@ -137,25 +171,9 @@ class DOMFS extends AbstractFSAL {
     } catch (CacheException $ex) {
     }
 
-    $doc = $this->_dom()->locate($model, $id);
-    $exists = !empty($doc) && isset($doc->_attachments->$name);
-    return $this->_cacheSave($cacheID, __FUNCTION__, $exists);
+    $exists = $this->_exists($model, $id, $name);
 
-//    $href = $this->link($model, $id, $name, true);
-////    $code    = false;
-////    $context = stream_context_create(array(
-////      'http' => array(
-////        'method'          => "HEAD",
-////        'follow_location' => 0
-////      )
-////    ));
-////    if (file_get_contents($href, null, $context) && !empty($http_response_header)) {
-////      sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $code);
-////    }
-//    list($status) = get_headers($href);
-//    /** @noinspection PhpUnusedLocalVariableInspection */
-//    list($protocol, $code, $message) = explode(' ', $status);
-//    return $this->_cacheSave($cacheID, __FUNCTION__, $code == 200);
+    return $this->_cacheSave($cacheID, __FUNCTION__, $exists);
   }
 
   /********************************************************************************************************************/
@@ -170,6 +188,7 @@ class DOMFS extends AbstractFSAL {
     if (!isset($this->_cache[$method])) {
       $this->_cache[$method] = array();
     }
+
     return $this->_cache[$method][$id] = $value;
   }
 
