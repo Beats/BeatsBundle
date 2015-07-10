@@ -3,6 +3,7 @@ namespace BeatsBundle\Entity;
 
 use BeatsBundle\DBAL\AbstractDB;
 use BeatsBundle\DBAL\AbstractDBAL;
+use BeatsBundle\DBAL\DOM;
 use BeatsBundle\Exception\Exception;
 
 /**
@@ -286,12 +287,12 @@ class AbstractEntity implements \IteratorAggregate {
    * @param bool  $map
    * @return AbstractEntity
    */
-  private function _rehydrate(array $entity, $map = true) {
+  protected function _rehydrate(array $entity, $map = true) {
     foreach ($entity as $field => $value) {
       $classParent = static::_parent($field);
       $classOthers = static::_others($field);
       $classChilds = static::_childs($field);
-      if ($field[0] == '$') {
+      if ($field == DOM::RDB_MODEL) {
         continue;
       } elseif ($classParent && $value != null) {
         $this->$field = static::_rehydrateEntity($value, $classParent);
@@ -319,12 +320,14 @@ class AbstractEntity implements \IteratorAggregate {
    * @param $deep
    * @return array
    */
-  private function _dehydrate($deep) {
+  protected function _dehydrate($deep) {
     if ($deep) {
       $entity = get_object_vars($this);
-      foreach ($entity as &$value) {
+      foreach ($entity as $field => &$value) {
         if ($value instanceof self) {
           $value = $value->_dehydrate($deep);
+        } elseif ($field[0] === '$') {
+          continue;
         } elseif (is_object($value)) {
           $value = (array)$value;
         } elseif (is_array($value)) {
@@ -817,7 +820,6 @@ class AbstractEntity implements \IteratorAggregate {
   }
 
   /********************************************************************************************************************/
-
 
   /**
    * @param AbstractEntity $entity
