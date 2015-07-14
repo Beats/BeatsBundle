@@ -24,6 +24,7 @@ abstract class AbstractFSAL extends ContainerAware {
     } elseif (!is_writable($directory)) {
       throw new FSALException(sprintf('Unable to write in the "%s" directory', $directory));
     }
+
     return $directory;
   }
 
@@ -65,10 +66,10 @@ abstract class AbstractFSAL extends ContainerAware {
   abstract public function detachAll($model, $id, $prefix);
 
   /**
-   * @param string $model Model name
-   * @param string $id Model document id
-   * @param string $name Attachment name
-   * @param string|null $path The directory where to place the loaded attachment
+   * @param string      $model Model name
+   * @param string      $id    Model document id
+   * @param string      $name  Attachment name
+   * @param string|null $path  The directory where to place the loaded attachment
    * @return File|bool
    */
   abstract public function file($model, $id, $name, $path = null);
@@ -84,11 +85,12 @@ abstract class AbstractFSAL extends ContainerAware {
     $temp = tempnam(implode(DIRECTORY_SEPARATOR, $home), $prefix);
     $file = $temp . $suffix;
     rename($temp, $file);
+
     return $file;
   }
 
   /**
-   * @param $url
+   * @param      $url
    * @param null $extension
    * @param null $prefix
    * @param null $home
@@ -97,6 +99,7 @@ abstract class AbstractFSAL extends ContainerAware {
   public function download($url, $extension = null, $prefix = null, $home = null) {
     $tmp = $this->temporary($extension, $prefix, $home);
     file_put_contents($tmp, fopen($url, 'r'));
+
     return new File($tmp);
   }
 
@@ -120,6 +123,7 @@ abstract class AbstractFSAL extends ContainerAware {
   public function store(UploadedFile $upload, $name = null, $home = null) {
     $home = empty($home) ? sys_get_temp_dir() : self::ensureDir($home);
     $name = empty($name) ? basename(tempnam($home, 'beats_upload_')) : $name;
+
     return $upload->move($home, $name)->getRealPath();
   }
 
@@ -140,17 +144,19 @@ abstract class AbstractFSAL extends ContainerAware {
       return false;
     }
 
-    $response = new StreamedResponse(function () use ($file) {
-      $f = fopen($file->getRealPath(), 'r');
-      $o = fopen('php://output', 'wb');
-      stream_copy_to_stream($f, $o);
-      fclose($f);
-      fclose($o);
-    });
+    $response = new StreamedResponse(
+      function () use ($file) {
+        $f = fopen($file->getRealPath(), 'r');
+        $o = fopen('php://output', 'wb');
+        stream_copy_to_stream($f, $o);
+        fclose($f);
+        fclose($o);
+      }
+    );
     $response->headers->set('Content-Length', $file->getSize());
     $response->headers->set('Accept-Ranges', 'bytes');
     $response->headers->set('Content-Transfer-Encoding', 'binary');
-    $response->headers->set('Content-Type', $file->getMimeType() ? : 'application/octet-stream');
+    $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/octet-stream');
 
     return $response;
   }
@@ -199,6 +205,12 @@ abstract class AbstractFSAL extends ContainerAware {
       return $this->_cache[$method][$id];
     }
     throw new CacheException();
+  }
+
+  /********************************************************************************************************************/
+
+  public function transcode($model, $id, File $file, $prefix, $options) {
+    throw new FSALException('Not implemented');
   }
 
   /********************************************************************************************************************/
