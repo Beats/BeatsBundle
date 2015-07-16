@@ -9,10 +9,14 @@ class Image {
   protected $_resource;
 
   static protected $_orientationToDeg = array(
-    0, 0,
-    180, 0,
-    90, 90,
-    -90, -90,
+    1 => 0,
+    2 => 0,
+    3 => 180,
+    4 => 180,
+    5 => -90,
+    6 => -90,
+    7 => 90,
+    8 => 90,
   );
 
 
@@ -43,6 +47,7 @@ class Image {
     if (!is_resource($this->_resource)) {
       $this->_resource = self::openImage($this->getPath(), $this->_type);
     }
+
     return $this->_resource;
   }
 
@@ -74,6 +79,7 @@ class Image {
     if (array_key_exists($param, $exif)) {
       return $exif[$param];
     }
+
     return null;
   }
 
@@ -91,18 +97,23 @@ class Image {
    * 6 = Rotate 90 CW
    * 7 = Mirror horizontal and rotate 90 CW
    * 8 = Rotate 270 CW
-   * @param null $rotation
+   * @param null $orientation
    * @return array|bool|null
    */
-  public function getRotation($rotation = null) {
-    $rotation = $rotation === 'true' ? true : ($rotation === 'false' ? false : $rotation);
-    $rotation = $rotation == 0 ? null : $rotation;
-    if (!empty($rotation)) {
-      if (is_bool($rotation) && $rotation) {
-        return self::$_orientationToDeg[$this->getExif('Orientation')];
+  public function getRotation($orientation = null) {
+    $orientation = $orientation === 'true' ? true : ($orientation === 'false' ? false : $orientation);
+    $orientation = $orientation == 0 ? null : $orientation;
+    if (!empty($orientation)) {
+      if (is_bool($orientation) && $orientation) {
+        $orientation = $this->getExif('Orientation');
       }
-      return $rotation;
+      if (empty($orientation)) {
+        return 0;
+      }
+
+      return self::$_orientationToDeg[$orientation];
     }
+
     return null;
   }
 
@@ -164,6 +175,7 @@ class Image {
         return imagejpeg($resource, $path, $quality);
       case IMAGETYPE_PNG:
         imagesavealpha($resource, true);
+
         return imagepng($resource, $path, ($quality / 100) % 10);
       default:
         throw new \BeatsBundle\Exception\Exception("Unsupported image type");

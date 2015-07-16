@@ -36,6 +36,11 @@
       var self = this;
       self._super.apply(self, arguments);
 
+      if (!self.options.rotateField) {
+        self.options.rotateField = '#' + self.element.attr('id').replace('file', 'rotate')
+          .replace(/\[/g, '\\[').replace(/\]/g, '\\]')
+      }
+
       var $control = self.$control()
         , $button = self.$button()
         , $progress = self.$progress()
@@ -91,6 +96,7 @@
               $clear.show();
               switch (true) {
                 case FUP.options.loadImageFileTypes.test(file.type):
+                  self._loadRotate(file, $(self.options.rotateField));
                   data.preview = self._loadPreview(file, 'img', 'image');
                   break;
                 case FUP.options.loadAudioFileTypes.test(file.type):
@@ -208,6 +214,16 @@
             $alert.html(file.error).show();
             __.updateProgress(0);
             __.toggleProgress(false);
+          }
+        })
+      }
+    },
+
+    _loadRotate: function (file, $input) {
+      if ($input && $input.length) {
+        loadImage.parseMetaData(file, function (data) {
+          if (data.imageHead && data.exif) {
+            $input.val(data.exif.get('Orientation'));
           }
         })
       }
