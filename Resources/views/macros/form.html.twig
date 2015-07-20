@@ -1,7 +1,15 @@
 {% macro classes(name) %}
   {% set _field = app._field(name) %}
   {% if _field is not empty %}
-    {% if _field.isError %}has-error{% else %}has-success{% endif %}
+    {% if _field is iterable %}
+      {% set class='has-success' %}
+      {% for _f in _field %}
+        {% if _f.isError %}{% set class='has-error' %}{% endif %}
+      {% endfor %}
+      {{ class }}
+    {% else %}
+      {% if _field.isError %}has-error{% else %}has-success{% endif %}
+    {% endif %}
   {% endif %}
   {#{% if _field is not empty and _field.isError %}has-error{% endif %}#}
 {% endmacro %}
@@ -9,10 +17,22 @@
 {% macro messages(name, hClass) %}
   {% set _field = app._field(name) %}
   {% set hClass = hclass|default('help-block') %}
-  {% if _field is not empty and _field.isError %}
-    {% for text in _field.getText %}
-      <span class="{{ hClass }}">{{ text }}</span>
-    {% endfor %}
+  {% if _field is not empty %}
+    {% if _field is iterable %}
+      {% for _f in _field %}
+        {% if _f.isError %}
+          {% for text in _f.getText %}
+            <span class="{{ hClass }}">{{ text }}</span>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% if _field.isError %}
+        {% for text in _field.getText %}
+          <span class="{{ hClass }}">{{ text }}</span>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
   {% else %}
     <span class="{{ hClass }}"></span>
   {% endif %}
@@ -109,7 +129,7 @@
   addon: null,
   }|merge(opts|default({})) %}
   {% if opts.addon is not empty %}
-    <div class="input-group {{ opts.addon.class|default('') }}"  style="{{ opts.style }}">
+    <div class="input-group {{ opts.addon.class|default('') }}" style="{{ opts.style }}">
       {% if opts.addon.l is defined %}
         {{ self._addon(opts.addon.l) }}
       {% endif %}
