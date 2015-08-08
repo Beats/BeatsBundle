@@ -9,6 +9,7 @@ use BeatsBundle\Service\Aware\ValidatorAware;
 use BeatsBundle\Service\Service;
 use BeatsBundle\Session\Message;
 use BeatsBundle\Session\Page;
+use BeatsBundle\Validation\ValidationException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -265,6 +266,23 @@ class AbstractController extends Controller {
     return new NotFoundHttpException($message, $previous);
   }
 
+  /********************************************************************************************************************/
+
+  protected function _api(\Closure $callback) {
+    try {
+      $args    = func_get_args();
+      $args[0] = $this->_request();
+      $data    = call_user_func_array($callback, $args);
+
+      return $this->renderAJAX(true, null, $data);
+    } catch (ValidationException $ex) {
+      return $this->renderAJAX(false, $ex->getMessage(), $ex->getResponse());
+    } catch (ModelException $ex) {
+      return $this->renderAJAX(false, $ex->getMessage());
+    } catch (\Exception $ex) {
+      return $this->renderAJAX($ex);
+    }
+  }
 
   /********************************************************************************************************************/
 
