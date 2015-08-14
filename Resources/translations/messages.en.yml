@@ -45,4 +45,7 @@ beats.validation.constraint.username.success: 'The value is a valid username'
 beats.exception.access_denied.anonymous.ok: "You must sign in to access this feature"
 beats.exception.access_denied.anonymous.no: "You are not allowed to access this feature"
 
+beats.exception.access_denied: "Access Denied"
 beats.exception.not_found: "Not found"
+beats.exception.bad_request: "Bad Request"
+beats.exception.server_error: "Server Error"

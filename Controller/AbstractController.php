@@ -13,6 +13,8 @@ use BeatsBundle\Validation\ValidationException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -27,6 +29,7 @@ class AbstractController extends Controller {
    * Returns the default template by type for the current action
    *
    * @param string $type
+   *
    * @return string
    */
   protected function _template($type = 'html') {
@@ -34,11 +37,13 @@ class AbstractController extends Controller {
     $request->setRequestFormat($type);
     if (preg_match(self::REGEX_TEMPLATE, $request->attributes->get('_controller'), $part)) {
       return implode(
-        ':', array(
+        ':',
+        array(
           str_replace('\\', '', $part['bundle']),
           $part['class'],
           implode(
-            '.', array(
+            '.',
+            array(
               $part['action'],
               strtolower($part['type']),
               'twig',
@@ -50,10 +55,10 @@ class AbstractController extends Controller {
 
     return preg_replace(
       array(
-        '#\\\\Controller\\\\#', '#\\\\#', '#Controller::#', '#Action$#'
+        '#\\\\Controller\\\\#', '#\\\\#', '#Controller::#', '#Action$#',
       ),
       array(
-        ':', '', ':', '.' . $type . '.twig'
+        ':', '', ':', '.' . $type . '.twig',
       ),
       $request->attributes->get('_controller')
     );
@@ -74,6 +79,7 @@ class AbstractController extends Controller {
    * @param array    $parameters
    * @param string   $type
    * @param Response $response
+   *
    * @return \Symfony\Component\HttpFoundation\Response
    */
   public function renderAction(array $parameters = array(), $type = 'html', Response $response = null) {
@@ -116,7 +122,8 @@ class AbstractController extends Controller {
 
   public function render($view, array $parameters = array(), Response $response = null) {
     $parameters = array_merge(
-      $parameters, array(
+      $parameters,
+      array(
         '_fields' => $this->_validator()->getMessages(),
       )
     );
@@ -131,6 +138,7 @@ class AbstractController extends Controller {
    * @param array $parameter
    * @param bool  $absolute
    * @param int   $status
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    */
   public function redirectTo($route, array $parameter = array(), $absolute = false, $status = 302) {
@@ -143,9 +151,12 @@ class AbstractController extends Controller {
    * @param array           $routeArgs
    * @param bool            $absolute
    * @param int             $status
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    */
-  public function redirectFlashTo(Message $message, $routeName = null, array $routeArgs = array(), $absolute = true, $status = 302) {
+  public function redirectFlashTo(
+    Message $message, $routeName = null, array $routeArgs = array(), $absolute = true, $status = 302
+  ) {
     $this->_flasher()->add($message);
     if (empty($routeName) || $message instanceof Page) {
       return $this->redirectTo('beats.basic.html.flash', $routeArgs, $absolute, $status);
@@ -161,6 +172,7 @@ class AbstractController extends Controller {
    * @param null|string $url
    * @param array       $parameters
    * @param int         $status
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    */
   public function redirectFlash(Message $message, $url = null, array $parameters = array(), $status = 302) {
@@ -233,6 +245,7 @@ class AbstractController extends Controller {
    * @param string|bool $message The exception message
    * @param \Exception  $previous
    * @param bool        $logout  Whether to forcibly logout the user
+   *
    * @return AccessDeniedHttpException
    */
   protected function _createAccessDeniedException($message = false, \Exception $previous = null, $logout = false) {
@@ -256,6 +269,7 @@ class AbstractController extends Controller {
    *
    * @param string|null $message
    * @param \Exception  $previous
+   *
    * @return NotFoundHttpException
    */
   protected function _createNotFoundException($message = null, \Exception $previous = null) {
@@ -264,6 +278,38 @@ class AbstractController extends Controller {
     }
 
     return new NotFoundHttpException($message, $previous);
+  }
+
+  /**
+   * Returns a BadRequest Exception with the given message
+   *
+   * @param string|null     $message
+   * @param \Exception|null $previous
+   *
+   * @return BadRequestHttpException
+   */
+  protected function _createBadRequestException($message = null, \Exception $previous = null) {
+    if (empty($message)) {
+      $message = $this->_trans('beats.exception.bad_request');
+    }
+
+    return new BadRequestHttpException($message, $previous);
+  }
+
+  /**
+   * Returns a ServerError Exception with the given message
+   *
+   * @param string|null     $message
+   * @param \Exception|null $previous
+   *
+   * @return HttpException
+   */
+  protected function _createServerErrorException($message = null, \Exception $previous = null) {
+    if (empty($message)) {
+      $message = $this->_trans('beats.exception.server_error');
+    }
+
+    return new HttpException(500, $message, $previous);
   }
 
   /********************************************************************************************************************/

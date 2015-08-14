@@ -14,6 +14,8 @@ use BeatsBundle\Service\Aware\ValidatorAware;
 use BeatsBundle\Service\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -120,6 +122,39 @@ abstract class AbstractModel extends ContainerAware {
     }
 
     return new NotFoundHttpException($message, $previous);
+  }
+
+
+  /**
+   * Returns a BadRequest Exception with the given message
+   *
+   * @param string|null     $message
+   * @param \Exception|null $previous
+   *
+   * @return BadRequestHttpException
+   */
+  protected function _createBadRequestException($message = null, \Exception $previous = null) {
+    if (empty($message)) {
+      $message = $this->_trans('beats.exception.bad_request');
+    }
+
+    return new BadRequestHttpException($message, $previous);
+  }
+
+  /**
+   * Returns a ServerError Exception with the given message
+   *
+   * @param string|null     $message
+   * @param \Exception|null $previous
+   *
+   * @return HttpException
+   */
+  protected function _createServerErrorException($message = null, \Exception $previous = null) {
+    if (empty($message)) {
+      $message = $this->_trans('beats.exception.server_error');
+    }
+
+    return new HttpException(500, $message, $previous);
   }
 
   /*********************************************************************************************************************/
