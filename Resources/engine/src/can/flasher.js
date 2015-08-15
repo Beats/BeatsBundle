@@ -147,7 +147,7 @@
 
       $.each(messages, function (idx, data) {
         if (!Beats.empty(data.type)) {
-          __.message(data.message, data.heading, data.type)
+          __.attach(data.message, data.heading, data.type)
         }
       })
     },
