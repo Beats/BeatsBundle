@@ -237,7 +237,6 @@ class AbstractController extends Controller {
 
   /********************************************************************************************************************/
 
-
   /**
    * Returns an AccessDenied Exception with the given message
    * If the message is a boolean it will render the default message for Anonymous users (TRUE) or Forbidden (FALSE)
@@ -314,19 +313,30 @@ class AbstractController extends Controller {
 
   /********************************************************************************************************************/
 
+  public function renderAPI($status, $message = null, $data = null, Response $response = null) {
+    $success = (200 <= $status && $status < 300);
+    if (empty($success) && empty($response)) {
+      $response = new Response('', $status);
+    }
+
+    return $this->renderJSON(self::ajaxMessage($success, $message, $data), $response);
+  }
+
   protected function _api(\Closure $callback) {
     try {
       $args    = func_get_args();
       $args[0] = $this->_request();
       $data    = call_user_func_array($callback, $args);
 
-      return $this->renderAJAX(true, null, $data);
+      return $this->renderAPI(200, null, $data);
     } catch (ValidationException $ex) {
-      return $this->renderAJAX(false, $ex->getMessage(), $ex->getResponse());
+      return $this->renderAPI(400, $ex->getMessage(), $ex->getResponse());
     } catch (ModelException $ex) {
-      return $this->renderAJAX(false, $ex->getMessage());
+      return $this->renderAPI(400, $ex->getMessage());
+    } catch (HttpException $ex) {
+      return $this->renderAPI($ex->getStatusCode(), $ex->getMessage());
     } catch (\Exception $ex) {
-      return $this->renderAJAX($ex);
+      return $this->renderAPI(500, $ex);
     }
   }
 
