@@ -67,7 +67,7 @@
       if (!$form.is('form')) {
         throw Beats.Error(this, 'The given element is not a valid form')
       }
-      options = $.isPlainObject(options) || {
+      options = $.isPlainObject(options)? options: {
         url: options,
         type: 'POST'
       };
