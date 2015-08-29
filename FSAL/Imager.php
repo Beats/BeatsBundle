@@ -49,11 +49,13 @@ class Imager extends ContainerAware {
 
   public function getImage($path) {
     $info = $this->getImageInfo($path);
+
     return $this->_toResource($path, $info->type);
   }
 
   public function getImageInfo($path) {
     $info = getimagesize($this->_toPath($path));
+
     return (object)array(
       'width'    => $info[0],
       'height'   => $info[1],
@@ -75,6 +77,7 @@ class Imager extends ContainerAware {
       $transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
       imagefilledrectangle($dst, 0, 0, $w, $h, $transparent);
     }
+
     return $dst;
   }
 
@@ -91,11 +94,22 @@ class Imager extends ContainerAware {
     return $dst;
   }
 
+  public function mirror($src, $mode) {
+    // TODO@ion: Add dependency: php5.5
+    if (!empty($mode) && function_exists('imageflip')) {
+      if (imageflip($src, $mode)) {
+        return $src;
+      };
+    }
+    return $src;
+  }
+
   public function rotate($src, $deg) {
     if ($deg == 0) {
       return $src;
     }
     $dst = imagerotate($src, $deg, 0);
+
     return $dst;
   }
 
@@ -176,43 +190,59 @@ class Imager extends ContainerAware {
       $dstW = (int)($srcW * $scale);
       $dstH = (int)($srcH * $scale);
     }
+
     return array($dstW, $dstH);
   }
 
   public function resizeCrop($src, $srcTLX, $srcTLY, $srcBRX, $srcBRY, $dstW, $dstH, $keepAR = self::KEEP_AR_NONE) {
     $tmp = $this->crop($src, $srcTLX, $srcTLY, $srcBRX, $srcBRY);
+
     return $this->resize($tmp, $srcBRX - $srcTLX, $srcBRY - $srcTLY, $dstW, $dstH, $keepAR);
   }
 
   public function maxResolution(array $dimensions) {
-    return array_reduce($dimensions, function (&$result, $item) {
+    return array_reduce(
+      $dimensions, function (&$result, $item) {
       if (empty($result)) {
         return $item;
       }
+
       return array_product($item) > array_product($result) ? $item : $result;
-    });
+    }
+    );
   }
 
   protected function _cleanup(array $parameters) {
-    return array_map(function ($item) {
-      return $item | 0;
-    }, $parameters);
+    return array_map(
+      function ($item) {
+        return $item | 0;
+      }, $parameters
+    );
   }
 
   /**
-   * @param $src
+   * @param       $src
    * @param array $dstDimensions
-   * @param int $keepAR
+   * @param int   $keepAR
    * @param array $crop
-   * @param float $rotateDeg
+   * @param float $rotate
+   *
    * @return array
    * @throws Exception
    */
-  public function extract($src, array $dstDimensions, $keepAR = self::KEEP_AR_NONE, array $crop = null, $rotateDeg = null) {
-    if (empty($rotateDeg)) {
-      $rotated = $src;
+  public function extract(
+    $src, array $dstDimensions, $keepAR = self::KEEP_AR_NONE,
+    array $crop = null, $rotate = null, $mirror = null
+  ) {
+    if (empty($mirror)) {
+      $mirrored = $src;
     } else {
-      $rotated = $this->rotate($src, $rotateDeg);
+      $mirrored = $this->mirror($src, $mirror);
+    }
+    if (empty($rotate)) {
+      $rotated = $mirrored;
+    } else {
+      $rotated = $this->rotate($mirrored, $rotate);
     }
 
     list($srcW, $srcH) = $this->dimensions($rotated);
@@ -226,7 +256,7 @@ class Imager extends ContainerAware {
       $temp = $this->resizeCrop($rotated, $srcTLX, $srcTLY, $srcBRX, $srcBRY, $dstW, $dstH, $keepAR);
     }
 
-    if (!empty($rotateDeg)) {
+    if (!empty($rotate)) {
       imagedestroy($rotated);
     }
 
@@ -254,6 +284,7 @@ class Imager extends ContainerAware {
     if (!Image::saveImage($image, IMAGETYPE_JPEG, $path)) {
       throw new Exception("Failed to save image to [$path]");
     }
+
     return new File($path);
   }
 

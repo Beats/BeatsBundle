@@ -1,6 +1,7 @@
 <?php
 namespace BeatsBundle\FSAL;
 
+use BeatsBundle\Exception\Exception;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 class Image {
@@ -8,17 +9,26 @@ class Image {
   protected $_path;
   protected $_resource;
 
-  static protected $_orientationToDeg = array(
+  static protected $_orientationToDeg  = array(
     1 => 0,
     2 => 0,
     3 => 180,
-    4 => 180,
+    4 => 0,
     5 => -90,
     6 => -90,
     7 => 90,
     8 => 90,
   );
-
+  static protected $_orientationToMode = array(
+    1 => 0,
+    2 => IMG_FLIP_HORIZONTAL,
+    3 => 0,
+    4 => IMG_FLIP_VERTICAL,
+    5 => IMG_FLIP_HORIZONTAL,
+    6 => 0,
+    7 => IMG_FLIP_HORIZONTAL,
+    8 => 0,
+  );
 
   public function __construct($path) {
     $this->_path = $path instanceof \SplFileInfo ? $path->getRealPath() : $path;
@@ -69,6 +79,7 @@ class Image {
 
   /**
    * @param null $param
+   *
    * @return array|null
    */
   public function getExif($param = null) {
@@ -81,6 +92,14 @@ class Image {
     }
 
     return null;
+  }
+
+  /**
+   *
+   * @return integer|null
+   */
+  public function getOrientation() {
+    return $this->getExif('Orientation');
   }
 
   /**
@@ -97,24 +116,36 @@ class Image {
    * 6 = Rotate 90 CW
    * 7 = Mirror horizontal and rotate 90 CW
    * 8 = Rotate 270 CW
+   *
    * @param null $orientation
+   *
    * @return array|bool|null
+   * @throws Exception
    */
   public function getRotation($orientation = null) {
-    $orientation = $orientation === 'true' ? true : ($orientation === 'false' ? false : $orientation);
-    $orientation = $orientation == 0 ? null : $orientation;
-    if (!empty($orientation)) {
-      if (is_bool($orientation) && $orientation) {
-        $orientation = $this->getExif('Orientation');
-      }
-      if (empty($orientation)) {
-        return 0;
-      }
-
+    if (is_null($orientation)) {
+      $orientation = $this->getOrientation();
+    }
+    if (is_null($orientation)) {
+      return null;
+    }
+    if (array_key_exists($orientation, self::$_orientationToDeg)) {
       return self::$_orientationToDeg[$orientation];
     }
+    throw new Exception("Unsuported EXIF orientation: $orientation");
+  }
 
-    return null;
+  public function getMirror($orientation = null) {
+    if (is_null($orientation)) {
+      $orientation = $this->getOrientation();
+    }
+    if (is_null($orientation)) {
+      return null;
+    }
+    if (array_key_exists($orientation, self::$_orientationToMode)) {
+      return self::$_orientationToMode[$orientation];
+    }
+    throw new Exception("Unsuported EXIF orientation: $orientation");
   }
 
   public function getAspectRatio() {
