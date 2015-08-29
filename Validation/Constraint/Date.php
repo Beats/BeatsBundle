@@ -10,13 +10,22 @@ class Date extends Constraint {
   protected $_format;
   protected $_zone;
 
-  public function __construct($format = null, $zone = null, $failure = 'The value is not a valid date', $success = 'The value is valid') {
+  public function __construct(
+    $format = null, $zone = null, $failure = 'The value is not a valid date', $success = 'The value is valid'
+  ) {
     parent::__construct($failure, $success);
     $this->_format = $format;
+    $this->_zone   = $zone;
   }
 
   protected function _dpiSetup() {
-    $this->_zone = empty($zone) ? $this->_chronos()->getTimezone() : UTC::createTimeZone($zone);
+    if ($this->_zone === false) {
+      $this->_zone = UTC::createTimeZone();
+    } elseif (empty($this->_zone)) {
+      $this->_zone = $this->_chronos()->getTimezone();
+    } else {
+      $this->_zone = UTC::createTimeZone($this->_zone);
+    }
   }
 
   public function validate($value, Context $context) {
