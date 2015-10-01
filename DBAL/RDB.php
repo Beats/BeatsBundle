@@ -64,8 +64,10 @@ class RDB extends AbstractDB {
 
   /**
    * Returns type of PDO parameter for binding
+   *
    * @param $field
    * @param $value
+   *
    * @return int
    */
   static public function pdoParam($field, $value) {
@@ -103,6 +105,7 @@ class RDB extends AbstractDB {
    * @param      $data
    * @param      $model
    * @param bool $avoidPK
+   *
    * @throws DBALException
    * @return array
    */
@@ -218,6 +221,7 @@ class RDB extends AbstractDB {
    * @param int   $limit
    * @param int   $offset
    * @param bool  $equal
+   *
    * @return int
    */
   public function buildSelect($model, array $where, array $order, $limit, $offset, $equal = true) {
@@ -225,7 +229,7 @@ class RDB extends AbstractDB {
     $sets = $this->sqlSets($where, $equal);
     $list = $this->sqlLIST($order);
 
-    $query = sprintf("SELECT * FROM %s %s", self::table($model), $this->limit($limit, $offset));
+    $query = sprintf("SELECT * FROM %s", self::table($model));
 
     if (count($where)) {
       $query = sprintf("%s WHERE (%s)", $query, implode(') AND (', $sets));
@@ -234,6 +238,8 @@ class RDB extends AbstractDB {
     if (count($order)) {
       $query = sprintf("%s ORDER BY %s ", $query, implode(', ', $list));
     }
+
+    $query = sprintf("%s %s", $query, $this->limit($limit, $offset));
 
     return $query;
   }
@@ -252,6 +258,7 @@ class RDB extends AbstractDB {
   /**
    * Returns the last PDO::execute result.
    * Can be used for getting the row number returned and such
+   *
    * @return mixed
    */
   public function lastExecute() {
@@ -274,6 +281,7 @@ class RDB extends AbstractDB {
 
   /**
    * Returns the current version of the DB layer
+   *
    * @return string
    */
   public function version() {
@@ -322,6 +330,7 @@ class RDB extends AbstractDB {
   /**
    * @param string $model
    * @param mixed  $id
+   *
    * @return object|mixed
    */
   public function locate($model, $id) {
@@ -339,6 +348,7 @@ class RDB extends AbstractDB {
    * @param array  $childs
    * @param array  $joints
    * @param string $id
+   *
    * @return mixed|object
    */
   public function locateDeep($model, array $parent, array $childs, array $joints, $id) {
@@ -368,7 +378,8 @@ class RDB extends AbstractDB {
   }
 
 
-  public function select($model, array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true) {
+  public function select($model, array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true
+  ) {
     $query     = $this->buildSelect($model, $where, $order, $limit, $offset, $equal);
     $statement = $this->_db->prepare($query);
     if (count($where)) {
@@ -403,6 +414,7 @@ class RDB extends AbstractDB {
    *
    * @param mixed $model
    * @param array $data
+   *
    * @return mixed
    */
   public function  update($model, array $data) {
@@ -430,6 +442,7 @@ class RDB extends AbstractDB {
    * @param string     $model
    * @param mixed      $id
    * @param null|mixed $rev
+   *
    * @return bool|mixed
    */
   public function devour($model, $id, $rev = null) {
@@ -449,6 +462,7 @@ class RDB extends AbstractDB {
 
   /**
    * @param string $model
+   *
    * @return mixed
    */
   public function truncate($model) {
@@ -473,6 +487,7 @@ class RDB extends AbstractDB {
   /**
    * @param string $model
    * @param array  $data
+   *
    * @return mixed
    */
   public function kill($model, array $data) {
@@ -789,6 +804,7 @@ class RDB extends AbstractDB {
   /**
    * @param string $template
    * @param array  $params
+   *
    * @return string
    */
   public function sql($template, array $params = array()) {
@@ -829,17 +845,18 @@ class RDB extends AbstractDB {
     return empty($ids) ? array() : $ids;
   }
 
-  public function filterIDs($model,
-                            $params = array(),
-                            $fields = array(),
-                            $links = array(),
-                            $where = array(),
-                            $having = array(),
-                            $group = array(),
-                            $order = array(),
-                            $limit = 0, $offset = 0,
-                            $distinct = true,
-                            &$aggregations
+  public function filterIDs(
+    $model,
+    $params = array(),
+    $fields = array(),
+    $links = array(),
+    $where = array(),
+    $having = array(),
+    $group = array(),
+    $order = array(),
+    $limit = 0, $offset = 0,
+    $distinct = true,
+    &$aggregations
 
   ) {
 
@@ -855,17 +872,17 @@ class RDB extends AbstractDB {
 
     $sql = $this->sql(
       "BeatsBundle:sql:filter", array(
-        'distinct' => $distinct,
-        'model'    => $model,
-        'fields'   => $fields,
-        'entity'   => $entity,
-        'links'    => $links,
-        'where'    => $where,
-        'having'   => $having,
-        'group'    => $group,
-        'order'    => $order,
-        'page'     => $page,
-      )
+                                'distinct' => $distinct,
+                                'model'    => $model,
+                                'fields'   => $fields,
+                                'entity'   => $entity,
+                                'links'    => $links,
+                                'where'    => $where,
+                                'having'   => $having,
+                                'group'    => $group,
+                                'order'    => $order,
+                                'page'     => $page,
+                              )
     );
 
 //    var_dump($sql, $params);

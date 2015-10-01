@@ -45,8 +45,10 @@ class DOM extends AbstractDB {
     $this->_rug = new Rug($config);
   }
 
-  protected function _table($model) {
-    return $this->_rug->db()->design('tables')->view(self::collection($model))->fetchAll()->all();
+  protected function _table($model, $limit = 0, $offset = 0) {
+    return $this->_rug->db()->design('tables')->view(self::collection($model))->fetchAll(
+      true, false, 0, $offset, $limit
+    )->all();
 //    $rows = $this->_db->get('_design/tables/_view/' . self::collection($model) . '?' . $query)->body->rows;
 //    return array_map(function ($row) {
 //      return $row->value;
@@ -62,9 +64,11 @@ class DOM extends AbstractDB {
 
   /**
    * Returns revision for a specific document
+   *
    * @param string $model
    * @param string $id
    * @param mixed  $_id
+   *
    * @return mixed
    * @throws DBALException
    */
@@ -104,6 +108,7 @@ class DOM extends AbstractDB {
 
   /**
    * Returns the current version of the DB layer
+   *
    * @return string
    */
   public function version() {
@@ -135,6 +140,7 @@ class DOM extends AbstractDB {
   /**
    * @param $id
    * @param $model
+   *
    * @return object|mixed
    */
   public function locate($model, $id) {
@@ -151,18 +157,20 @@ class DOM extends AbstractDB {
   }
 
 
-  public function select($model, array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true) {
+  public function select($model, array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true
+  ) {
     if (!empty($order)) {
       throw new DBALException("DOM doesn't support ORDER BY clauses");
     }
 
-    return $this->_table($model);
+    return $this->_table($model, $limit, $offset);
   }
 
   /**
    * @param string $model
    * @param array  $data
    * @param bool   $sequence
+   *
    * @return mixed
    */
   public function insert($model, array $data, $sequence = false) {
@@ -180,6 +188,7 @@ class DOM extends AbstractDB {
   /**
    * @param string $model
    * @param array  $data
+   *
    * @internal param mixed $id
    * @return mixed
    */
@@ -207,6 +216,7 @@ class DOM extends AbstractDB {
    * @param string     $model
    * @param mixed      $id
    * @param null|mixed $rev
+   *
    * @return mixed
    */
   public function devour($model, $id, $rev = null) {
@@ -226,7 +236,9 @@ class DOM extends AbstractDB {
 
   /**
    * Kills all of documents for specific (view) model (as truncate in SQL)
+   *
    * @param string $model
+   *
    * @return mixed
    */
   public function truncate($model) {
@@ -238,6 +250,7 @@ class DOM extends AbstractDB {
   /**
    * @param string $model
    * @param array  $data
+   *
    * @return mixed
    * @throws DBALException
    */
@@ -294,6 +307,7 @@ class DOM extends AbstractDB {
 
   /**
    * @param $type
+   *
    * @return \Rug\Gateway\Database\Document\DesignGateway
    */
   public function views($type) {
@@ -303,6 +317,7 @@ class DOM extends AbstractDB {
   /**
    * @param $type
    * @param $name
+   *
    * @return \Rug\Gateway\Database\Document\Design\ViewGateway
    */
   public function view($type, $name) {
@@ -379,11 +394,12 @@ class DOM extends AbstractDB {
 
   public function killDependencies($key, $type, $name = 'dependencies') {
     // Don't forget to emit(doc.id_xxx, doc.$model), where doc.id_xxx is the field that holds the $key param
-    $rows = $this->view($type, $name)->fetchKey($key)->all(true);
+    $rows     = $this->view($type, $name)->fetchKey($key)->all(true);
     $affected = array();
     foreach ($rows as $row) {
       $affected[] = $this->devour($row->value, DOM::rdbID($row->value, $row->id));
     }
+
     return $affected;
   }
 
