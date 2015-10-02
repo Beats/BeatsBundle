@@ -288,7 +288,9 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * Entity class factory
+   *
    * @param array|object $row
+   *
    * @return string
    */
   protected function _classFactory($row) {
@@ -445,7 +447,9 @@ class AbstractDBAL extends ContainerAware {
    *
    * @return AbstractEntity[]
    */
-  public function select(array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true, $type = null) {
+  public function select(
+    array $where = array(), array $order = array(), $limit = 0, $offset = 0, $equal = true, $type = null
+  ) {
     return $this->_buildCollection($this->_db($type)->select($this->_model, $where, $order, $limit, $offset, $equal));
   }
 
@@ -598,15 +602,17 @@ class AbstractDBAL extends ContainerAware {
   /********************************************************************************************************************/
 
   protected function _rdbKill(AbstractEntity $entity, $callback = null) {
-    if (true)
+    if (true) {
       throw new Exception(__METHOD__ . ' not implemented');
+    }
 
     return null;
   }
 
   protected function _domKill(AbstractEntity $entity) {
-    if (true)
+    if (true) {
       throw new Exception(__METHOD__ . ' not implemented');
+    }
 
     return null;
   }
@@ -752,21 +758,23 @@ class AbstractDBAL extends ContainerAware {
 
   /**
    * @param string $model
+   *
    * @return string[]
    * @throws DBALException
    */
-  protected function _filterIDs($model, $sorters = array(),
-                                $params = array(),
-                                $fields = array(),
-                                $links = array(),
-                                $where = array(),
-                                $having = array(),
-                                $group = array(),
-                                $order = array(),
-                                $limit = 0, $offset = 0,
-                                $distinct = true,
-                                $aggregations = false,
-                                $callback = null
+  protected function _filterIDs(
+    $model, $sorters = array(),
+    $params = array(),
+    $fields = array(),
+    $links = array(),
+    $where = array(),
+    $having = array(),
+    $group = array(),
+    $order = array(),
+    $limit = 0, $offset = 0,
+    $distinct = true,
+    $aggregations = false,
+    $callback = null
   ) {
 
     foreach ($sorters as $sorter) {
@@ -802,9 +810,9 @@ class AbstractDBAL extends ContainerAware {
   protected function _filterFieldJSON(&$fields = array(), $name, $table, $field) {
     $this->_filterField(
       $fields, $name, sprintf(
-        'CASE WHEN COUNT(%1$s.%2$s) = 0 THEN \'[]\' ELSE json_agg(DISTINCT %1$s.%2$s)::text END',
-        $table, $field, $table, $field
-      )
+               'CASE WHEN COUNT(%1$s.%2$s) = 0 THEN \'[]\' ELSE json_agg(DISTINCT %1$s.%2$s)::text END',
+               $table, $field, $table, $field
+             )
     );
   }
 
@@ -836,19 +844,29 @@ class AbstractDBAL extends ContainerAware {
     return $where;
   }
 
-  protected function _filterWhereORs(&$where = array(), array $ors) {
-    if (!empty($ors)) {
-      if (count($ors) == 1) {
-        array_push($where, array_pop($ors));
+  protected function _filterWhereTerms(&$where = array(), array $terms, $connective) {
+    if (!empty($terms)) {
+      if (count($terms) == 1) {
+        array_push($where, array_pop($terms));
 
         return $where;
       }
 
-      return $this->_filterWhereRAW($where, sprintf('(%s)', implode(') OR (', $ors)));
+      return $this->_filterWhereRAW($where, sprintf('(%s)', implode(sprintf(') %s (', $connective), $terms)));
     }
   }
 
-  protected function _filterWhere(&$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null) {
+  protected function _filterWhereORs(&$where = array(), array $terms) {
+    return $this->_filterWhereTerms($where, $terms, 'OR');
+  }
+
+  protected function _filterWhereANDs(&$where = array(), array $terms) {
+    return $this->_filterWhereTerms($where, $terms, 'AND');
+  }
+
+  protected function _filterWhere(
+    &$where = array(), &$params = array(), $table, $field, $value, $op = '=', $param = null
+  ) {
     $param = empty($param) ? $field : $param;
 
     if (is_array($value) and $op === '=') {
@@ -857,7 +875,7 @@ class AbstractDBAL extends ContainerAware {
 
     if (in_array($op, array('IN'))) {
       $values = array();
-      $pdo = $this->rdb()->pdo();
+      $pdo    = $this->rdb()->pdo();
       foreach (is_array($value) ? $value : array($value) as $value) {
         $values[] = $pdo->quote($value);
       };
