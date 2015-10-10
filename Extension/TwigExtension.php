@@ -34,6 +34,8 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
       'ellipsis'   => new Twig_Filter_Method($this, 'ellipsis', array('is_safe' => array('html'))),
 
+      'toArray'    => new Twig_Filter_Method($this, 'toArray', array('is_safe' => array('html'))),
+
       'rdbTable'   => new \Twig_SimpleFilter(
         'rdbTable', array(self::CLASS_RDB, 'table'), array('is_safe' => array('sql'))
       ),
@@ -88,7 +90,10 @@ class TwigExtension extends ContainerAwareTwigExtension {
     if (!is_array($months)) {
       $months = $months
         ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        : [
+          "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
+          "December"
+        ];
     }
     $opts = array();
     foreach ($months as $m => $label) {
@@ -136,7 +141,7 @@ class TwigExtension extends ContainerAwareTwigExtension {
     if (empty($id)) {
       return $default;
     }
-    if (empty($default)  || $this->_fsal()->exists($model, $id, $name)) {
+    if (empty($default) || $this->_fsal()->exists($model, $id, $name)) {
       return $this->_fsal()->link($model, $id, $name, $absolute);
     }
 
@@ -204,16 +209,34 @@ class TwigExtension extends ContainerAwareTwigExtension {
     if (0 < $diff_s) {
       $diff_d = floor($diff_s / 86400);
       if ($diff_d == 0) {
-        if ($diff_s < 60) return 'just now';
-        if ($diff_s < 120) return '1 minute ago';
-        if ($diff_s < 3600) return floor($diff_s / 60) . ' minutes ago';
-        if ($diff_s < 7200) return '1 hour ago';
-        if ($diff_s < 86400) return floor($diff_s / 3600) . ' hours ago';
+        if ($diff_s < 60) {
+          return 'just now';
+        }
+        if ($diff_s < 120) {
+          return '1 minute ago';
+        }
+        if ($diff_s < 3600) {
+          return floor($diff_s / 60) . ' minutes ago';
+        }
+        if ($diff_s < 7200) {
+          return '1 hour ago';
+        }
+        if ($diff_s < 86400) {
+          return floor($diff_s / 3600) . ' hours ago';
+        }
       }
-      if ($diff_d == 1) return 'Yesterday';
-      if ($diff_d < 7) return $diff_d . ' days ago';
-      if ($diff_d < 31) return ceil($diff_d / 7) . ' weeks ago';
-      if ($diff_d < 60) return 'last month';
+      if ($diff_d == 1) {
+        return 'Yesterday';
+      }
+      if ($diff_d < 7) {
+        return $diff_d . ' days ago';
+      }
+      if ($diff_d < 31) {
+        return ceil($diff_d / 7) . ' weeks ago';
+      }
+      if ($diff_d < 60) {
+        return 'last month';
+      }
 
       return date('F Y', $ts);
 
@@ -222,16 +245,34 @@ class TwigExtension extends ContainerAwareTwigExtension {
       $diff_s = abs($diff_s);
       $diff_d = floor($diff_s / 86400);
       if ($diff_d == 0) {
-        if ($diff_s < 120) return 'in a minute';
-        if ($diff_s < 3600) return 'in ' . floor($diff_s / 60) . ' minutes';
-        if ($diff_s < 7200) return 'in an hour';
-        if ($diff_s < 86400) return 'in ' . floor($diff_s / 3600) . ' hours';
+        if ($diff_s < 120) {
+          return 'in a minute';
+        }
+        if ($diff_s < 3600) {
+          return 'in ' . floor($diff_s / 60) . ' minutes';
+        }
+        if ($diff_s < 7200) {
+          return 'in an hour';
+        }
+        if ($diff_s < 86400) {
+          return 'in ' . floor($diff_s / 3600) . ' hours';
+        }
       }
-      if ($diff_d == 1) return 'Tomorrow';
-      if ($diff_d < 4) return date('l', $ts);
-      if ($diff_d < 7 + (7 - date('w'))) return 'next week';
-      if (ceil($diff_d / 7) < 4) return 'in ' . ceil($diff_d / 7) . ' weeks';
-      if (date('n', $ts) == date('n') + 1) return 'next month';
+      if ($diff_d == 1) {
+        return 'Tomorrow';
+      }
+      if ($diff_d < 4) {
+        return date('l', $ts);
+      }
+      if ($diff_d < 7 + (7 - date('w'))) {
+        return 'next week';
+      }
+      if (ceil($diff_d / 7) < 4) {
+        return 'in ' . ceil($diff_d / 7) . ' weeks';
+      }
+      if (date('n', $ts) == date('n') + 1) {
+        return 'next month';
+      }
 
       return date('F Y', $ts);
     } else {
@@ -282,6 +323,16 @@ class TwigExtension extends ContainerAwareTwigExtension {
 
   /********************************************************************************************************************/
 
+  public function toArray($stdClassObject) {
+    $response = array();
+    foreach ($stdClassObject as $key => $value) {
+      $response[] = array($key, $value);
+    }
+    return $response;
+  }
+
+  /********************************************************************************************************************/
+
   public function currentRoute($suffix = '') {
     $route = $this->_request()->attributes->get('_route');
 
@@ -301,7 +352,9 @@ class TwigExtension extends ContainerAwareTwigExtension {
     foreach ($this->_flasher()->get() as $flash) {
       $flashes[] = sprintf(
         '<span data-type="%s" data-heading="%s" data-message="%s"></span>',
-        $flash->type, htmlentities($flash->heading), htmlentities($flash->message)
+        $flash->type,
+        htmlentities($flash->heading),
+        htmlentities($flash->message)
       );
     }
 
@@ -311,7 +364,8 @@ class TwigExtension extends ContainerAwareTwigExtension {
   public function currentPath($relative = false) {
     try {
       return $this->_router()->generate(
-        $this->_request()->attributes->get('_route'), $this->_request()->attributes->get('_route_params'),
+        $this->_request()->attributes->get('_route'),
+        $this->_request()->attributes->get('_route_params'),
         $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH
       );
     } catch (\Exception $ex) {
