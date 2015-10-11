@@ -4,9 +4,9 @@ beats-can:
     - '@BeatsBundle/Resources/lib/js/ecma-extend.js'
     - '//code.jquery.com/jquery-1.11.2.js'
     - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
-    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
+    - '@BeatsBundle/Resources/public/js/bootstrap.js'
     - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
-    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
+    - '@BeatsBundle/Resources/public/css/bootstrap.css'
     - '@BeatsBundle/Resources/lib/css/bootstrap-extend.css'
     - '//cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js'
     - '@BeatsBundle/Resources/lib/js/jquery.hammer.js'
@@ -86,9 +86,9 @@ ecma-jquery-boostrap:
     - '@BeatsBundle/Resources/lib/js/ecma-extend.js'
     - '//code.jquery.com/jquery-1.11.2.js'
     - '@BeatsBundle/Resources/lib/js/jquery-extend.js'
-    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.js'
+    - '@BeatsBundle/Resources/public/js/bootstrap.js'
     - '@BeatsBundle/Resources/lib/js/bootstrap-extend.js'
-    - '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css'
+    - '@BeatsBundle/Resources/public/css/bootstrap.css'
     - '@BeatsBundle/Resources/lib/css/bootstrap-extend.css'
 ecma-jquery:
   version: 0.1
