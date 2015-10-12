@@ -55,7 +55,7 @@ class Exporter extends WarmableContainerAware {
 
     $translations = array();
     foreach ($translator->getLocales() as $locale => $data) {
-      $translations[$locale] = $translator->export('en');
+      $translations[$locale] = $translator->export($locale);
     }
 
     return $translations;
