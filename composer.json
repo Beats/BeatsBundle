@@ -2,7 +2,7 @@
   "name": "beats/beats-bundle",
   "type": "symfony-bundle",
   "description": "Symfony BeatsBundle",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "keywords": [],
   "authors": [
     {
